@@ -4,7 +4,7 @@
 
 Drivetrain::Drivetrain()
 {
-    printf("Our float:");
+
 }
 
 void Drivetrain::Update()

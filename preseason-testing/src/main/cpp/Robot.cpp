@@ -1,8 +1,10 @@
+#pragma once
+
 #include "Robot.h"
 
-#include "subsystems/Drivetrain.h"
-
 #include <frc2/command/CommandScheduler.h>
+
+#include <stdio.h>
 
 void Robot::RobotInit() {}
 
@@ -19,10 +21,33 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
-    Drivetrain d = Drivetrain();
+
 }
 
 void Robot::TeleopPeriodic() {
+  printf("%f, %f, %f\n%d\n", this->driver.GetLeftX(), this->driver.GetLeftY(), this->driver.GetRightX(), this->driver.GetPOV());
+  
+
+  this->drivetrain.Update();
+}
+
+void Robot::TestInit()
+{
+
+}
+
+void Robot::TestPeriodic()
+{
+
+}
+
+void Robot::DisabledInit()
+{
+
+}
+
+void Robot::DisabledPeriodic()
+{
 
 }
 
