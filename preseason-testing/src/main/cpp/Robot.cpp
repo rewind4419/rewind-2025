@@ -6,10 +6,30 @@
 
 #include <stdio.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+
+}
 
 void Robot::RobotPeriodic() {
     frc2::CommandScheduler::GetInstance().Run();
+
+    printf("Auto type%d\n", this->selectedAuto->GetDouble(-1));
+
+    switch (this->selectedAuto->GetInteger(-1))
+    {
+    case -1:
+      this->selectedAutoName->SetString("N/A - defaulting to Red Near");
+      break;
+    case 0:
+      this->selectedAutoName->SetString("Red near");
+      break;
+    case 1:
+      this->selectedAutoName->SetString("Blue near");
+      break;
+    case 2:
+      this->selectedAutoName->SetString("Red far");
+      break;
+    }
 }
 
 void Robot::AutonomousInit() {
@@ -25,7 +45,7 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-  printf("%f, %f, %f\n%d\n", this->driver.GetLeftX(), this->driver.GetLeftY(), this->driver.GetRightX(), this->driver.GetPOV());
+
   
 
   this->drivetrain.Update();
