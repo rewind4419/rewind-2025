@@ -2,8 +2,10 @@
 
 #include "subsystems/Drivetrain.h"
 #include "util/Controller.h"
-#include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/TimedRobot.h>
+
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandScheduler.h>
@@ -11,14 +13,17 @@
 #include <frc2/command/RunCommand.h>
 #include <frc/RobotController.h>
 
+enum AutoType
+{
+    AUTO_FAR,
+    AUTO_NEAR
+};
+
 class Robot : public frc::TimedRobot {
 public:
-    frc::ShuffleboardTab& robotTab = frc::Shuffleboard::GetTab("Robot");
+    frc::SendableChooser<AutoType> autoChooser;
+    AutoType m_autoSelected;  
 
-    // the report values of the Robot subsystem
-    nt::GenericEntry* selectedAuto = robotTab.AddInteger("Selected Auto", {return 5;});
-    nt::GenericEntry* selectedAutoName = robotTab.AddString("Currently selected:", "N/A").GetEntry();
-    
     Controller driver{0};
     Controller mate{0};
 

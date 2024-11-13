@@ -7,33 +7,20 @@
 #include <stdio.h>
 
 void Robot::RobotInit() {
-
+  // Define the auto options //
+  autoChooser.SetDefaultOption("Far Auto (0)", AUTO_FAR);
+  autoChooser.AddOption("Near Auto (1)", AUTO_NEAR);
+  frc::SmartDashboard::PutData("Auto Modes", &autoChooser);
 }
 
 void Robot::RobotPeriodic() {
-    frc2::CommandScheduler::GetInstance().Run();
-
-    printf("Auto type%d\n", this->selectedAuto->GetDouble(-1));
-
-    switch (this->selectedAuto->GetInteger(-1))
-    {
-    case -1:
-      this->selectedAutoName->SetString("N/A - defaulting to Red Near");
-      break;
-    case 0:
-      this->selectedAutoName->SetString("Red near");
-      break;
-    case 1:
-      this->selectedAutoName->SetString("Blue near");
-      break;
-    case 2:
-      this->selectedAutoName->SetString("Red far");
-      break;
-    }
+  // Reads back the selected auto to the user
+  frc::SmartDashboard::PutNumber("Selected Auto: ", autoChooser.GetSelected());
 }
 
 void Robot::AutonomousInit() {
-
+  AutoType type = autoChooser.GetSelected();
+  printf("Running auto %d\n", type);
 }
 
 void Robot::AutonomousPeriodic() {
@@ -46,9 +33,10 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {
 
+
   
 
-  this->drivetrain.Update();
+  drivetrain.Update();
 }
 
 void Robot::TestInit()

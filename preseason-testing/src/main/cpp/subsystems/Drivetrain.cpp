@@ -7,7 +7,12 @@ Drivetrain::Drivetrain()
 
 }
 
-void Drivetrain::Update()
+void Drivetrain::SetVec(float x, float y, float r)
 {
 
+}
+
+void Drivetrain::Update()
+{
+    
 }
