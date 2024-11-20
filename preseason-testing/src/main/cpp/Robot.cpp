@@ -3,7 +3,7 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
-
+#include "util/PID.h"
 #include <stdio.h>
 
 void Robot::RobotInit() {
@@ -16,6 +16,8 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   // Reads back the selected auto to the user
   frc::SmartDashboard::PutNumber("Selected Auto: ", autoChooser.GetSelected());
+
+  frc::SmartDashboard::GetNumber("aaaa", 0.0);
 }
 
 void Robot::AutonomousInit() {
@@ -24,7 +26,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-
+  
 }
 
 void Robot::TeleopInit() {
@@ -32,11 +34,7 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-
-
-  
-
-  drivetrain.Update();
+  drivetrain.SetVec(driver.GetLeftX(), driver.GetLeftY(), driver.GetRightX());
 }
 
 void Robot::TestInit()

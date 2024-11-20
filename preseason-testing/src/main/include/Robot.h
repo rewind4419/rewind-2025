@@ -29,7 +29,6 @@ public:
 
     Drivetrain drivetrain;
 
-
     void RobotInit() override;
     void RobotPeriodic() override;
     void AutonomousInit() override;
