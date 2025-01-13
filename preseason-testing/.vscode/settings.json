@@ -22,7 +22,8 @@
     "functional": "cpp",
     "type_traits": "cpp",
     "utility": "cpp",
-    "*.inc": "cpp"
+    "*.inc": "cpp",
+    "array": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }

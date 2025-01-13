@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
@@ -16,8 +14,7 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   // Reads back the selected auto to the user
   frc::SmartDashboard::PutNumber("Selected Auto: ", autoChooser.GetSelected());
-
-  frc::SmartDashboard::GetNumber("aaaa", 0.0);
+  drivetrain.printCalibationData();
 }
 
 void Robot::AutonomousInit() {
@@ -44,7 +41,7 @@ void Robot::TestInit()
 
 void Robot::TestPeriodic()
 {
-
+  drivetrain.printCalibationData();
 }
 
 void Robot::DisabledInit()
