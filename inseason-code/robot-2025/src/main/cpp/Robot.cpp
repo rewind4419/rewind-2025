@@ -1,17 +1,13 @@
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
-#include "util/PID.h"
 #include <stdio.h>
 
 void Robot::RobotInit() {
-  // Define the auto options //
+  // Define the auto options
   autoChooser.SetDefaultOption("Far Auto (0)", AUTO_FAR);
   autoChooser.AddOption("Near Auto (1)", AUTO_NEAR);
   frc::SmartDashboard::PutData("Auto Modes", &autoChooser);
-
-  // fl.driveMotor = rev::spark::SparkMax {3, rev::spark::SparkLowLevel::MotorType::kBrushless};
-  // fl.encoder;
 }
 
 void Robot::RobotPeriodic() {
@@ -33,7 +29,7 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-  //drivetrain.SetVec(driver.GetLeftX(), driver.GetLeftY(), driver.GetRightX());
+
 }
 
 void Robot::TestInit()
@@ -43,7 +39,7 @@ void Robot::TestInit()
 
 void Robot::TestPeriodic()
 {
-  //drivetrain.printCalibationData();
+
 }
 
 void Robot::DisabledInit()

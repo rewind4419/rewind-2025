@@ -8,14 +8,37 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-void SwerveModule::Update(float steerAngle, float drivePower)
-{
-    driveMotor.Set(drivePower);
+// void SwerveModule::Update(float steerAngle, float drivePower)
+// {
+//     driveMotor.Set(drivePower);
 
-    float currentAngle = encoder.GetAbsolutePosition().GetValue().value() * 2 * M_PI;
+//     float currentAngle = encoder.GetAbsolutePosition().GetValue().value() * 2 * M_PI;
 
-    for () // solve modulo problem without while loop
-}
+//     float optimizedAngle = currentAngle - floor(currentAngle / (2 * M_PI)) * 2 * M_PI;
+
+//     if (optimizedAngle < 0) {optimizedAngle += M_PI * 2;}
+
+    
+// }
+
+
+// SwerveModule::SwerveModule (
+//     ctre::phoenix6::hardware::CANcoder encoder, 
+//     rev::spark::SparkMax driveMotor, 
+//     rev::spark::SparkMax steerMotor, 
+//     PID steerPID, 
+//     float encoderOffset
+// ) {
+//     SwerveModule s;
+
+//     s.encoder = encoder;
+//     s.driveMotor = driveMotor;
+//     s.steerMotor = steerMotor;
+//     s.steerPID = steerPID,
+//     s.encoderOffset = encoderOffset;
+
+//     return s;
+// }
 
 Drivetrain::Drivetrain()
 {
