@@ -5,12 +5,16 @@
 #pragma once
 
 #include <string>
+#include <optional>
 
 #include "util/Controller.h"
+#include "RobotContainer.h"
 
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/SendableChooser.h>
+
+#include <frc2/command/CommandPtr.h>
 
 enum AutoType
 {
@@ -24,9 +28,6 @@ public:
   frc::SendableChooser<AutoType> autoChooser;
   AutoType m_autoSelected;
 
-  Controller driver{0};
-  Controller mate{0};
-
   void RobotInit() override;
   void RobotPeriodic() override;
   void AutonomousInit() override;
@@ -37,4 +38,7 @@ public:
   void DisabledPeriodic() override;
   void TestInit() override;
   void TestPeriodic() override;
+
+  std::optional<frc2::CommandPtr> m_autonomousCommand;
+  RobotContainer m_container;
 };

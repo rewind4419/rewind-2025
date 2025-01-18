@@ -1,7 +1,9 @@
+#pragma once
+
 #include <frc/PS4Controller.h>
 
 
-class Controller : public frc::PS4Controller
+class RewindController : public frc::PS4Controller
 {
 public:
     // adds the constructor from PS4Controller to this one
