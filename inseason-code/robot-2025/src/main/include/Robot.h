@@ -4,41 +4,32 @@
 
 #pragma once
 
-#include <string>
 #include <optional>
 
-#include "util/Controller.h"
-#include "RobotContainer.h"
-
 #include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/smartdashboard/SendableChooser.h>
-
 #include <frc2/command/CommandPtr.h>
 
-enum AutoType
-{
-  AUTO_FAR,
-  AUTO_NEAR
-};
+#include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
-public:
-
-  frc::SendableChooser<AutoType> autoChooser;
-  AutoType m_autoSelected;
-
-  void RobotInit() override;
+ public:
+  Robot();
   void RobotPeriodic() override;
-  void AutonomousInit() override;
-  void AutonomousPeriodic() override;
-  void TeleopInit() override;
-  void TeleopPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
+  void DisabledExit() override;
+  void AutonomousInit() override;
+  void AutonomousPeriodic() override;
+  void AutonomousExit() override;
+  void TeleopInit() override;
+  void TeleopPeriodic() override;
+  void TeleopExit() override;
   void TestInit() override;
   void TestPeriodic() override;
+  void TestExit() override;
 
+ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
+
   RobotContainer m_container;
 };

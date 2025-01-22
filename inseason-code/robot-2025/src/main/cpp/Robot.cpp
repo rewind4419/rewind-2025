@@ -1,79 +1,52 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "Robot.h"
 
 #include <frc2/command/CommandScheduler.h>
-#include <frc2/command/Command.h>
-#include <frc2/command/ScheduleCommand.h>
-#include <frc2/command/StartEndCommand.h>
-#include <stdio.h>
 
-/*
-Tasks
-
-- Drivetrain subsystem (waiting for a test drivetrain to run configurator)
-
-- Photon Vision Code
-
-- Elevator Subsystem that uses commands to set height
-
-*/
-
-void Robot::RobotInit() {
-  // Define the auto options
-  autoChooser.SetDefaultOption("Far Auto (0)", AUTO_FAR);
-  autoChooser.AddOption("Near Auto (1)", AUTO_NEAR);
-  frc::SmartDashboard::PutData("Auto Modes", &autoChooser);
-}
+Robot::Robot() {}
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
-
-  // Reads back the selected auto to the user
-  frc::SmartDashboard::PutNumber("Selected Auto: ", autoChooser.GetSelected());
 }
 
-void Robot::AutonomousInit() {
-  AutoType type = autoChooser.GetSelected();
-  printf("Running auto %d\n", type);
+void Robot::DisabledInit() {}
 
+void Robot::DisabledPeriodic() {}
+
+void Robot::DisabledExit() {}
+
+void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
-  if (m_autonomousCommand.has_value())
-  {
-    m_autonomousCommand.value().Schedule();
+  if (m_autonomousCommand) {
+    m_autonomousCommand->Schedule();
   }
 }
 
-void Robot::AutonomousPeriodic() {
+void Robot::AutonomousPeriodic() {}
 
-}
+void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {
-
+  if (m_autonomousCommand) {
+    m_autonomousCommand->Cancel();
+  }
 }
 
-void Robot::TeleopPeriodic() {
+void Robot::TeleopPeriodic() {}
 
+void Robot::TeleopExit() {}
+
+void Robot::TestInit() {
+  frc2::CommandScheduler::GetInstance().CancelAll();
 }
 
-void Robot::TestInit()
-{
+void Robot::TestPeriodic() {}
 
-}
-
-void Robot::TestPeriodic()
-{
-
-}
-
-void Robot::DisabledInit()
-{
-
-}
-
-void Robot::DisabledPeriodic()
-{
-
-}
+void Robot::TestExit() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
