@@ -8,9 +8,26 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/Subsystem.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 Elevator::Elevator()
 {
+    frc::SmartDashboard::PutNumber("kP", 0.0);
+    frc::SmartDashboard::PutNumber("kI", 0.0);
+    frc::SmartDashboard::PutNumber("kD", 0.0);
+}
 
+void Elevator::Periodic()
+{
+    ctre::phoenix6::configs::Slot0Configs conf {};
+
+    conf.kP = frc::SmartDashboard::GetNumber("kP", 0.0);
+    conf.kI = frc::SmartDashboard::GetNumber("kI", 0.0);
+    conf.kD = frc::SmartDashboard::GetNumber("kD", 0.0);
+
+    talon.GetConfigurator().Apply(conf);
+
+    frc::SmartDashboard::PutNumber("Current", talon.GetSupplyCurrent().GetValueAsDouble());
 }
 
 frc2::CommandPtr Elevator::SetHeight(float height)
@@ -28,5 +45,12 @@ frc2::CommandPtr Elevator::SetHeight(float height)
     //     {this}
     // ).ToPtr();
 
-    return frc2::cmd::RunOnce([height] () {printf("going to height %f\n", height);});
+    return frc2::cmd::RunOnce([this, height] () {
+        // this->m_power = height;
+        // this->talon.Set(height);
+
+        ctre::phoenix6::controls::PositionVoltage request {units::turn_t(height)};
+
+        this->talon.SetControl(request.WithSlot(0));
+    });
 }

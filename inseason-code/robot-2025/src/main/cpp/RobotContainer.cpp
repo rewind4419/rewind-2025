@@ -47,7 +47,7 @@ void RobotContainer::ConfigureBindings()
   //     })
   // );
 
-  elevator.SetDefaultCommand(elevator.RunOnce([] () {printf("Elevator default\n");}));
+  // elevator.SetDefaultCommand(elevator.RunOnce([] () {printf("Elevator default\n");}));
 
   // joystick.R1().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& { return brake; }));
   // joystick.L1().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& {
@@ -72,7 +72,7 @@ void RobotContainer::ConfigureBindings()
   //   drivetrain.ResetRotation(frc::Rotation2d {0.0_rad});
   // }));
 
-  joystick.Square().OnTrue(elevator.SetHeight(5.0f));
+  joystick.Square().OnTrue(elevator.SetHeight(0.5f));
   joystick.Circle().OnTrue(elevator.SetHeight(0.0f));
 
   // drivetrain.RegisterTelemetry([this](auto const &state) { logger.Telemeterize(state); });
@@ -84,7 +84,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand()
   
   */
 
- return frc2::cmd::Print("Bah");
+ return frc2::cmd::Print("Auto");
 
   //return pathplanner::PathPlannerAuto("test-auto").ToPtr();
 
