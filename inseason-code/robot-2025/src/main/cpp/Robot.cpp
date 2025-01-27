@@ -6,6 +6,10 @@
 
 #include <frc2/command/CommandScheduler.h>
 
+#include <frc2/command/Command.h>
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/PrintCommand.h>
+
 Robot::Robot() {}
 
 void Robot::RobotPeriodic() {
@@ -36,7 +40,9 @@ void Robot::TeleopInit() {
   }
 }
 
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+
+}
 
 void Robot::TeleopExit() {}
 
