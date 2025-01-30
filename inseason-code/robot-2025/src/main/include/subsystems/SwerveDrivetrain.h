@@ -15,6 +15,8 @@
 /*
 CAN IDs (on the canivore)
 
+fr and bl are swapped
+4 and 5 should be 2 and 3
 
 FL Steer - 0
 FL Drive - 1
@@ -24,6 +26,8 @@ BL Steer - 4
 BL Drive - 5
 BR Steer - 6
 BR Drive - 7
+
+9 and 10 need to swap
 
 FL Encoder - 8
 FR Encoder - 9
@@ -124,6 +128,8 @@ class CommandSwerveDrivetrain : public frc2::SubsystemBase, public TunerSwerveDr
     frc2::sysid::SysIdRoutine *m_sysIdRoutineToApply = &m_sysIdRoutineTranslation;
 
 public:
+    
+
     /**
      * \brief Constructs a CTRE SwerveDrivetrain using the specified constants.
      *
@@ -138,12 +144,43 @@ public:
     CommandSwerveDrivetrain(swerve::SwerveDrivetrainConstants const &driveTrainConstants, ModuleConstants const &... modules) :
         TunerSwerveDrivetrain{driveTrainConstants, modules...}
     {
-
         printf("Swerve it?");
 
         if (utils::IsSimulation()) {
             StartSimThread();
         }
+
+        // RobotConfig config = RobotConfig::fromGUISettings();
+
+        // // Configure the AutoBuilder last
+        // AutoBuilder::configure(
+        //     [this](){
+        //         // add a cached robot pose
+        //         return this->SamplePoseAt(utils::GetCurrentTime).; 
+        //     }, // Robot pose supplier
+        //     [this](frc::Pose2d pose){
+        //         resetPose(pose);
+        //     }, // Method to reset odometry (will be called if your auto has a starting pose)
+        //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        //     [this](auto speeds, auto feedforwards){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+        //     std::make_shared<PPHolonomicDriveController>( // PPHolonomicController is the built in path following controller for holonomic drive trains
+        //         PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+        //         PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+        //     ),
+        //     config, // The robot configuration
+        //     []() {
+        //         // Boolean supplier that controls when the path will be mirrored for the red alliance
+        //         // This will flip the path being followed to the red side of the field.
+        //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+        //         auto alliance = DriverStation::GetAlliance();
+        //         if (alliance) {
+        //             return alliance.value() == DriverStation::Alliance::kRed;
+        //         }
+        //         return false;
+        //     },
+        //     this // Reference to this subsystem to set requirements
+        // );
     }
 
     /**

@@ -25,9 +25,9 @@ void Elevator::Periodic()
     conf.kI = frc::SmartDashboard::GetNumber("kI", 0.0);
     conf.kD = frc::SmartDashboard::GetNumber("kD", 0.0);
 
-    talon.GetConfigurator().Apply(conf);
+    //talon.GetConfigurator().Apply(conf);
 
-    frc::SmartDashboard::PutNumber("Current", talon.GetSupplyCurrent().GetValueAsDouble());
+    //frc::SmartDashboard::PutNumber("Current", talon.GetSupplyCurrent().GetValueAsDouble());
 }
 
 frc2::CommandPtr Elevator::SetHeight(float height)
@@ -48,9 +48,10 @@ frc2::CommandPtr Elevator::SetHeight(float height)
     return frc2::cmd::RunOnce([this, height] () {
         // this->m_power = height;
         // this->talon.Set(height);
+        printf("Elevator height to %f\n", height);
 
         ctre::phoenix6::controls::PositionVoltage request {units::turn_t(height)};
 
-        this->talon.SetControl(request.WithSlot(0));
+        // this->talon.SetControl(request.WithSlot(0));
     });
 }

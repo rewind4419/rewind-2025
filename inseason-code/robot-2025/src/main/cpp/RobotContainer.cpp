@@ -27,7 +27,7 @@ RobotContainer::RobotContainer()
 {
   // Register named commands here
 
-  pathplanner::NamedCommands::registerCommand("test", frc2::cmd::Print("Ran the test command"));
+  pathplanner::NamedCommands::registerCommand("PrintHi", frc2::cmd::Print("Hey hi!"));
 
   pathplanner::EventTrigger("trigger").OnTrue(frc2::cmd::Print("Passed the trigger event"));
 
@@ -36,16 +36,16 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureBindings()
 {
-  // // Note that X is defined as forward according to WPILib convention,
-  // // and Y is defined as to the left according to WPILib convention.
-  // drivetrain.SetDefaultCommand(
-  //     // Drivetrain will execute this command periodically
-  //     drivetrain.ApplyRequest([this]() -> auto&& {
-  //         return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-  //             .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-  //             .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-  //     })
-  // );
+  // Note that X is defined as forward according to WPILib convention,
+  // and Y is defined as to the left according to WPILib convention.
+  drivetrain.SetDefaultCommand(
+      // Drivetrain will execute this command periodically
+      drivetrain.ApplyRequest([this]() -> auto&& {
+          return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+              .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
+              .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+      })
+  );
 
   // elevator.SetDefaultCommand(elevator.RunOnce([] () {printf("Elevator default\n");}));
 
@@ -66,7 +66,7 @@ void RobotContainer::ConfigureBindings()
   
   // reset the field-centric heading on left bumper press
 
-  // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
+  joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
 
   // joystick.Cross().OnTrue(drivetrain.RunOnce([this] {
   //   drivetrain.ResetRotation(frc::Rotation2d {0.0_rad});
@@ -84,9 +84,9 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand()
   
   */
 
- return frc2::cmd::Print("Auto");
+//  return frc2::cmd::Print("Auto");
 
-  //return pathplanner::PathPlannerAuto("test-auto").ToPtr();
+  return pathplanner::PathPlannerAuto("TestAuto").ToPtr();
 
   //return frc2::cmd::Print("No autonomous command configured");
 }

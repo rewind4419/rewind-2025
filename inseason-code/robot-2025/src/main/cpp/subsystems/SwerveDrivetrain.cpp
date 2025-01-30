@@ -1,6 +1,10 @@
 #include "subsystems/SwerveDrivetrain.h"
 #include <frc/RobotController.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
+#include "subsystems/SwerveDrivetrain.h"
+
 void CommandSwerveDrivetrain::Periodic()
 {
     /*
@@ -21,6 +25,20 @@ void CommandSwerveDrivetrain::Periodic()
             m_hasAppliedOperatorPerspective = true;
         }
     }
+
+    std::optional<frc::Pose2d> pose = this->SamplePoseAt(utils::GetCurrentTime());
+    if (pose.has_value())
+    {
+        frc::SmartDashboard::PutNumber("Pose X", pose.value().X().value());
+        frc::SmartDashboard::PutNumber("Pose Y", pose.value().Y().value());
+        frc::SmartDashboard::PutNumber("Rot", pose.value().Rotation().Radians().value());
+    }
+    else
+    {
+        printf("Nope value\n");
+    }
+
+    frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());
 }
 
 void CommandSwerveDrivetrain::StartSimThread()

@@ -14,8 +14,10 @@ class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants::SteerMotorClosedLoopOutput
     static constexpr configs::Slot0Configs steerGains = configs::Slot0Configs{}
-        .WithKP(100).WithKI(0).WithKD(0.5)
-        .WithKS(0.1).WithKV(1.91).WithKA(0)
+        // .WithKP(100).WithKI(0).WithKD(0.5)
+        // .WithKS(0.1).WithKV(1.91).WithKA(0)
+        .WithKP(60).WithKI(0).WithKD(0.0)
+        .WithKS(0.0).WithKV(0).WithKA(0)
         .WithStaticFeedforwardSign(signals::StaticFeedforwardSignValue::UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants::DriveMotorClosedLoopOutput
@@ -81,7 +83,7 @@ private:
     static constexpr bool kInvertLeftSide = false;
     static constexpr bool kInvertRightSide = true;
 
-    static constexpr int kPigeonId = 1;
+    static constexpr int kPigeonId = 12;
 
     // These are only used for simulation
     static constexpr units::kilogram_square_meter_t kSteerInertia = 0.01_kg_sq_m;
@@ -136,7 +138,7 @@ private:
     static constexpr int kFrontRightDriveMotorId = 3;
     static constexpr int kFrontRightSteerMotorId = 2;
     static constexpr int kFrontRightEncoderId = 9;
-    static constexpr units::turn_t kFrontRightEncoderOffset = -0.42333984375_tr;
+    static constexpr units::turn_t kFrontRightEncoderOffset = -0.42333984375_tr;// - 0.5_tr;
     static constexpr bool kFrontRightSteerMotorInverted = true;
     static constexpr bool kFrontRightEncoderInverted = false;
 
@@ -147,7 +149,7 @@ private:
     static constexpr int kBackLeftDriveMotorId = 5;
     static constexpr int kBackLeftSteerMotorId = 4;
     static constexpr int kBackLeftEncoderId = 10;
-    static constexpr units::turn_t kBackLeftEncoderOffset = -0.398681640625_tr;
+    static constexpr units::turn_t kBackLeftEncoderOffset = -0.398681640625_tr;// - 0.5_tr;
     static constexpr bool kBackLeftSteerMotorInverted = true;
     static constexpr bool kBackLeftEncoderInverted = false;
 

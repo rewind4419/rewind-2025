@@ -17,5 +17,5 @@ public:
     // Height is in meters
     frc2::CommandPtr SetHeight(float height);
 private:
-    ctre::phoenix6::hardware::TalonFX talon {2};
+    //ctre::phoenix6::hardware::TalonFX talon {2};
 };
