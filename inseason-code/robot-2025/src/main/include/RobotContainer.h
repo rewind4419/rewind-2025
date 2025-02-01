@@ -30,7 +30,6 @@ private:
   // Telemetry logger{MaxSpeed};
 
   frc2::CommandPS4Controller joystick{0};
-
 public:
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   Elevator elevator;

@@ -10,7 +10,15 @@
 
 #include "SwerveConstants.h"
 
+#include <pathplanner/lib/auto/AutoBuilder.h>
+#include <pathplanner/lib/config/RobotConfig.h>
+#include <pathplanner/lib/commands/FollowPathCommand.h>
+#include <pathplanner/lib/controllers/PPHolonomicDriveController.h>
+
+
 #include <stdio.h>
+
+using namespace pathplanner;
 
 /*
 CAN IDs (on the canivore)
@@ -42,6 +50,8 @@ class CommandSwerveDrivetrain : public frc2::SubsystemBase, public TunerSwerveDr
     static constexpr units::second_t kSimLoopPeriod = 5_ms;
     std::unique_ptr<frc::Notifier> m_simNotifier;
     units::second_t m_lastSimTime;
+
+    swerve::requests::ApplyRobotSpeeds m_applyRobotSpeeds = swerve::requests::ApplyRobotSpeeds {};
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     static constexpr frc::Rotation2d kBlueAlliancePerspectiveRotation{0_deg};
@@ -144,43 +154,62 @@ public:
     CommandSwerveDrivetrain(swerve::SwerveDrivetrainConstants const &driveTrainConstants, ModuleConstants const &... modules) :
         TunerSwerveDrivetrain{driveTrainConstants, modules...}
     {
-        printf("Swerve it?");
+        printf("Swerve it?\n");
 
         if (utils::IsSimulation()) {
             StartSimThread();
         }
 
-        // RobotConfig config = RobotConfig::fromGUISettings();
+        printf("Configuring AutoBuilder...\n");
 
-        // // Configure the AutoBuilder last
-        // AutoBuilder::configure(
-        //     [this](){
-        //         // add a cached robot pose
-        //         return this->SamplePoseAt(utils::GetCurrentTime).; 
-        //     }, // Robot pose supplier
-        //     [this](frc::Pose2d pose){
-        //         resetPose(pose);
-        //     }, // Method to reset odometry (will be called if your auto has a starting pose)
-        //     [this](){ return getRobotRelativeSpeeds(); }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        //     [this](auto speeds, auto feedforwards){ driveRobotRelative(speeds); }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-        //     std::make_shared<PPHolonomicDriveController>( // PPHolonomicController is the built in path following controller for holonomic drive trains
-        //         PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-        //         PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-        //     ),
-        //     config, // The robot configuration
-        //     []() {
-        //         // Boolean supplier that controls when the path will be mirrored for the red alliance
-        //         // This will flip the path being followed to the red side of the field.
-        //         // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+        frc::DCMotor br = frc::DCMotor::KrakenX60();
+        
 
-        //         auto alliance = DriverStation::GetAlliance();
-        //         if (alliance) {
-        //             return alliance.value() == DriverStation::Alliance::kRed;
-        //         }
-        //         return false;
-        //     },
-        //     this // Reference to this subsystem to set requirements
-        // );
+        RobotConfig config = RobotConfig {30_kg, 6.8_kg_sq_m, ModuleConfig {
+            0.0508_m,
+            1_mps,
+            1.2,
+            br.WithReduction(5.361),
+            40_A,
+            1
+        }, 0.533_m};
+
+        // Configure the AutoBuilder last
+        AutoBuilder::configure(
+            [this](){
+                // add a cached robot pose
+                return this->GetState().Pose;
+            }, // Robot pose supplier
+            [this](frc::Pose2d pose){
+                this->ResetPose(pose);
+            }, // Method to reset odometry (will be called if your auto has a starting pose)
+            [this](){  return this->GetState().Speeds; /*return getRobotRelativeSpeeds();*/ }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            [this](auto speeds, auto feedforwards){
+                this->SetControl(this->m_applyRobotSpeeds.WithSpeeds(speeds));
+                // this->ApplyRequest([this]() -> auto&& {
+                //     return this->m_applyRobotSpeeds
+                //         .WithSpeeds(speeds);
+                // }).
+                printf("Test driver\n");
+            }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            std::make_shared<PPHolonomicDriveController>( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            []() {
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+                // This will flip the path being followed to the red side of the field.
+                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+                return false;
+                // auto alliance = DriverStation::GetAlliance();
+                // if (alliance) {
+                //     return alliance.value() == DriverStation::Alliance::kRed;
+                // }
+                // return false;
+            },
+            this // Reference to this subsystem to set requirements
+        );
     }
 
     /**
