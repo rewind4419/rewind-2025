@@ -21,28 +21,28 @@
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/CommandPtr.h>
 
 RobotContainer::RobotContainer()
 {
   // Register named commands here
 
-  pathplanner::NamedCommands::registerCommand("PrintHi", frc2::cmd::Print("Hey hi!"));
+  // Another option that allows you to specify the default auto by its name
+  // autoChooser = AutoBuilder::buildAutoChooser("My Default Auto");
 
-  pathplanner::EventTrigger("trigger").OnTrue(frc2::cmd::Print("Passed the trigger event"));
+  frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
 
   ConfigureBindings();
 }
 
 void RobotContainer::ConfigureBindings()
 {
-  drivetrain.SetDefaultCommand(
-      drivetrain.ApplyRequest([this]() -> auto&& {
-          return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-              .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-              .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-      })
-  );
+  // drivetrain.SetDefaultCommand(
+  //   drivetrain.ApplyRequest([this]() -> auto&& {
+  //       return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+  //           .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
+  //           .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+  //   })
+  // );
 
 
   /*drivetrain.ApplyRequest([this]() -> auto&& {
@@ -82,19 +82,27 @@ void RobotContainer::ConfigureBindings()
   // drivetrain.RegisterTelemetry([this](auto const &state) { logger.Telemeterize(state); });
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand()
+frc2::Command* RobotContainer::GetAutonomousCommand()
 {
-  /*
-  
-  */
+  frc2::CommandPtr first = frc2::cmd::RunOnce([this] () {
+    printf("Starting drive and resetting odo");
 
-  return pathplanner::PathPlannerAuto("ABC").ToPtr();
+    this->drivetrain.ResetPose(frc::Pose2d {});
+    this->drivetrain.SetControl(this->drive.WithVelocityY(1_mps));
+  });
 
-//  return frc2::cmd::Print("Auto");
+  frc2::CommandPtr second = frc2::cmd::Wait(3_s);
 
-  //return pathplanner::PathPlannerAuto("TestAuto").ToPtr();
+  frc2::CommandPtr third = frc2::cmd::RunOnce([this] () {
+    printf("Starting drive and resetting odo");
 
-    // Create a path following command using AutoBuilder. This will also trigger event markers.
+    this->drivetrain.SetControl(this->drive.WithVelocityY(0_mps));
+  });
 
-  //return frc2::cmd::Print("No autonomous command configured");
+  frc2::CommandPtr parallel = frc2::cmd::Sequence();
+
+  return parallel.get();
+
+  //return autoChooser.GetSelected();
+
 }

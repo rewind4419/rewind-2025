@@ -51,7 +51,7 @@ class CommandSwerveDrivetrain : public frc2::SubsystemBase, public TunerSwerveDr
     std::unique_ptr<frc::Notifier> m_simNotifier;
     units::second_t m_lastSimTime;
 
-    swerve::requests::ApplyRobotSpeeds m_applyRobotSpeeds = swerve::requests::ApplyRobotSpeeds {};
+    
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     static constexpr frc::Rotation2d kBlueAlliancePerspectiveRotation{0_deg};
@@ -138,7 +138,7 @@ class CommandSwerveDrivetrain : public frc2::SubsystemBase, public TunerSwerveDr
     frc2::sysid::SysIdRoutine *m_sysIdRoutineToApply = &m_sysIdRoutineTranslation;
 
 public:
-    
+    swerve::requests::ApplyRobotSpeeds m_applyRobotSpeeds = swerve::requests::ApplyRobotSpeeds {};
 
     /**
      * \brief Constructs a CTRE SwerveDrivetrain using the specified constants.
@@ -165,7 +165,7 @@ public:
         frc::DCMotor br = frc::DCMotor::KrakenX60();
         
 
-        RobotConfig config = RobotConfig {30_kg, 6.8_kg_sq_m, ModuleConfig {
+        RobotConfig config = RobotConfig {50_kg, 6.8_kg_sq_m, ModuleConfig {
             0.0508_m,
             1_mps,
             1.2,
@@ -178,23 +178,37 @@ public:
         AutoBuilder::configure(
             [this](){
                 // add a cached robot pose
+                printf("Giving the pose: %f, %f\n", this->GetState().Pose.X().value(), this->GetState().Pose.Y().value());
                 return this->GetState().Pose;
             }, // Robot pose supplier
             [this](frc::Pose2d pose){
+                printf("Resetting pose to X: %f, Y: %f, R: %f\n", pose.X().value(), pose.Y().value(), pose.Rotation().Radians());
                 this->ResetPose(pose);
             }, // Method to reset odometry (will be called if your auto has a starting pose)
-            [this](){  return this->GetState().Speeds; /*return getRobotRelativeSpeeds();*/ }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            [this](){ printf("Providing speeds: %f, %f\n", this->GetState().Speeds.vx.value(), this->GetState().Speeds.vy.value());  return this->GetState().Speeds; /*return getRobotRelativeSpeeds();*/ }, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             [this](auto speeds, auto feedforwards){
-                this->SetControl(this->m_applyRobotSpeeds.WithSpeeds(speeds));
-                // this->ApplyRequest([this]() -> auto&& {
-                //     return this->m_applyRobotSpeeds
-                //         .WithSpeeds(speeds);
-                // }).
+                printf("Running at %f, %f\n", speeds.vx.value(), speeds.vy.value());
+                frc::ChassisSpeeds sbpeeds{3.0_mps, -2.0_mps,
+                  units::radians_per_second_t(std::numbers::pi)};
+
+                this->SetControl(
+                    this->m_applyRobotSpeeds.WithSpeeds(speeds)
+                );
+                // this->RunOnce([this](){
+            
+                //   frc::ChassisSpeeds sbpeeds{3.0_mps, -2.0_mps,
+                //   units::radians_per_second_t(std::numbers::pi)};
+
+                //   this->SetControl(
+                //     this->m_applyRobotSpeeds.WithSpeeds(sbpeeds)
+                //   );
+                //   printf("Running the command\n");
+                // });
                 printf("Test driver\n");
             }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             std::make_shared<PPHolonomicDriveController>( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                PIDConstants(10.0, 0.0, 0.0) // Rotation PID constants
             ),
             config, // The robot configuration
             []() {
@@ -271,13 +285,13 @@ public:
         }
     }
 
-    /**
+    /*
      * \brief Returns a command that applies the specified control request to this swerve drivetrain.
-     *
+     
      * This captures the returned swerve request by reference, so it must live
      * for at least as long as the drivetrain. This can be done by storing the
      * request as a member variable of your drivetrain subsystem or robot.
-     *
+     
      * \param request Function returning the request to apply
      * \returns Command to run
      */

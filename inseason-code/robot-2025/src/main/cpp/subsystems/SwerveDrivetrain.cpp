@@ -35,7 +35,7 @@ void CommandSwerveDrivetrain::Periodic()
     }
     else
     {
-        printf("Nope value\n");
+        printf("Swerve reporting no value!\n");
     }
 
     frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());

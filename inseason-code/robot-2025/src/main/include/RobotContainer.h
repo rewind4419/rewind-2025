@@ -8,6 +8,8 @@
 #include <frc2/command/button/CommandXboxController.h>
 #include <frc2/command/button/CommandPS4Controller.h>
 
+#include <frc/smartdashboard/SendableChooser.h>
+
 #include "subsystems/Elevator.h"
 #include "subsystems/SwerveDrivetrain.h"
 
@@ -22,6 +24,7 @@ private:
   swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
     .WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
+    
   swerve::requests::SwerveDriveBrake brake{};
   swerve::requests::PointWheelsAt point{};
 
@@ -36,11 +39,17 @@ public:
 
   RobotContainer();
 
-  frc2::CommandPtr GetAutonomousCommand();
+  frc2::Command* GetAutonomousCommand();
+  frc::SendableChooser<frc2::Command*> autoChooser;
 
   // TODO: add a robot config here
-  //pathplanner::RobotConfig config {}
+  //pathplanner::RobotConfig config {}s
 
 private:
   void ConfigureBindings();
+
+  // frc2::CommandPtr first;
+  // frc2::CommandPtr second;
+  // frc2::CommandPtr third;
+  // frc2::CommandPtr parallel;
 };
