@@ -26,6 +26,7 @@
 RobotContainer::RobotContainer()
 {
   // Register named commands here
+  this->pather = SwervePather(&this->drivetrain);
 
   pathplanner::NamedCommands::registerCommand("PrintHi", frc2::cmd::Print("Hey hi!"));
 
@@ -80,13 +81,26 @@ void RobotContainer::ConfigureBindings()
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  /*
-  
-  */
+  // Set control needs to be run every frame to keep moving
 
-//  return frc2::cmd::Print("Auto");
-
-  return pathplanner::PathPlannerAuto("TestAuto").ToPtr();
-
-  //return frc2::cmd::Print("No autonomous command configured");
+  return frc2::cmd::Sequence(
+    frc2::cmd::Print("Starting..."),
+    frc2::cmd::RunOnce([this](){this->drivetrain.ResetPose(frc::Pose2d{});}),
+    frc2::cmd::Run([this]() {
+      return this->drivetrain.SetControl(this->drive.WithVelocityY(1_mps));
+    }),
+    // drivetrain.ApplyRequest([this]() -> auto&& {
+    //       return drive.WithVelocityX(0 * MaxSpeed) // Drive forward with negative Y (forward)
+    //           .WithVelocityY(0.5 * MaxSpeed) // Drive left with negative X (left)
+    //           .WithRotationalRate(0 * MaxAngularRate); // Drive counterclockwise with negative X (left)
+    // }),
+    frc2::cmd::Print("Done with first, waiting..."),
+    frc2::cmd::Wait(3_s),
+    frc2::cmd::Print("Stopping..."),
+    drivetrain.ApplyRequest([this]() -> auto&& {
+          return drive.WithVelocityX(0 * MaxSpeed) // Drive forward with negative Y (forward)
+              .WithVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
+              .WithRotationalRate(0 * MaxAngularRate); // Drive counterclockwise with negative X (left)
+      })
+  );
 }

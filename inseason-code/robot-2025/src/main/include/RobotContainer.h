@@ -10,6 +10,7 @@
 
 #include "subsystems/Elevator.h"
 #include "subsystems/SwerveDrivetrain.h"
+#include "subsystems/SwervePather.h"
 
 #include <pathplanner/lib/config/RobotConfig.h>
 
@@ -33,14 +34,12 @@ private:
 
 public:
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
+  SwervePather pather;
   Elevator elevator;
 
   RobotContainer();
 
   frc2::CommandPtr GetAutonomousCommand();
-
-  // TODO: add a robot config here
-  //pathplanner::RobotConfig config {}
 
 private:
   void ConfigureBindings();
