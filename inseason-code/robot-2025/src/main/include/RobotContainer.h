@@ -12,6 +12,7 @@
 
 #include "subsystems/Elevator.h"
 #include "subsystems/SwerveDrivetrain.h"
+#include "subsystems/SwervePather.h"
 
 #include <pathplanner/lib/config/RobotConfig.h>
 
@@ -35,6 +36,7 @@ private:
   frc2::CommandPS4Controller joystick{0};
 public:
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
+  SwervePather pather;
   Elevator elevator;
 
   RobotContainer();

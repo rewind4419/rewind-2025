@@ -25,6 +25,7 @@
 RobotContainer::RobotContainer()
 {
   // Register named commands here
+  this->pather = SwervePather(&this->drivetrain);
 
   // Another option that allows you to specify the default auto by its name
   // autoChooser = AutoBuilder::buildAutoChooser("My Default Auto");
