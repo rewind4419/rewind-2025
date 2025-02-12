@@ -8,11 +8,11 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include <pathplanner/lib/auto/AutoBuilder.h>
-#include <pathplanner/lib/path/PathPlannerPath.h>
-#include <pathplanner/lib/commands/PathPlannerAuto.h>
-#include <pathplanner/lib/auto/NamedCommands.h>
-#include <pathplanner/lib/events/EventTrigger.h>
+// #include <pathplanner/lib/auto/AutoBuilder.h>
+// #include <pathplanner/lib/path/PathPlannerPath.h>
+// #include <pathplanner/lib/commands/PathPlannerAuto.h>
+// #include <pathplanner/lib/auto/NamedCommands.h>
+// #include <pathplanner/lib/events/EventTrigger.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 // Copyright (c) FIRST and other WPILib contributors.
@@ -30,20 +30,20 @@ RobotContainer::RobotContainer()
   // Another option that allows you to specify the default auto by its name
   // autoChooser = AutoBuilder::buildAutoChooser("My Default Auto");
 
-  frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
+  //frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
 
   ConfigureBindings();
 }
 
 void RobotContainer::ConfigureBindings()
 {
-  // drivetrain.SetDefaultCommand(
-  //   drivetrain.ApplyRequest([this]() -> auto&& {
-  //       return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-  //           .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-  //           .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-  //   })
-  // );
+  drivetrain.SetDefaultCommand(
+    drivetrain.ApplyRequest([this]() -> auto&& {
+        return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+    })
+  );
 
 
   /*drivetrain.ApplyRequest([this]() -> auto&& {
@@ -83,26 +83,17 @@ void RobotContainer::ConfigureBindings()
   // drivetrain.RegisterTelemetry([this](auto const &state) { logger.Telemeterize(state); });
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand()
+frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  frc2::CommandPtr first = frc2::cmd::RunOnce([this] () {
-    printf("Starting drive and resetting odo");
+  
+  // frc2::SequentialCommandGroup()
 
-    this->drivetrain.ResetPose(frc::Pose2d {});
-    this->drivetrain.SetControl(this->drive.WithVelocityY(1_mps));
-  });
-
-  frc2::CommandPtr second = frc2::cmd::Wait(3_s);
-
-  frc2::CommandPtr third = frc2::cmd::RunOnce([this] () {
-    printf("Starting drive and resetting odo");
-
-    this->drivetrain.SetControl(this->drive.WithVelocityY(0_mps));
-  });
-
-  frc2::CommandPtr parallel = frc2::cmd::Sequence();
-
-  return parallel.get();
+  return this->pather.DriveFor(10_s, 3_mps);
+  
+  // return frc2::cmd::Run([this] () {
+  //   printf("Starting drive\n");
+  //   this->drivetrain.SetControl(this->drive.WithVelocityY(5_mps));
+  // });
 
   //return autoChooser.GetSelected();
 

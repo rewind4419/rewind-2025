@@ -26,7 +26,8 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
-    m_autonomousCommand.value()->Schedule();
+    m_autonomousCommand.value().get()->Schedule();
+    //m_autonomousCommand.value()->Schedule();
     //m_autonomousCommand->Schedule();
   }
 }
@@ -37,7 +38,7 @@ void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {
   if (m_autonomousCommand) {
-    m_autonomousCommand.value()->Cancel();
+    m_autonomousCommand.value().get()->Cancel();
   }
 }
 

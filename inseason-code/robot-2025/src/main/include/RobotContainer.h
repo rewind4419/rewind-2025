@@ -14,7 +14,7 @@
 #include "subsystems/SwerveDrivetrain.h"
 #include "subsystems/SwervePather.h"
 
-#include <pathplanner/lib/config/RobotConfig.h>
+//#include <pathplanner/lib/config/RobotConfig.h>
 
 class RobotContainer {
 private:
@@ -25,6 +25,8 @@ private:
   swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
     .WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
+    
+
     
   swerve::requests::SwerveDriveBrake brake{};
   swerve::requests::PointWheelsAt point{};
@@ -41,8 +43,8 @@ public:
 
   RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
-  frc::SendableChooser<frc2::Command*> autoChooser;
+  frc2::CommandPtr GetAutonomousCommand();
+  // frc::SendableChooser<frc2::Command> autoChooser;
 
   // TODO: add a robot config here
   //pathplanner::RobotConfig config {}s
