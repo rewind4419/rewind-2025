@@ -1,7 +1,13 @@
 #pragma once
 
 #include <frc2/command/CommandPtr.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/SubsystemBase.h>
+
+#include <frc/geometry/Translation2d.h>
+#include <frc/geometry/Pose2d.h>
+
 #include "subsystems/SwerveConstants.h"
 #include "subsystems/SwerveDrivetrain.h"
 
@@ -15,22 +21,49 @@ public:
 
     void Periodic() override;
 
-    // Test function
-
-    // Height is in meters
+public:
+    // Drive tasks
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
-private:
+    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target);
+
+public:
+    // These could be private but im just making them public so the driving tasks can access this stuff with a pointer to this class
     CommandSwerveDrivetrain* drivetrain;
-
-    units::meters_per_second_t MaxSpeed = TunerConstants::kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
-    units::radians_per_second_t MaxAngularRate = 0.75_tps; // 3/4 of a rotation per second max angular velocity
-
 
     swerve::requests::RobotCentric drive_openloop = swerve::requests::RobotCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
+};
 
-    swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-        .WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.05) // Add a 10% deadband
-        .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
-    
+// Swerve Pather Commands
+
+class SwerveCmdDriveFor : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveFor>
+{
+public:
+    SwerveCmdDriveFor(SwervePather* pather, units::time::second_t timer, units::velocity::meters_per_second_t v);
+
+    void Initialize() override;
+    void Execute() override;
+    void End(bool interrupted) override;
+    bool IsFinished() override;
+private:
+    SwervePather* m_pather;
+    double startTime;
+    units::time::second_t timer;
+    units::velocity::meters_per_second_t v;
+};
+
+class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveFor>
+{
+public:
+    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target);
+
+    void Initialize() override;
+    void Execute() override;
+    void End(bool interrupted) override;
+    bool IsFinished() override;
+private:
+    SwervePather* m_pather;
+    double startTime;
+    frc::Pose2d target;
+    double lastDistance = 0.0;
 };

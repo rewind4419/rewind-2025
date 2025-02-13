@@ -86,9 +86,9 @@ void RobotContainer::ConfigureBindings()
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
   
-  // frc2::SequentialCommandGroup()
+  return this->pather.DriveWaypointSimple(frc::Pose2d {2_m, 3_m, 0_rad});
 
-  return this->pather.DriveFor(10_s, 3_mps);
+  //return this->pather.DriveFor(10_s, 3_mps);
   
   // return frc2::cmd::Run([this] () {
   //   printf("Starting drive\n");
