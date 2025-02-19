@@ -83,10 +83,11 @@ void RobotContainer::ConfigureBindings()
   // drivetrain.RegisterTelemetry([this](auto const &state) { logger.Telemeterize(state); });
 }
 
+
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  
-  return this->pather.DriveWaypointSimple(frc::Pose2d {2_m, 3_m, 0_rad});
+  // TODO: Figure out why this v is actually the drive for task?
+  return this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(2_rad)});
 
   //return this->pather.DriveFor(10_s, 3_mps);
   

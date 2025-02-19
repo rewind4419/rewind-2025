@@ -11,6 +11,8 @@
 #include "subsystems/SwerveConstants.h"
 #include "subsystems/SwerveDrivetrain.h"
 
+#include "util/PID.h"
+
 #include <units/length.h>
 #include <units/time.h>
 
@@ -23,11 +25,15 @@ public:
 
 public:
     // Drive tasks
+    frc2::CommandPtr ResetPose(frc::Pose2d r);
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
-    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target);
 
+    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target);
+    
+    PID translationPID{0.0, 0.0, 0.0};
+    PID rotationPID{0.0, 0.0, 0.0};
 public:
-    // These could be private but im just making them public so the driving tasks can access this stuff with a pointer to this class
+    // These could be private with a getter but im just making them public so the driving tasks can access this stuff with a pointer to this class easily
     CommandSwerveDrivetrain* drivetrain;
 
     swerve::requests::RobotCentric drive_openloop = swerve::requests::RobotCentric{}

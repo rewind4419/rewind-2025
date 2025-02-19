@@ -3,15 +3,49 @@
 #include <stdio.h>
 
 #include <frc2/command/Commands.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
 {
     this->drivetrain = drivetrain;
+
+    // SmartDashboard PID Tuning
+    frc::SmartDashboard::PutNumber("Translation kP", 0.0);
+    frc::SmartDashboard::PutNumber("Translation kI", 0.0);
+    frc::SmartDashboard::PutNumber("Translation kD", 0.0);
+
+    frc::SmartDashboard::PutNumber("Rotation kP", 0.0);
+    frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
+    frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
 }
 
 void SwervePather::Periodic()
 {
     // Put logging etc in here
+    this->translationPID.kP = frc::SmartDashboard::GetNumber("Translation kP", 0.0);
+    this->translationPID.kI = frc::SmartDashboard::GetNumber("Translation kI", 0.0);
+    this->translationPID.kD = frc::SmartDashboard::GetNumber("Translation kD", 0.0);
+
+    this->rotationPID.kP = frc::SmartDashboard::GetNumber("Rotation kP", 0.0);
+    this->rotationPID.kI = frc::SmartDashboard::GetNumber("Rotation kI", 0.0);
+    this->rotationPID.kD = frc::SmartDashboard::GetNumber("Rotation kD", 0.0);
+
+    // printf("PIDS: %f, %f, %f - %f, %f, %f\n", 
+    //     this->translationPID.kP,
+    //     this->translationPID.kI,
+    //     this->translationPID.kD,
+
+    //     this->rotationPID.kP,
+    //     this->rotationPID.kI,
+    //     this->rotationPID.kD
+    // ); 
+}
+
+frc2::CommandPtr SwervePather::ResetPose(frc::Pose2d r)
+{
+    return this->RunOnce([this, r] {
+        this->drivetrain->ResetPose(r);
+    });
 }
 
 frc2::CommandPtr SwervePather::DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v)
@@ -35,6 +69,7 @@ SwerveCmdDriveFor::SwerveCmdDriveFor(SwervePather* pather, units::time::second_t
 void SwerveCmdDriveFor::Initialize()
 {
     //printf("Starting drive with speed %f\n", this->v.value());
+    frc::SmartDashboard::PutString("Status", "Starting periodic drive");
     this->startTime = frc::Timer::GetFPGATimestamp().value();
 }
 
@@ -51,6 +86,7 @@ void SwerveCmdDriveFor::Execute()
 
 void SwerveCmdDriveFor::End(bool interrupted)
 {
+    frc::SmartDashboard::PutString("Status", "Finished periodic drive");
     //printf("Stopping, %s\n", interrupted ? "interrupted" : "not interrupted");
 }
 
@@ -68,7 +104,7 @@ SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather,
 
 void SwerveCmdDriveWaypointSimple::Initialize()
 {
-
+    frc::SmartDashboard::PutString("Status", "Started waypoint");
 }
 
 void SwerveCmdDriveWaypointSimple::Execute()
@@ -84,23 +120,22 @@ void SwerveCmdDriveWaypointSimple::Execute()
     frc::Translation2d diffTranslation = targetTranslation - currentTranslation;
     frc::Rotation2d diffRot = targetRot - currentRot;
 
-    printf("DiffX: %f, Diff: %f\n", diffTranslation.X().value(), diffTranslation.Y().value());
+    frc::SmartDashboard::PutNumber("DiffX", diffTranslation.X().value());
+    // this->m_pather->drivetrain->SetControl(
+    //     this->m_pather->drive_openloop
+    //     .WithVelocityY((diffTranslation.Y().value() * 0.1) * 1_mps)
+    //     .WithVelocityX((diffTranslation.X().value() * 0.1) * 1_mps)
+    //     .WithRotationalRate(0.0_rad_per_s)
+    // );
 
-    this->m_pather->drivetrain->SetControl(
-        this->m_pather->drive_openloop
-        .WithVelocityY((diffTranslation.Y().value() * 0.1) * 1_mps)
-        .WithVelocityX((diffTranslation.X().value() * 0.1) * 1_mps)
-        .WithRotationalRate(0.0_rad_per_s)
-    );
+    // this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
 
-    this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
-
-    printf("Distance: %f\n", this->lastDistance);
+    // printf("Distance: %f\n", this->lastDistance);
 }
 
 void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 {
-
+    frc::SmartDashboard::PutString("Status", "Finished waypoint");
 }
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
