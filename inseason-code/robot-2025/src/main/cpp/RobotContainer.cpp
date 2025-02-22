@@ -44,51 +44,24 @@ void RobotContainer::ConfigureBindings()
             .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
     })
   );
-
-
-  /*drivetrain.ApplyRequest([this]() -> auto&& {
-          return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-              .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-              .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
-      })*/
-
-  // elevator.SetDefaultCommand(elevator.RunOnce([] () {printf("Elevator default\n");}));
-
-  // joystick.R1().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& { return brake; }));
-  // joystick.L1().WhileTrue(drivetrain.ApplyRequest([this]() -> auto&& {
-  //     return point.WithModuleDirection(frc::Rotation2d{-joystick.GetLeftY(), -joystick.GetLeftX()});
-  // }));
-
-
   
+  // // reset the field-centric heading on left bumper press
 
-  // // Run SysId routines when holding back/start and X/Y.
-  // // Note that each routine should be run exactly once in a single log.
-  // (joystick.Back() && joystick.Y()).WhileTrue(drivetrain.SysIdDynamic(frc2::sysid::Direction::kForward));
-  // (joystick.Back() && joystick.X()).WhileTrue(drivetrain.SysIdDynamic(frc2::sysid::Direction::kReverse));
-  // (joystick.Start() && joystick.Y()).WhileTrue(drivetrain.SysIdQuasistatic(frc2::sysid::Direction::kForward));
-  // (joystick.Start() && joystick.X()).WhileTrue(drivetrain.SysIdQuasistatic(frc2::sysid::Direction::kReverse));
-  
-  // reset the field-centric heading on left bumper press
+  // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
 
-  joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
 
-  // joystick.Cross().OnTrue(drivetrain.RunOnce([this] {
-  //   drivetrain.ResetRotation(frc::Rotation2d {0.0_rad});
-  // }));
-
-  joystick.Square().OnTrue(elevator.SetHeight(0.5f));
-  joystick.Circle().OnTrue(elevator.SetHeight(0.0f));
-
-  // drivetrain.RegisterTelemetry([this](auto const &state) { logger.Telemeterize(state); });
+  // joystick.Square().OnTrue(elevator.SetHeight(0.5f));
+  // joystick.Circle().OnTrue(elevator.SetHeight(0.0f));
 }
 
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  // TODO: Figure out why this v is actually the drive for task?
-  return this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(2_rad)});
-
+  return this->pather.ResetPose(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_rad)))
+    .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(0_rad)}))
+    .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{-1_m, 1_m, frc::Rotation2d(0_rad)}))
+    .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{0_m, 0_m, frc::Rotation2d(0_rad)}));
+  
   //return this->pather.DriveFor(10_s, 3_mps);
   
   // return frc2::cmd::Run([this] () {

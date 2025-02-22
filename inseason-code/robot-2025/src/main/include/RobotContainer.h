@@ -14,6 +14,8 @@
 #include "subsystems/SwerveDrivetrain.h"
 #include "subsystems/SwervePather.h"
 
+#include <ctre/phoenix6/CANcoder.hpp>
+
 //#include <pathplanner/lib/config/RobotConfig.h>
 
 class RobotContainer {
@@ -50,6 +52,14 @@ public:
   //pathplanner::RobotConfig config {}s
 
   float yeet = 0.0f;
+
+  /*
+  FL Encoder - 8
+  FR Encoder - 9
+  BL Encoder - 10
+  BR Encoder - 11
+   */
+
 
 private:
   void ConfigureBindings();

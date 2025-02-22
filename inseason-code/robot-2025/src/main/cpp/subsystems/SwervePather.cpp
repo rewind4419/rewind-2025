@@ -1,6 +1,7 @@
 #include "subsystems/SwervePather.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -121,14 +122,21 @@ void SwerveCmdDriveWaypointSimple::Execute()
     frc::Rotation2d diffRot = targetRot - currentRot;
 
     frc::SmartDashboard::PutNumber("DiffX", diffTranslation.X().value());
-    // this->m_pather->drivetrain->SetControl(
-    //     this->m_pather->drive_openloop
-    //     .WithVelocityY((diffTranslation.Y().value() * 0.1) * 1_mps)
-    //     .WithVelocityX((diffTranslation.X().value() * 0.1) * 1_mps)
-    //     .WithRotationalRate(0.0_rad_per_s)
-    // );
+    frc::SmartDashboard::PutNumber("DiffY", diffTranslation.Y().value());
 
-    // this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
+    float diffMagnitude = sqrtf(diffTranslation.X().value() * diffTranslation.X().value() + diffTranslation.Y().value() * diffTranslation.Y().value());
+
+    float factor = clamp(diffMagnitude, -0.5, 0.5) / diffMagnitude;
+
+    this->m_pather->drivetrain->SetControl(
+        this->m_pather->drive_openloop
+        .WithVelocityY((diffTranslation.Y().value() * factor) * 1_mps)
+        .WithVelocityX((diffTranslation.X().value() * factor) * 1_mps)
+        .WithRotationalRate(0.0_rad_per_s)
+    );
+
+    this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
+    frc::SmartDashboard::PutNumber("Distance to goal", this->lastDistance);
 
     // printf("Distance: %f\n", this->lastDistance);
 }
@@ -140,5 +148,6 @@ void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
 {
-    return (this->lastDistance < 0.1);
+   // return false;
+    return (this->lastDistance < 0.35);
 }

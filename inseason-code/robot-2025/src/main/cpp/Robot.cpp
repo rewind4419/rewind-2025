@@ -10,6 +10,8 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/PrintCommand.h>
 
+#include <frc/SmartDashboard/SmartDashboard.h>
+
 Robot::Robot() {}
 
 void Robot::RobotPeriodic() {
@@ -43,7 +45,10 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-
+  frc::SmartDashboard::PutNumber("FL Angle", this->fl.GetAbsolutePosition().GetValueAsDouble());
+  frc::SmartDashboard::PutNumber("FR Angle", this->fr.GetAbsolutePosition().GetValueAsDouble());
+  frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
+  frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
 }
 
 void Robot::TeleopExit() {}

@@ -26,20 +26,12 @@ void CommandSwerveDrivetrain::Periodic()
         }
     }
 
-    // Incorperate vision code
 
-    // This isn't needed, ignore it for now
-    // std::optional<frc::Pose2d> pose = this->SamplePoseAt(utils::GetCurrentTime());
-    // if (pose.has_value())
-    // {
-    //     frc::SmartDashboard::PutNumber("Pose X", pose.value().X().value());
-    //     frc::SmartDashboard::PutNumber("Pose Y", pose.value().Y().value());
-    //     frc::SmartDashboard::PutNumber("Rot", pose.value().Rotation().Radians().value());
-    // }
-    // else
-    // {
-    //     printf("Swerve reporting no value!\n");
-    // }
+    frc::Pose2d pose = this->GetState().Pose;
+    
+    frc::SmartDashboard::PutNumber("Pose X", pose.X().value());
+    frc::SmartDashboard::PutNumber("Pose Y", pose.Y().value());
+    frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Radians().value());
 
     frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());
 }
