@@ -58,7 +58,7 @@ private:
     units::velocity::meters_per_second_t v;
 };
 
-class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveFor>
+class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveWaypointSimple>
 {
 public:
     SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target);
@@ -71,5 +71,5 @@ private:
     SwervePather* m_pather;
     double startTime;
     frc::Pose2d target;
-    double lastDistance = 0.0;
+    double lastDistance = 10.0;
 };
