@@ -18,6 +18,8 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
     frc::SmartDashboard::PutNumber("Rotation kP", 0.0);
     frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
     frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
+
+    
 }
 
 void SwervePather::Periodic()
