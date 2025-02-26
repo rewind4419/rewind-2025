@@ -6,11 +6,14 @@
 
 void Robot::RobotInit() {
   // Define the auto options //
+
   autoChooser.SetDefaultOption("Far Auto (0)", AUTO_FAR);
   autoChooser.AddOption("Near Auto (1)", AUTO_NEAR);
   frc::SmartDashboard::PutData("Auto Modes", &autoChooser);
 
-  // fl.driveMotor = rev::spark::SparkMax {3, rev::spark::SparkLowLevel::MotorType::kBrushless};
+  //fl.driveMotor = rev::spark::SparkMax {3, rev::spark::SparkLowLevel::MotorType::kBrushless};
+  //fl.driveMotor = ctre::phoenix6::TalonFX (1)
+
   // fl.encoder;
 }
 

@@ -1,4 +1,5 @@
 #include <rev/SparkMax.h>
+#include <frc/WPILib.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <ctre/phoenix6/CANcoder.hpp>
 

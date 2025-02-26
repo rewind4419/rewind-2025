@@ -24,6 +24,8 @@
 
 // SwerveModule::SwerveModule (
 //     ctre::phoenix6::hardware::CANcoder encoder, 
+//     ctre::phoenix6::TalonFX driveMotor
+//     ctre::phoenix6::TalonFX steerMotor
 //     rev::spark::SparkMax driveMotor, 
 //     rev::spark::SparkMax steerMotor, 
 //     PID steerPID, 
