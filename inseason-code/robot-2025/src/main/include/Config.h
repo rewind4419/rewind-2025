@@ -1,0 +1,7 @@
+#pragma once
+
+#define CORAL_GRABBER_MOTOR_1_ID 1
+#define CORAL_GRABBER_MOTOR_2_ID 2
+
+#define ELEVATOR_MOTOR_1_ID 3
+#define ELEVATOR_MOTOR_2_ID 4

@@ -30,6 +30,22 @@ void Elevator::Periodic()
     //frc::SmartDashboard::PutNumber("Current", talon.GetSupplyCurrent().GetValueAsDouble());
 }
 
+frc2::CommandPtr Elevator::Home()
+{
+    // TODO
+    return frc2::FunctionalCommand(
+        // Init
+        [this] { },
+        // Run
+        [this] {  },
+        // End
+        [this] (bool interrupted) { },
+        // Is finished
+        [this] { return true; },
+        {this}
+    ).ToPtr();
+}
+
 frc2::CommandPtr Elevator::SetHeight(float height)
 {
     //     frc2::FunctionalCommand(

@@ -40,10 +40,10 @@ private:
 
   frc2::CommandPS4Controller joystick{0};
 public:
-  // CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
-  // SwervePather pather{&drivetrain};
+  CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
+  SwervePather pather{&drivetrain};
   Elevator elevator;
-  CoralArm coralarm;
+ // CoralArm coralarm;
 
 
   RobotContainer();
