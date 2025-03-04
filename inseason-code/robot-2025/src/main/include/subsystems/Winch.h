@@ -1,27 +1,36 @@
-// #pragma once
+#pragma once
 
-// #include <frc2/command/SubsystemBase.h>
-// #include <frc2/command/CommandPtr.h>
+#include <functional>
 
-// #include <units/length.h>
+#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/CommandPtr.h>
 
-// #include <ctre/phoenix6/TalonFX.hpp>
+#include <units/length.h>
+#include <units/dimensionless.h>
 
-// #include "Config.h"
+#include <ctre/phoenix6/TalonFX.hpp>
 
-// class Winch : public frc2::SubsystemBase {
-// public:
-//     Winch();
+#include "Config.h"
 
-//     void Periodic() override;
+class Winch : public frc2::SubsystemBase {
+public:
+    Winch();
 
-//     frc2::CommandPtr DrivePower(float power);
+    void Periodic() override;
 
-// private:
-//     // rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
-//     // rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
+    frc2::CommandPtr GotoPosition(units::angle::turn_t position);
+    //frc2::CommandPtr HoldPos();
+    frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
-//     ctre::phoenix6::hardware::TalonFX winchMotor {CORAL_ARM_MOTOR_ID, "rio"};
+    units::angle::turn_t target = 0.0_tr;
+private:
+    // rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
+    // rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
+    ctre::phoenix6::controls::DutyCycleOut winchMotorRequest {0};
+    ctre::phoenix6::controls::PositionVoltage winchPosition {0.0_tr};
 
-//     //ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
-// };
+
+    ctre::phoenix6::hardware::TalonFX winchMotor {WINCH_MOTOR_ID, "rio"};
+
+    //ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
+};

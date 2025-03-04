@@ -14,6 +14,7 @@
 #include "subsystems/SwerveDrivetrain.h"
 #include "subsystems/SwervePather.h"
 #include "subsystems/CoralArm.h"
+#include "subsystems/Winch.h"
 
 #include <ctre/phoenix6/CANcoder.hpp>
 
@@ -40,12 +41,12 @@ private:
 
 public:
   frc2::CommandPS4Controller joystick{0};
-  
+
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   SwervePather pather{&drivetrain};
   Elevator elevator;
-  CoralArm coralarm;
-
+  // CoralArm coralarm;
+  Winch winch;
 
   RobotContainer();
 

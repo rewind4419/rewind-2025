@@ -47,8 +47,11 @@ void RobotContainer::ConfigureBindings()
   // // reset the field-centric heading on left bumper press
   //joystick.R2().OnTrue(frc2::cmd::Print("e"));
   // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
-  
-  joystick.Triangle().OnTrue(coralarm.CoralArmResetPosition());
+  winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
+    return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  }));
+
+  // joystick.Triangle().OnTrue(coralarm.CoralArmResetPosition());
 }
 
 
