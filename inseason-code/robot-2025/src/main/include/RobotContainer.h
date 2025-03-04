@@ -38,12 +38,13 @@ private:
   //  *       define a destructor to un-register the telemetry from the drivetrain */
   // Telemetry logger{MaxSpeed};
 
-  frc2::CommandPS4Controller joystick{0};
 public:
+  frc2::CommandPS4Controller joystick{0};
+  
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   SwervePather pather{&drivetrain};
   Elevator elevator;
- // CoralArm coralarm;
+  CoralArm coralarm;
 
 
   RobotContainer();

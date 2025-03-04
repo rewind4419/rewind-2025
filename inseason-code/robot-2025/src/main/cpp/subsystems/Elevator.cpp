@@ -15,6 +15,8 @@ Elevator::Elevator()
     frc::SmartDashboard::PutNumber("kP", 0.0);
     frc::SmartDashboard::PutNumber("kI", 0.0);
     frc::SmartDashboard::PutNumber("kD", 0.0);
+
+    
 }
 
 void Elevator::Periodic()

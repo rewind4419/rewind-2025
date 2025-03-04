@@ -31,9 +31,9 @@ void CommandSwerveDrivetrain::Periodic()
     
     frc::SmartDashboard::PutNumber("Pose X", pose.X().value());
     frc::SmartDashboard::PutNumber("Pose Y", pose.Y().value());
-    frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Radians().value());
+    frc::SmartDashboard::PutNumber("Pose R", pose.Rotation().Radians().value());
 
-    frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());
+    //frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());
 }
 
 void CommandSwerveDrivetrain::StartSimThread()

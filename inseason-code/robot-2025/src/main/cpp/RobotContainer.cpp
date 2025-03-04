@@ -45,10 +45,10 @@ void RobotContainer::ConfigureBindings()
   );
   
   // // reset the field-centric heading on left bumper press
-  joystick.R2().OnTrue(frc2::cmd::Print("e"));
+  //joystick.R2().OnTrue(frc2::cmd::Print("e"));
   // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
-  // joystick.Square().OnTrue(elevator.SetHeight(0.5f));
-  // joystick.Circle().OnTrue(elevator.SetHeight(0.0f));
+  
+  joystick.Triangle().OnTrue(coralarm.CoralArmResetPosition());
 }
 
 
