@@ -45,7 +45,7 @@ public:
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   SwervePather pather{&drivetrain};
   Elevator elevator;
-  // CoralArm coralarm;
+  CoralArm coralarm;
   Winch winch;
 
   RobotContainer();

@@ -19,7 +19,7 @@ public:
     void Periodic() override;
 
     frc2::CommandPtr GotoPosition(units::angle::turn_t position);
-    //frc2::CommandPtr HoldPos();
+    frc2::CommandPtr HoldPos();
     frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
     units::angle::turn_t target = 0.0_tr;

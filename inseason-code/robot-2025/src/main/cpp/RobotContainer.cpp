@@ -47,11 +47,34 @@ void RobotContainer::ConfigureBindings()
   // // reset the field-centric heading on left bumper press
   //joystick.R2().OnTrue(frc2::cmd::Print("e"));
   // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
-  winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
+
+  winch.SetDefaultCommand(winch.HoldPos());
+
+  joystick.R2().WhileTrue(winch.DrivePower([this]() -> float {
     return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
   }));
 
+  joystick.L2().WhileTrue(winch.DrivePower([this]() -> float {
+    return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  }));
+
+  // joystick.Square().OnTrue(winch.GotoPosition(100_tr));
+  // joystick.Cross().OnTrue(winch.GotoPosition(0_tr));
+  
+  // winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
+  //   return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  // }));
+  //joystick.Circle().WhileTrue(coralarm.CoralArmRun(0.5));
+
   // joystick.Triangle().OnTrue(coralarm.CoralArmResetPosition());
+
+  // joystick.Cross().WhileTrue(coralarm.CoralArmTo(0_tr));
+  // joystick.Circle().WhileTrue(coralarm.CoralArmTo(-0.1_tr));
+
+  joystick.Triangle().OnTrue(elevator.Home());
+
+  joystick.Cross().WhileTrue(elevator.SetHeight(1.0));
+  joystick.Circle().WhileTrue(elevator.SetHeight(10.0));
 }
 
 
