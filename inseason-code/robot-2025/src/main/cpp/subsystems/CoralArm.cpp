@@ -20,7 +20,7 @@ configs::TalonFXConfiguration abctalonFXConfigs{};
 CoralArm::CoralArm() {
     printf("Initialized coral arm\n");
 
-    this->coralArmMotor.SetPosition(-0.25_tr);
+    this->motor1.SetPosition(0_tr);
 
     // in init function
     
@@ -29,10 +29,11 @@ CoralArm::CoralArm() {
     // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
     // slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
     // slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kP = 100.0; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 40; // A position error of 2.5 rotations results in 12 V output
     // slot0Configs.kI = 0; // no output for integrated error
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-    //slot0Configs.kG = 3.0;
+    slot0Configs.kG = 0.7;
+    slot0Configs.GravityType = signals::GravityTypeValue::Arm_Cosine;
 
     // set Motion Magic settings
     auto& motionMagicConfigs = abctalonFXConfigs.MotionMagic;
@@ -46,12 +47,14 @@ CoralArm::CoralArm() {
 
     feedback.SensorToMechanismRatio = 33.333333333;
 
-    this->coralArmMotor.GetConfigurator().Apply(abctalonFXConfigs);
-    this->coralArmMotor.GetConfigurator().Apply(feedback);
+    this->motor1.GetConfigurator().Apply(abctalonFXConfigs);
+    this->motor1.GetConfigurator().Apply(feedback);
+
+    this->target = 0.0_tr;
 }
 
 void CoralArm::Periodic() {
-    frc::SmartDashboard::PutNumber("Arm Position", this->coralArmMotor.GetPosition().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("Arm Position", this->motor1.GetPosition().GetValueAsDouble());
 
     // auto& slot0Configs = abctalonFXConfigs.Slot0;
     // // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
@@ -66,27 +69,53 @@ void CoralArm::Periodic() {
 }
 
 
-frc2::CommandPtr CoralArm::CoralArmResetPosition()
+frc2::CommandPtr CoralArm::ResetPosition()
 {
     return this->RunOnce([this] {
-        this->coralArmMotor.SetPosition(-0.25_tr);
+        printf("Setting pos\n");
+        this->motor1.SetPosition(0_tr);
     });
 }
 
-// angle is in radians, where 0 straight up
-frc2::CommandPtr CoralArm::CoralArmTo(units::angle::turn_t target)
+frc2::CommandPtr CoralArm::HoldPos()
 {
-    return this->Run([this, target] {
-        printf("Driving to %f\n", target.value());
-        this->coralArmMotor.SetControl(
-            this->coralArmRequest.WithPosition(
-                target
-            )
-        );
+    return this->Run([this]{
+        printf("Holding\n");
+        this->motor1.SetControl(coralArmRequest.WithPosition(target));
     });
 }
 
-frc2::CommandPtr CoralArm::CoralArmRun(double speed) {
+frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos)
+{
+    return frc2::FunctionalCommand(
+        [this, pos] () {this->target = pos;},
+        [this, pos] () {
+            this->motor1.SetControl(coralArmRequest.WithPosition(pos));
+        },
+        [] (bool interrupted) {/*printf("Finished going!\n");*/},
+        [this, pos] () -> bool {
+            printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
+            return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;},
+        {this}
+    ).ToPtr();
+}
+
+frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_t()> pos)
+{
+    return frc2::FunctionalCommand(
+        [this, pos] () {this->target = pos();},
+        [this, pos] () {
+            this->motor1.SetControl(coralArmRequest.WithPosition(pos()));
+        },
+        [] (bool interrupted) {/*printf("Finished going!\n");*/},
+        [this, pos] () -> bool {
+            printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos().value());
+            return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;},
+        {this}
+    ).ToPtr();
+}
+
+frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
 
     return this->StartEnd(
     [this, speed] {

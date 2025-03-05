@@ -40,7 +40,8 @@ private:
   // Telemetry logger{MaxSpeed};
 
 public:
-  frc2::CommandPS4Controller joystick{0};
+  frc2::CommandPS4Controller driver{0};
+  frc2::CommandPS4Controller mate{0};
 
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   SwervePather pather{&drivetrain};

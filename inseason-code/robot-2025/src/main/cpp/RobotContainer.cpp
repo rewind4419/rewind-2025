@@ -32,49 +32,82 @@ RobotContainer::RobotContainer()
   //frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
 
   ConfigureBindings();
+
+  frc::SmartDashboard::PutNumber("ElevatorPos", 0.0);
+  frc::SmartDashboard::PutNumber("CoralArmPos", 0.0);
 }
 
 void RobotContainer::ConfigureBindings()
 {
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
-        return drive.WithVelocityX(-joystick.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-            .WithVelocityY(-joystick.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .WithRotationalRate(-joystick.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+        return drive.WithVelocityX(-driver.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-driver.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-driver.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
     })
   );
   
   // // reset the field-centric heading on left bumper press
-  //joystick.R2().OnTrue(frc2::cmd::Print("e"));
-  // joystick.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
+  //driver.R2().OnTrue(frc2::cmd::Print("e"));
+  // driver.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
 
   winch.SetDefaultCommand(winch.HoldPos());
 
-  joystick.R2().WhileTrue(winch.DrivePower([this]() -> float {
-    return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  //elevator.SetDefaultCommand(elevator.HoldPos());
+  
+  //coralarm.SetDefaultCommand(coralarm.HoldPos());
+
+  coralarm.SetDefaultCommand(coralarm.SetPositionProvider([] () -> units::angle::turn_t {
+    return units::angle::turn_t{
+      frc::SmartDashboard::GetNumber("CoralArmPos", 0.0)
+    };
   }));
 
-  joystick.L2().WhileTrue(winch.DrivePower([this]() -> float {
-    return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  elevator.SetDefaultCommand(elevator.SetHeightProvider([] () -> units::angle::turn_t {
+    return units::angle::turn_t{
+      frc::SmartDashboard::GetNumber("ElevatorPos", 0.0)
+    };
   }));
 
-  // joystick.Square().OnTrue(winch.GotoPosition(100_tr));
-  // joystick.Cross().OnTrue(winch.GotoPosition(0_tr));
+  // driver.Cross().OnTrue(coralarm.SetPosition(0_tr));
+  // driver.Square().OnTrue(coralarm.SetPosition(0.1_tr));
+  // driver.Triangle().OnTrue(coralarm.ResetPosition());
+  // driver.Circle().OnTrue(coralarm.SetPosition(0.25_tr));
+
+  // driver.Cross().OnTrue(elevator.SetHeight(0_tr));
+  // driver.Square().OnTrue(elevator.SetHeight(1_tr));
+  // driver.Triangle().OnTrue(elevator.Home());
+  // driver.Circle().OnTrue(elevator.SetHeight(4_tr));
+
+  // driver.R2().WhileTrue(winch.DrivePower([this]() -> float {
+  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
+  // }));
+
+  // driver.L2().WhileTrue(winch.DrivePower([this]() -> float {
+  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
+  // }));
+
+  // driver.Square().OnTrue(winch.GotoPosition(100_tr));
+  // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
   
   // winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
-  //   return (joystick.GetR2Axis() - joystick.GetL2Axis()) * 0.5;
+  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
   // }));
-  //joystick.Circle().WhileTrue(coralarm.CoralArmRun(0.5));
+  //driver.Circle().WhileTrue(coralarm.CoralArmRun(0.5));
 
-  // joystick.Triangle().OnTrue(coralarm.CoralArmResetPosition());
+  // driver.Triangle().OnTrue(coralarm.CoralArmResetPosition());
 
-  // joystick.Cross().WhileTrue(coralarm.CoralArmTo(0_tr));
-  // joystick.Circle().WhileTrue(coralarm.CoralArmTo(-0.1_tr));
+  // driver.Cross().WhileTrue(coralarm.CoralArmTo(0_tr));
+  // driver.Circle().WhileTrue(coralarm.CoralArmTo(-0.1_tr));
 
-  joystick.Triangle().OnTrue(elevator.Home());
+  // elevator.SetDefaultCommand(elevator.DrivePower([this]() -> float {
+  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
+  // }));
 
-  joystick.Cross().WhileTrue(elevator.SetHeight(1.0));
-  joystick.Circle().WhileTrue(elevator.SetHeight(10.0));
+  driver.Triangle().OnTrue(elevator.Home());
+
+  // driver.Cross().WhileTrue(elevator.SetHeight(0.0));
+  // driver.Circle().WhileTrue(elevator.SetHeight(3.0));
 }
 
 

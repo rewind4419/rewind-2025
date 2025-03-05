@@ -19,10 +19,21 @@ public:
 
     // Height is in meters
     frc2::CommandPtr Home();
-    frc2::CommandPtr SetHeight(float height);
+    frc2::CommandPtr HoldPos();
+    frc2::CommandPtr SetHeight(units::angle::turn_t pos);
+    frc2::CommandPtr SetHeightProvider(std::function<units::angle::turn_t()> pos);
+    frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
+
+    units::angle::turn_t target;
+
+    const float epsilon = 0.2;
 private:
     ctre::phoenix6::hardware::TalonFX motor1 {ELEVATOR_MOTOR_1_ID};
     ctre::phoenix6::hardware::TalonFX motor2 {ELEVATOR_MOTOR_2_ID};
 
     ctre::phoenix6::controls::MotionMagicVoltage elevatorRequest {0_tr};
+
+    ctre::phoenix6::controls::DutyCycleOut elevatorRequestTorque {0};
+    
+    ctre::phoenix6::controls::Follower elevatorFollower {ELEVATOR_MOTOR_1_ID, true};
 };
