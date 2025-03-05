@@ -65,3 +65,21 @@ frc2::CommandPtr Elevator::SetHeight(float height)
         
     });
 }
+
+/*
+ElevatorSubsystem::ElevatorSubsystem() {
+    // Initialize motors if necessary
+}
+
+void ElevatorSubsystem::Periodic() {
+    // Code that runs periodically (e.g., sensor updates)
+}
+
+void ElevatorSubsystem::MoveElevator(double speed) {
+    m_verticalMotor.Set(speed);
+}
+
+void ElevatorSubsystem::OperateDoor(double position) {
+    m_doorMotor.Set(position);
+}
+*/
