@@ -37,3 +37,23 @@ private:
     
     ctre::phoenix6::controls::Follower elevatorFollower {ELEVATOR_MOTOR_1_ID, true};
 };
+
+/*
+pragma once
+
+#include <frc2/command/SubsystemBase.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+
+class ElevatorSubsystem : public frc2::SubsystemBase {
+public:
+    ElevatorSubsystem();
+
+    void Periodic() override;
+    void MoveElevator(double speed);
+    void OperateDoor(double position);
+
+private:
+    frc::PWMSparkMax m_verticalMotor{0}; // PWM port 0 for vertical movement
+    frc::PWMSparkMax m_doorMotor{1};     // PWM port 1 for door operation
+};
+*/

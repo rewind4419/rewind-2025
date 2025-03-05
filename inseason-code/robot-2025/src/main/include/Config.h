@@ -10,6 +10,10 @@
 
 #define WINCH_MOTOR_ID 6
 
+#define ALGAE_HANDLER_MOTOR_ID1 7
+#define ALGAE_HANDLER_MOTOR_ID2 8
+
+#define INTAKE_MOTOR_ID 9
 
 /*
 Notes
@@ -33,4 +37,6 @@ Subsystems
 - Elevator
 - Intake
 - Arm
+- Climber
+- Algae Handler
 */
