@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <functional>
 
 #include <math.h>
 
@@ -48,21 +49,36 @@ public:
     }
 };
 
+void print_hi()
+{
+    printf("Hello there!\n");
+}
+
 int main()
 {
-    V2 a {2.0, 2.0};
-    V2 b {1.5, 1.5};
+    // V2 a {2.0, 2.0};
+    // V2 b {1.5, 1.5};
 
-    printf("A: (%f, %f)\n", a.x, a.y);
-    printf("B: (%f, %f)\n", b.x, b.y);
+    // printf("A: (%f, %f)\n", a.x, a.y);
+    // printf("B: (%f, %f)\n", b.x, b.y);
 
-    printf("Dot: %f\n", a.dot(b));
-    printf("Cross: %f\n", a.cross(b));
+    // printf("Dot: %f\n", a.dot(b));
+    // printf("Cross: %f\n", a.cross(b));
 
-    V2 normalized = a.normalize();
+    // V2 normalized = a.normalize();
 
-    printf("A Length: %f\n", a.length());
-    printf("A LengthSquared: %f\n", a.lengthSquared());
+    // printf("A Length: %f\n", a.length());
+    // printf("A LengthSquared: %f\n", a.lengthSquared());
 
-    printf("A Normalized: (%f, %f)\n", normalized.x, normalized.y);
+    // printf("A Normalized: (%f, %f)\n", normalized.x, normalized.y);
+
+    float baa = 0.5f;
+
+    std::function<void()> my_function = [baa] {printf("Hello, my name is %f\n", baa);};
+
+    my_function();
+
+    baa = 1.0f;
+
+    my_function();
 }
