@@ -16,5 +16,3 @@ public:
     float kI = 0.0;
     float kD = 0.0;
 };
-
-float clamp(float x, float min, float max);

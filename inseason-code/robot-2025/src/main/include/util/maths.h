@@ -4,7 +4,13 @@
 #include <frc/geometry/Pose2d.h>
 
 #include <units/length.h>
+#include <units/angle.h>
 
+float clamp(float x, float min, float max);
+float len(float x, float y);
+float lenSq(float x, float y);
+
+units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max);
 // General purpose vector 2 class
 class V2
 {
@@ -68,19 +74,6 @@ public:
     }
 };
 
-RPose RPosefromFRCPose(frc::Pose2d pose)
-{
-    return RPose {
-        V2 {
-            pose.X().value(),
-            pose.Y().value()
-        },
-        pose.Rotation().Radians().value()
-    };
-}
+RPose RPosefromFRCPose(frc::Pose2d pose);
 
-frc::Pose2d RPosetoFrcPose(RPose pose)
-{
-    //Todo
-    //return frc::Pose2d {(pose.translation.x)_m, (pose.translation.y)_m, frc::Rotation2d{} }
-}
+frc::Pose2d RPosetoFrcPose(RPose pose);

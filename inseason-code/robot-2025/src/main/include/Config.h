@@ -15,6 +15,18 @@
 
 #define INTAKE_MOTOR_ID 9
 
+// TODO: implement all the safeties! only basic ones exist now
+#define ELEVATOR_MIN 0_tr
+#define ELEVATOR_FUNNEL 1.5_tr // To grab from funnel
+#define ELEVATOR_IN_MAX 4.0_tr // Highest elevator can go when coral arm at 0
+#define ELEVATOR_SAFE_MAX 18_tr // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
+
+#define CORAL_ARM_MIN 0_tr
+#define CORAL_ARM_INTAKING_MAX 0.025_tr
+#define CORAL_ARM_MIN_SAFE 0.29_tr // Any less than this, and can't extend all the way
+#define CORAL_ARM_SAFE_TARGET 0.3_tr
+#define CORAL_ARM_MAX 0.40_tr // Arbitrary
+
 /*
 Notes
 - Binding something to a function that is supposed to

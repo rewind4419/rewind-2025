@@ -7,6 +7,8 @@
 #include <frc2/command/Subsystem.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#include "util/maths.h"
+
 using namespace ctre::phoenix6;
 
 configs::TalonFXConfiguration abcdtalonFXConfigs{};
@@ -62,7 +64,7 @@ frc2::CommandPtr Elevator::Home()
 frc2::CommandPtr Elevator::HoldPos() {
     return this->Run([this]{
         //printf("Holding\n");
-        this->motor1.SetControl(elevatorRequest.WithPosition(target));
+        this->motor1.SetControl(elevatorRequest.WithPosition(clamp(target, ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
         this->motor2.SetControl(elevatorFollower);
     });
 }
@@ -72,8 +74,9 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
     return frc2::FunctionalCommand(
             [this, pos] () {this->target = pos;},
             [this, pos] () {
-                this->motor1.SetControl(elevatorRequest.WithPosition(pos));
+                this->motor1.SetControl(elevatorRequest.WithPosition(clamp(pos, ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
                 this->motor2.SetControl(elevatorFollower);
+
             },
             [] (bool interrupted) {/*printf("Finished going!\n");*/},
             [this, pos] () -> bool {
@@ -88,7 +91,7 @@ frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t(
     return frc2::FunctionalCommand(
             [this, pos] () {this->target = pos();},
             [this, pos] () {
-                this->motor1.SetControl(elevatorRequest.WithPosition(pos()));
+                this->motor1.SetControl(elevatorRequest.WithPosition(clamp(pos(), ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
                 this->motor2.SetControl(elevatorFollower);
             },
             [] (bool interrupted) {/*printf("Finished going!\n");*/},

@@ -1,5 +1,7 @@
 #include "util/PID.h"
 
+#include "util/maths.h"
+
 // Positive kD resists change, don't do negative kD
 PID::PID(float kP, float kI, float kD)
 {
@@ -29,9 +31,3 @@ void PID::reset()
     this->accumulatedError = 0.0f;
 }
 
-float clamp(float x, float min, float max)
-{
-    if (x < min) {return min;}
-    else if (x > max) {return max;}
-    else {return x;} 
-}

@@ -11,6 +11,8 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#include "util/maths.h"
+
 #include "math.h"
 
 using namespace ctre::phoenix6;
@@ -81,7 +83,7 @@ frc2::CommandPtr CoralArm::HoldPos()
 {
     return this->Run([this]{
         printf("Holding\n");
-        this->motor1.SetControl(coralArmRequest.WithPosition(target));
+        this->motor1.SetControl(coralArmRequest.WithPosition(clamp(target, CORAL_ARM_MIN, CORAL_ARM_MAX)));
     });
 }
 
@@ -90,7 +92,7 @@ frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos)
     return frc2::FunctionalCommand(
         [this, pos] () {this->target = pos;},
         [this, pos] () {
-            this->motor1.SetControl(coralArmRequest.WithPosition(pos));
+            this->motor1.SetControl(coralArmRequest.WithPosition(clamp(pos, CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
         [this, pos] () -> bool {
@@ -105,7 +107,7 @@ frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_
     return frc2::FunctionalCommand(
         [this, pos] () {this->target = pos();},
         [this, pos] () {
-            this->motor1.SetControl(coralArmRequest.WithPosition(pos()));
+            this->motor1.SetControl(coralArmRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
         [this, pos] () -> bool {

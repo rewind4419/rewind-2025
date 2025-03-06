@@ -6,6 +6,8 @@
 
 #include <frc2/command/button/Trigger.h>
 
+#include <frc/geometry/Rotation2d.h>
+
 #include <frc/smartdashboard/SmartDashboard.h>
 
 // #include <pathplanner/lib/auto/AutoBuilder.h>
@@ -21,6 +23,8 @@
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/SequentialCommandGroup.h>
+
+#include "utils/maths.h"
 
 RobotContainer::RobotContainer()
 {
@@ -41,20 +45,40 @@ void RobotContainer::ConfigureBindings()
 {
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
+      if (driver.R1().Get())
+      {
+        // if (lenSq(driver.GetLeftY()+driver.GetLeftX()) > 0.05*0.05)
+        // {}
+        // Surgery Mode
+        return drive.WithVelocityX(-driver.GetLeftY() * SurgeryModeSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-driver.GetLeftX() * SurgeryModeSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-driver.GetRightX() * SurgeryModeAngularRate); // Drive counterclockwise with negative X (left)
+      } else {
         return drive.WithVelocityX(-driver.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
             .WithVelocityY(-driver.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
             .WithRotationalRate(-driver.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+      }
     })
   );
   
   // // reset the field-centric heading on left bumper press
-  //driver.R2().OnTrue(frc2::cmd::Print("e"));
-  // driver.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
+  driver.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
+
+  driver.Square().OnTrue(drivetrain.RunOnce([this] { 
+    drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() + frc::Rotation2d{90_deg});
+  }));
+
+  driver.Circle().OnTrue(drivetrain.RunOnce([this] { 
+    drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() - frc::Rotation2d{90_deg});
+  }));
+
+  driver.Circle().OnTrue(drivetrain.RunOnce([this] { 
+    drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() - frc::Rotation2d{180_deg});
+  }));
 
   winch.SetDefaultCommand(winch.HoldPos());
 
   //elevator.SetDefaultCommand(elevator.HoldPos());
-  
   //coralarm.SetDefaultCommand(coralarm.HoldPos());
 
   coralarm.SetDefaultCommand(coralarm.SetPositionProvider([] () -> units::angle::turn_t {
@@ -62,7 +86,6 @@ void RobotContainer::ConfigureBindings()
       frc::SmartDashboard::GetNumber("CoralArmPos", 0.0)
     };
   }));
-
   elevator.SetDefaultCommand(elevator.SetHeightProvider([] () -> units::angle::turn_t {
     return units::angle::turn_t{
       frc::SmartDashboard::GetNumber("ElevatorPos", 0.0)
@@ -93,8 +116,9 @@ void RobotContainer::ConfigureBindings()
   // winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
   //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
   // }));
-  //driver.Circle().WhileTrue(coralarm.CoralArmRun(0.5));
+   mate.POVLeft().WhileTrue(coralarm.CoralArmRunIntake(0.5));
 
+   mate.POVRight().WhileTrue(coralarm.CoralArmRunIntake(-0.125));
   // driver.Triangle().OnTrue(coralarm.CoralArmResetPosition());
 
   // driver.Cross().WhileTrue(coralarm.CoralArmTo(0_tr));

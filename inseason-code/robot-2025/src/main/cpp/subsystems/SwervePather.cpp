@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "util/maths.h"
+
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
