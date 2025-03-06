@@ -10,6 +10,7 @@
 
 #include "Config.h"
 
+
 #include <functional>
 
 class CoralArm : public frc2::SubsystemBase {
@@ -28,7 +29,7 @@ public:
 
     units::angle::turn_t target;
 
-    const float epsilon = 0.1f; // in turns
+    const float epsilon = 0.04f; // in turns
 public:
     rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
     rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};

@@ -22,7 +22,7 @@ Winch::Winch()
 
 void Winch::Periodic()
 {
-    frc::SmartDashboard::PutNumber("Winch current encoder position", this->winchMotor.GetPosition().GetValueAsDouble());
+    // frc::SmartDashboard::PutNumber("Winch current encoder position", this->winchMotor.GetPosition().GetValueAsDouble());
     // frc::SmartDashboard::PutNumber("Winch target", this->target.value());
 }
 

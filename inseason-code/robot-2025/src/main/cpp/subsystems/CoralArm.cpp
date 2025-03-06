@@ -90,14 +90,21 @@ frc2::CommandPtr CoralArm::HoldPos()
 frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos)
 {
     return frc2::FunctionalCommand(
-        [this, pos] () {this->target = pos;},
+        [this, pos] () {
+            printf("Started coral pos\n");
+            this->target = pos;
+        },
         [this, pos] () {
             this->motor1.SetControl(coralArmRequest.WithPosition(clamp(pos, CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
-        [] (bool interrupted) {/*printf("Finished going!\n");*/},
+        [] (bool interrupted) {
+            printf("Finished coral pos\n");
+        },
         [this, pos] () -> bool {
             printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
-            return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;},
+            bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;
+            return done;
+        },
         {this}
     ).ToPtr();
 }
@@ -105,14 +112,18 @@ frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos)
 frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_t()> pos)
 {
     return frc2::FunctionalCommand(
-        [this, pos] () {this->target = pos();},
+        [this, pos] () {
+            this->target = pos();
+        },
         [this, pos] () {
             this->motor1.SetControl(coralArmRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
         [this, pos] () -> bool {
-            printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos().value());
-            return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;},
+            //printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos().value());
+            bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;
+            return done;
+        },
         {this}
     ).ToPtr();
 }

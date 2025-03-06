@@ -27,13 +27,13 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
 void SwervePather::Periodic()
 {
     // Put logging etc in here
-    this->translationPID.kP = frc::SmartDashboard::GetNumber("Translation kP", 0.0);
-    this->translationPID.kI = frc::SmartDashboard::GetNumber("Translation kI", 0.0);
-    this->translationPID.kD = frc::SmartDashboard::GetNumber("Translation kD", 0.0);
+    // this->translationPID.kP = frc::SmartDashboard::GetNumber("Translation kP", 0.0);
+    // this->translationPID.kI = frc::SmartDashboard::GetNumber("Translation kI", 0.0);
+    // this->translationPID.kD = frc::SmartDashboard::GetNumber("Translation kD", 0.0);
 
-    this->rotationPID.kP = frc::SmartDashboard::GetNumber("Rotation kP", 0.0);
-    this->rotationPID.kI = frc::SmartDashboard::GetNumber("Rotation kI", 0.0);
-    this->rotationPID.kD = frc::SmartDashboard::GetNumber("Rotation kD", 0.0);
+    // this->rotationPID.kP = frc::SmartDashboard::GetNumber("Rotation kP", 0.0);
+    // this->rotationPID.kI = frc::SmartDashboard::GetNumber("Rotation kI", 0.0);
+    // this->rotationPID.kD = frc::SmartDashboard::GetNumber("Rotation kD", 0.0);
 
     // printf("PIDS: %f, %f, %f - %f, %f, %f\n", 
     //     this->translationPID.kP,

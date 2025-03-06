@@ -9,7 +9,6 @@
 
 #include "Config.h"
 
-
 class Elevator : public frc2::SubsystemBase
 {
 public:
@@ -26,7 +25,7 @@ public:
 
     units::angle::turn_t target;
 
-    const float epsilon = 0.2;
+    const float epsilon = 0.15;
 private:
     ctre::phoenix6::hardware::TalonFX motor1 {ELEVATOR_MOTOR_1_ID};
     ctre::phoenix6::hardware::TalonFX motor2 {ELEVATOR_MOTOR_2_ID};

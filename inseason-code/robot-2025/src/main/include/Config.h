@@ -23,8 +23,7 @@
 
 #define CORAL_ARM_MIN 0_tr
 #define CORAL_ARM_INTAKING_MAX 0.025_tr
-#define CORAL_ARM_MIN_SAFE 0.29_tr // Any less than this, and can't extend all the way
-#define CORAL_ARM_SAFE_TARGET 0.3_tr
+#define CORAL_ARM_SAFE 0.3_tr // Any less than this, and can't extend all the way
 #define CORAL_ARM_MAX 0.40_tr // Arbitrary
 
 /*

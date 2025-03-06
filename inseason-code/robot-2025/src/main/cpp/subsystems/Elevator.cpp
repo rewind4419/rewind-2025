@@ -28,7 +28,7 @@ Elevator::Elevator() {
     slot0Configs.kP = 2.0; // A position error of 2.5 rotations results in 12 V output
     // slot0Configs.kI = 0; // no output for integrated error
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-    slot0Configs.kG = 0.4;
+    slot0Configs.kG = 0.55;
 
     // set Motion Magic settings
     auto& motionMagicConfigs = abcdtalonFXConfigs.MotionMagic;
@@ -50,14 +50,16 @@ Elevator::Elevator() {
 void Elevator::Periodic()
 {
     frc::SmartDashboard::PutNumber("ElevatorHeight", motor1.GetPosition().GetValueAsDouble());
-    frc::SmartDashboard::PutNumber("ElevatorHeight2", motor2.GetPosition().GetValueAsDouble());
+    // frc::SmartDashboard::PutNumber("ElevatorHeight2", motor2.GetPosition().GetValueAsDouble());
+
+    
+
 }
 
 frc2::CommandPtr Elevator::Home()
 {
     return this->RunOnce([this] {
         this->motor1.SetPosition(0_tr);
-        this->motor2.SetPosition(0_tr);
     });
 }
 
@@ -72,16 +74,24 @@ frc2::CommandPtr Elevator::HoldPos() {
 frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
 {
     return frc2::FunctionalCommand(
-            [this, pos] () {this->target = pos;},
+            [this, pos] () {
+                this->target = pos;
+                // Set the target
+                printf("Started elevator pos\n");
+            },
             [this, pos] () {
                 this->motor1.SetControl(elevatorRequest.WithPosition(clamp(pos, ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
                 this->motor2.SetControl(elevatorFollower);
-
             },
-            [] (bool interrupted) {/*printf("Finished going!\n");*/},
+            [this, pos] (bool interrupted) {
+                printf("Ended elevator pos\n");
+            },
             [this, pos] () -> bool {
-                //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
-                return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;},
+                printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
+                bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;
+                // Once we reached the goal, update the current
+                return done;
+            },
             {this}
     ).ToPtr();
 }
@@ -89,16 +99,21 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
 frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos)
 {
     return frc2::FunctionalCommand(
-            [this, pos] () {this->target = pos();},
-            [this, pos] () {
-                this->motor1.SetControl(elevatorRequest.WithPosition(clamp(pos(), ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
-                this->motor2.SetControl(elevatorFollower);
-            },
-            [] (bool interrupted) {/*printf("Finished going!\n");*/},
-            [this, pos] () -> bool {
-                //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
-                return fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;},
-            {this}
+        [this, pos] () {
+            this->target = pos();
+        },
+        [this, pos] () {
+            this->motor1.SetControl(elevatorRequest.WithPosition(clamp(pos(), ELEVATOR_MIN, ELEVATOR_SAFE_MAX)));
+            this->motor2.SetControl(elevatorFollower);
+        },
+        [] (bool interrupted) {/*printf("Finished going!\n");*/},
+        [this, pos] () -> bool {
+            //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
+            bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;
+            // Once we reached the goal, update the current
+            return done;
+        },
+        {this}
     ).ToPtr();
 }
 
