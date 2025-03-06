@@ -82,7 +82,7 @@ frc2::CommandPtr CoralArm::ResetPosition()
 frc2::CommandPtr CoralArm::HoldPos()
 {
     return this->Run([this]{
-        printf("Holding\n");
+        //printf("Holding\n");
         this->motor1.SetControl(coralArmRequest.WithPosition(clamp(target, CORAL_ARM_MIN, CORAL_ARM_MAX)));
     });
 }
@@ -117,6 +117,7 @@ frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_
     ).ToPtr();
 }
 
+// Run intake, positive pulls in, negative yeets out
 frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
 
     return this->StartEnd(

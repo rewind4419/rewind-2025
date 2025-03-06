@@ -22,9 +22,9 @@
 
 class RobotContainer {
 private:
-  units::meters_per_second_t SurgeryModeSpeed = TunerConstants::kSpeedAt12Volts * 0.5;
+  units::meters_per_second_t SurgeryModeSpeed = TunerConstants::kSpeedAt12Volts * 0.1;
   units::meters_per_second_t MaxSpeed = TunerConstants::kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
-  units::radians_per_second_t SurgeryModeAngularRate = 0.75_tps * 0.5;
+  units::radians_per_second_t SurgeryModeAngularRate = 0.75_tps * 0.1;
   units::radians_per_second_t MaxAngularRate = 0.75_tps; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -43,7 +43,7 @@ private:
 
 public:
   frc2::CommandPS4Controller driver{0};
-  frc2::CommandPS4Controller mate{0};
+  frc2::CommandPS4Controller mate{1};
 
   CommandSwerveDrivetrain drivetrain{TunerConstants::CreateDrivetrain()};
   SwervePather pather{&drivetrain};

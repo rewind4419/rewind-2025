@@ -24,7 +24,7 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/SequentialCommandGroup.h>
 
-#include "utils/maths.h"
+#include "util/maths.h"
 
 RobotContainer::RobotContainer()
 {
@@ -72,14 +72,14 @@ void RobotContainer::ConfigureBindings()
     drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() - frc::Rotation2d{90_deg});
   }));
 
-  driver.Circle().OnTrue(drivetrain.RunOnce([this] { 
+  driver.Cross().OnTrue(drivetrain.RunOnce([this] { 
     drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() - frc::Rotation2d{180_deg});
   }));
 
   winch.SetDefaultCommand(winch.HoldPos());
 
-  //elevator.SetDefaultCommand(elevator.HoldPos());
-  //coralarm.SetDefaultCommand(coralarm.HoldPos());
+  // elevator.SetDefaultCommand(elevator.HoldPos());
+  // coralarm.SetDefaultCommand(coralarm.HoldPos());
 
   coralarm.SetDefaultCommand(coralarm.SetPositionProvider([] () -> units::angle::turn_t {
     return units::angle::turn_t{
@@ -92,6 +92,24 @@ void RobotContainer::ConfigureBindings()
     };
   }));
 
+  // mate.POVDown().OnTrue(coralarm.SetPosition(0_tr));
+  // mate.POVUp().OnTrue(coralarm.SetPosition(0.3_tr));
+
+  //mate.POVLeft().OnTrue(elevator.SetHeight(1.2_tr));
+
+  // mate.Cross().OnTrue(elevator.SetHeight(0_tr));
+
+  // mate.Triangle().OnTrue(elevator.SetHeight(10_tr));
+
+  // mate.Square().OnTrue(elevator.SetHeight(9_tr));
+  // mate.Square().OnTrue(coralarm.SetPosition(0.35_tr));
+
+  // mate.Circle().OnTrue(elevator.SetHeight(10_tr));
+  // mate.Circle().OnTrue(coralarm.SetPosition(0.3_tr));
+
+  // mate.Square().OnTrue(frc2::cmd::Print("Does 1"));
+  // mate.Square().OnTrue(frc2::cmd::Print("Does 2"));
+
   // driver.Cross().OnTrue(coralarm.SetPosition(0_tr));
   // driver.Square().OnTrue(coralarm.SetPosition(0.1_tr));
   // driver.Triangle().OnTrue(coralarm.ResetPosition());
@@ -102,13 +120,13 @@ void RobotContainer::ConfigureBindings()
   // driver.Triangle().OnTrue(elevator.Home());
   // driver.Circle().OnTrue(elevator.SetHeight(4_tr));
 
-  // driver.R2().WhileTrue(winch.DrivePower([this]() -> float {
-  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
-  // }));
+  mate.R2().WhileTrue(winch.DrivePower([this]() -> float {
+    return (mate.GetR2Axis() - mate.GetL2Axis()) * 0.5;
+  }));
 
-  // driver.L2().WhileTrue(winch.DrivePower([this]() -> float {
-  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
-  // }));
+  mate.L2().WhileTrue(winch.DrivePower([this]() -> float {
+    return (mate.GetR2Axis() - mate.GetL2Axis()) * 0.5;
+  }));
 
   // driver.Square().OnTrue(winch.GotoPosition(100_tr));
   // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
@@ -116,9 +134,12 @@ void RobotContainer::ConfigureBindings()
   // winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
   //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
   // }));
-   mate.POVLeft().WhileTrue(coralarm.CoralArmRunIntake(0.5));
+   mate.R1().WhileTrue(coralarm.CoralArmRunIntake(0.25));
 
-   mate.POVRight().WhileTrue(coralarm.CoralArmRunIntake(-0.125));
+   mate.L1().WhileTrue(coralarm.CoralArmRunIntake(-0.125));
+
+  mate.Triangle().WhileTrue(coralarm.CoralArmRunIntake(1.0));
+
   // driver.Triangle().OnTrue(coralarm.CoralArmResetPosition());
 
   // driver.Cross().WhileTrue(coralarm.CoralArmTo(0_tr));
@@ -128,7 +149,7 @@ void RobotContainer::ConfigureBindings()
   //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
   // }));
 
-  driver.Triangle().OnTrue(elevator.Home());
+  //driver.Triangle().OnTrue(elevator.Home());
 
   // driver.Cross().WhileTrue(elevator.SetHeight(0.0));
   // driver.Circle().WhileTrue(elevator.SetHeight(3.0));
