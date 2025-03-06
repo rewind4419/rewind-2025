@@ -134,3 +134,12 @@ frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
         coralIntakeMotorR.Set(0.0);
     });
 }
+
+// Base intake speed
+frc2::CommandPtr CoralArm::CoralArmBaseIntake(double speed) {
+    return this->Run(
+    [this, speed] {
+        coralIntakeMotorL.Set(speed);
+        coralIntakeMotorR.Set(-speed);
+    });
+}

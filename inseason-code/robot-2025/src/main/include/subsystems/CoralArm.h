@@ -23,6 +23,8 @@ public:
     frc2::CommandPtr SetPosition(units::angle::turn_t pos);
     frc2::CommandPtr SetPositionProvider(std::function<units::angle::turn_t()> pos);
 
+    // Base intake motor speed to hold coral in arm
+    frc2::CommandPtr CoralArmBaseIntake(double speed);
     // Runs the Coral Intake motors at the specified POWER until the task is canceled
     frc2::CommandPtr CoralArmRunIntake(double speed);
 
