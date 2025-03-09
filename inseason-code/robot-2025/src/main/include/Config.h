@@ -1,7 +1,9 @@
 #pragma once
 
-#define CORAL_INTAKE_MOTOR_1_ID 1
-#define CORAL_INTAKE_MOTOR_2_ID 2
+// #define CORAL_INTAKE_MOTOR_1_ID 1
+// #define CORAL_INTAKE_MOTOR_2_ID 2
+#define CORAL_INTAKE_MOTOR_ID 1
+//#define CORAL_INTAKE_MOTOR_ID_2 2
 
 #define CORAL_ARM_MOTOR_ID 5
 

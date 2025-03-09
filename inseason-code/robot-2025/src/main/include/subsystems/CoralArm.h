@@ -12,6 +12,9 @@
 
 #include <functional>
 
+#include <frc/system/plant/DCMotor.h>
+
+
 class CoralArm : public frc2::SubsystemBase {
 public:
     CoralArm();
@@ -32,10 +35,13 @@ public:
 
     const float epsilon = 0.1f; // in turns
 public:
-    rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
-    rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
+   // rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
+   // rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
 
     ctre::phoenix6::hardware::TalonFX motor1 {CORAL_ARM_MOTOR_ID, "rio"};
+
+    ctre::phoenix6::hardware::TalonFX coralIntakeMotor {CORAL_INTAKE_MOTOR_ID};
+    //ctre::phoenix6::hardware::TalonFX coralIntakeMotorR {CORAL_INTAKE_MOTOR_ID_2}; Just in case we need another Kraken
 
     ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
 };
