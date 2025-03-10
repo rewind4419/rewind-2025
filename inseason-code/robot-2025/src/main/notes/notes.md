@@ -1,8 +1,9 @@
 # Notes
+
+## Reminders
+
 - Binding something to a function that is supposed to
   return a CommandPtr but returns nothing causes a bootloop!
-
-
 
 ## TODO List
 
@@ -10,23 +11,24 @@
     - it's on motor ID 4, on the elevator
 
 - Make swervepather not absolutely garbage
-    1. Add rotation PID
-    2. Add feedforwards
-    3. Prototype more advanced control algorithms
+    - Add rotation PID
+    - Add feedforwards
+    - Prototype more advanced control algorithms
 
 - Create commands for positioning elevator/arm to specific reef level
     - Seperate button to move elevator and arm to each level
-    
-### Scrimmage TODO
+
+- PhotonVision integration
+    - Create kraken-based swerve drive vision code on new bot
 
 - Write an auto code that simply moves the robot forward
 
-- Increase the speed of the wheels of the Coral Arm (currently fixing)
+- Increase the speed of the wheels of the Coral Arm ***(IN PROGRESS)***
 
 - Lower the default position for intaking coral
 
 - Fix driver code
-  - Sometimes triangle doesn't work until pressing circle first
+    - Sometimes triangle doesn't work until pressing circle first
 
 ## Subsystems
 
