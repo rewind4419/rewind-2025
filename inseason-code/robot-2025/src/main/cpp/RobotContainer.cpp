@@ -78,7 +78,7 @@ void RobotContainer::ConfigureBindings()
 
   winch.SetDefaultCommand(winch.HoldPos());
 
-  coralarm.SetDefaultCommand(coralarm.CoralArmBaseIntake(0.05));
+  coralarm.SetDefaultCommand(coralarm.CoralArmBaseIntake(0.01));
   // elevator.SetDefaultCommand(elevator.HoldPos());
   // coralarm.SetDefaultCommand(coralarm.HoldPos());
 
