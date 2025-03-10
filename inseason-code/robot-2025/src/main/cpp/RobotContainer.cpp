@@ -80,6 +80,9 @@ void RobotContainer::ConfigureBindings()
 
   elevator.SetDefaultCommand(elevator.HoldPos());
   coralarm.SetDefaultCommand(coralarm.HoldPos());
+  // coralarm.SetDefaultCommand(coralarm.CoralArmBaseIntake(0.01));
+  // // elevator.SetDefaultCommand(elevator.HoldPos());
+  // // coralarm.SetDefaultCommand(coralarm.HoldPos());
 
   mate.Circle().OnTrue(
     frc2::cmd::Select<int>(

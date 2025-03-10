@@ -116,5 +116,6 @@ To-Do List from Scrimmage (03/08/2025):
 - Write an auto code that simply moves the robot forward
 - Increase the speed of the wheels of the Coral Arm (currently fixing)
 - Lower the default position for intaking coral
-
+- Fix driver code
+  - Sometimes triangle doesn't work until pressing circle first
 */

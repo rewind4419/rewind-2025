@@ -135,13 +135,27 @@ frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
     [this, speed] {
         // On task start
         printf("Start \n");
-        coralIntakeMotorL.Set(speed);
-        coralIntakeMotorR.Set(-speed);
+        //coralIntakeMotorL.Set(speed);
+        //coralIntakeMotorR.Set(-speed);
+        coralIntakeMotor.Set(speed);
+        //coralIntakeMotor.SetInverted(true); //invert the second set of wheels
     }, 
     [this] {
         printf("End \n");
         // On task end/cancel
-        coralIntakeMotorL.Set(0.0);
-        coralIntakeMotorR.Set(0.0);
+        //coralIntakeMotorL.Set(0.0);
+        //coralIntakeMotorR.Set(0.0);
+        coralIntakeMotor.Set(0.0);
+    });
+}
+
+// Base intake speed
+frc2::CommandPtr CoralArm::CoralArmBaseIntake(double speed) {
+    return this->Run(
+    [this, speed] {
+        //coralIntakeMotorL.Set(speed);
+        //coralIntakeMotorR.Set(-speed);
+        //coralIntakeMotor.Set(speed);
+        coralIntakeMotor.SetInverted(true); //invert the second set of wheels
     });
 }
