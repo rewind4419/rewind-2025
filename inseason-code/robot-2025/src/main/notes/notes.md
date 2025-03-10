@@ -17,6 +17,17 @@
 - Create commands for positioning elevator/arm to specific reef level
     - Seperate button to move elevator and arm to each level
     
+### Scrimmage TODO
+
+- Write an auto code that simply moves the robot forward
+
+- Increase the speed of the wheels of the Coral Arm (currently fixing)
+
+- Lower the default position for intaking coral
+
+- Fix driver code
+  - Sometimes triangle doesn't work until pressing circle first
+
 ## Subsystems
 
 - Elevator
