@@ -27,29 +27,3 @@
 #define CORAL_ARM_INTAKING_MAX 0.025_tr
 #define CORAL_ARM_SAFE 0.3_tr // Any less than this, and can't extend all the way
 #define CORAL_ARM_MAX 0.40_tr // Arbitrary
-
-/*
-Notes
-- Binding something to a function that is supposed to
-  return a CommandPtr but returns nothing causes a bootloop!
-
-
-
-TODO List
-
-- Fix the black and red swapped wire!
-    - it's on motor ID 4, on the elevator
-
-- Make swervepather not absolutely garbage
-    1. Add rotation PID
-    2. Add feedforwards
-    3. Prototype more advanced control algorithms
-
-Subsystems
-
-- Elevator
-- Intake
-- Arm
-- Climber
-- Algae Handler
-*/
