@@ -190,8 +190,8 @@ void RobotContainer::ConfigureBindings()
   //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
   // }));
 
-  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(0.2)); //Changed from 0.25 to 0.4 to 0.3 to 0.2, this seems to be outake
-  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-0.4)); //Changed from -0.125 to -0.2 to -0.125 to -0.2 to -0.3 to -0.4, this seems to be intake
+  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(10_tps)); //intake
+  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-5_tps)); //outake
   // mate.Triangle().WhileTrue(coralarm.CoralArmRunIntake(1.0));
 }
 

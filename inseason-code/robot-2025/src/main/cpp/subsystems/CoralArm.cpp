@@ -17,7 +17,8 @@
 
 using namespace ctre::phoenix6;
 
-configs::TalonFXConfiguration abctalonFXConfigs{};
+configs::TalonFXConfiguration abctalonFXConfigs{}; //Arm Pivot
+configs::TalonFXConfiguration abcdetalonFXConfigs{}; //Wheels
 
 CoralArm::CoralArm() {
     printf("Initialized coral arm\n");
@@ -37,6 +38,9 @@ CoralArm::CoralArm() {
     slot0Configs.kG = 0.7;
     slot0Configs.GravityType = signals::GravityTypeValue::Arm_Cosine;
 
+    auto& slot1Configs = abcdetalonFXConfigs.Slot0;
+    slot1Configs.kP = 0.3;
+
     // set Motion Magic settings
     auto& motionMagicConfigs = abctalonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 100_tps; // Target cruise velocity of 80 rps
@@ -51,6 +55,8 @@ CoralArm::CoralArm() {
 
     this->motor1.GetConfigurator().Apply(abctalonFXConfigs);
     this->motor1.GetConfigurator().Apply(feedback);
+
+    this->coralIntakeMotor.GetConfigurator().Apply(abcdetalonFXConfigs);
 
     this->target = 0.0_tr;
 }
@@ -129,15 +135,16 @@ frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_
 }
 
 // Run intake, positive pulls in, negative yeets out
-frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
+frc2::CommandPtr CoralArm::CoralArmRunIntake(units::angular_velocity::turns_per_second_t speed) {
 
-    return this->StartEnd(
+    return this->RunEnd(
     [this, speed] {
         // On task start
         printf("Start \n");
         //coralIntakeMotorL.Set(speed);
         //coralIntakeMotorR.Set(-speed);
-        coralIntakeMotor.Set(speed);
+        //coralIntakeMotor.Set(speed);
+        this->coralIntakeMotor.SetControl(coralIntakeRequest.WithVelocity(speed));
         //coralIntakeMotor.SetInverted(true); //invert the second set of wheels
     }, 
     [this] {
@@ -145,7 +152,7 @@ frc2::CommandPtr CoralArm::CoralArmRunIntake(double speed) {
         // On task end/cancel
         //coralIntakeMotorL.Set(0.0);
         //coralIntakeMotorR.Set(0.0);
-        coralIntakeMotor.Set(0.0);
+        this->coralIntakeMotor.SetControl(coralIntakeRequest.WithVelocity(0.0_tps));
     });
 }
 

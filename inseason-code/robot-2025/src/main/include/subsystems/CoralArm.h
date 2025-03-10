@@ -30,7 +30,7 @@ public:
     // Base intake motor speed to hold coral in arm
     frc2::CommandPtr CoralArmBaseIntake(double speed);
     // Runs the Coral Intake motors at the specified POWER until the task is canceled
-    frc2::CommandPtr CoralArmRunIntake(double speed);
+    frc2::CommandPtr CoralArmRunIntake(units::angular_velocity::turns_per_second_t speed);
 
     units::angle::turn_t target;
 
@@ -45,4 +45,6 @@ public:
     //ctre::phoenix6::hardware::TalonFX coralIntakeMotorR {CORAL_INTAKE_MOTOR_ID_2}; Just in case we need another Kraken
 
     ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
+    
+    ctre::phoenix6::controls::VelocityVoltage coralIntakeRequest {0_tps};
 };
