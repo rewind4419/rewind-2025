@@ -20,6 +20,8 @@
 
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot
+    - Find out what is needed for pather
+    - Measure camera offset from drivebase midpoint
 
 - Write an auto code that simply moves the robot forward
 
