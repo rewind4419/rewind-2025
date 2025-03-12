@@ -9,6 +9,8 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/PrintCommand.h>
+#include <photon/PhotonUtils.h>
+#include <subsystems/Auto.h>
 
 #include <frc/SmartDashboard/SmartDashboard.h>
 
@@ -36,7 +38,12 @@ void Robot::AutonomousInit() {
   }
 }
 
-void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousPeriodic() {
+  photon::PhotonPipelineResult result = Cam1.GetLatestResult();
+  bool hasTargets = result.HasTargets();
+  photon::PhotonTrackedTarget target = result.GetBestTarget();
+
+}
 
 void Robot::AutonomousExit() {}
 
