@@ -191,7 +191,7 @@ void RobotContainer::ConfigureBindings()
   // }));
 
   mate.R2().WhileTrue(coralarm.CoralArmRunIntake(10_tps)); //intake
-  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-5_tps)); //outake
+  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-10_tps)); //outake
   // mate.Triangle().WhileTrue(coralarm.CoralArmRunIntake(1.0));
 }
 
