@@ -33,8 +33,8 @@ class Robot : public frc::TimedRobot {
 
   RobotContainer m_container;
 
-  ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
-  ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
-  ctre::phoenix6::hardware::CANcoder bl {10, "Default Name"};
-  ctre::phoenix6::hardware::CANcoder br {11, "Default Name"};
+  // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
+  // ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
+  // ctre::phoenix6::hardware::CANcoder bl {10, "Default Name"};
+  // ctre::phoenix6::hardware::CANcoder br {11, "Default Name"};
 };

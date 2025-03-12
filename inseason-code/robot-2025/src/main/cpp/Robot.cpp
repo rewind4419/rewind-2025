@@ -38,11 +38,12 @@ void Robot::AutonomousInit() {
   }
 }
 
+AutoManager m;
+
 void Robot::AutonomousPeriodic() {
-  photon::PhotonPipelineResult result = Cam1.GetLatestResult();
+  photon::PhotonPipelineResult result = m.Cam1.GetLatestResult();
   bool hasTargets = result.HasTargets();
   photon::PhotonTrackedTarget target = result.GetBestTarget();
-
 }
 
 void Robot::AutonomousExit() {}

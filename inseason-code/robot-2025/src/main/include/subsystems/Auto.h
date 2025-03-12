@@ -1,4 +1,9 @@
 #include <photon/PhotonCamera.h>
 
-photon::PhotonCamera Cam1{"Cam1"};
+class AutoManager
+{
+public:
+    photon::PhotonCamera Cam1{"Cam1"};
+};
+
  
