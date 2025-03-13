@@ -22,7 +22,12 @@ public:
     frc2::CommandPtr HoldPos();
     frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
+    frc2::CommandPtr TestCommand();
+    frc2::CommandPtr TestCommand2();
+
     units::angle::turn_t target = 0.0_tr;
+
+    bool iscool = false;
 private:
     // rev::spark::SparkMax coralIntakeMotorL {CORAL_INTAKE_MOTOR_1_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};
     // rev::spark::SparkMax coralIntakeMotorR {CORAL_INTAKE_MOTOR_2_ID, rev::spark::SparkLowLevel::MotorType::kBrushless};

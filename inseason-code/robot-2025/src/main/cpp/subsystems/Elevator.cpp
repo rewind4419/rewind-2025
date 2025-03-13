@@ -28,7 +28,7 @@ Elevator::Elevator() {
     slot0Configs.kP = 2.0; // A position error of 2.5 rotations results in 12 V output
     // slot0Configs.kI = 0; // no output for integrated error
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-    slot0Configs.kG = 0.55;
+    slot0Configs.kG = 0.3;
 
     // set Motion Magic settings
     auto& motionMagicConfigs = abcdtalonFXConfigs.MotionMagic;
@@ -60,7 +60,7 @@ frc2::CommandPtr Elevator::Home()
 {
     return this->RunOnce([this] {
         this->motor1.SetPosition(0_tr);
-    });
+    }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr Elevator::HoldPos() {
@@ -87,13 +87,13 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
                 printf("Ended elevator pos\n");
             },
             [this, pos] () -> bool {
-                printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
+                //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
                 bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;
                 // Once we reached the goal, update the current
                 return done;
             },
             {this}
-    ).ToPtr();
+    ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos)

@@ -17,12 +17,14 @@ frc2::CommandPtr RobotState::SetCurrentState(State state)
 {
     return this->RunOnce([this, state] {
         this->currentState = state;
-    });
+        printf("Setting current to %d\n", state);
+    }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr RobotState::SetTargetState(State state)
 {
     return this->RunOnce([this, state] {
         this->targetState = state;
-    });
+        printf("Setting target to %d\n", state);
+    }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }

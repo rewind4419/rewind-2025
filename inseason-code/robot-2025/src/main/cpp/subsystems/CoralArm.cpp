@@ -82,7 +82,7 @@ frc2::CommandPtr CoralArm::ResetPosition()
     return this->RunOnce([this] {
         printf("Setting pos\n");
         this->motor1.SetPosition(0_tr);
-    });
+    }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr CoralArm::HoldPos()
@@ -107,12 +107,12 @@ frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos)
             printf("Finished coral pos\n");
         },
         [this, pos] () -> bool {
-            printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
+            //printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
             bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;
             return done;
         },
         {this}
-    ).ToPtr();
+    ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_t()> pos)

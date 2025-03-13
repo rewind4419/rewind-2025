@@ -43,6 +43,7 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureBindings()
 {
+  // Drivetrain //
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
       if (driver.R1().Get())
@@ -76,17 +77,23 @@ void RobotContainer::ConfigureBindings()
     drivetrain.ResetRotation(drivetrain.GetOperatorForwardDirection() - frc::Rotation2d{180_deg});
   }));
 
+  // Hold Pos (defaults)
+
   winch.SetDefaultCommand(winch.HoldPos());
 
   elevator.SetDefaultCommand(elevator.HoldPos());
   coralarm.SetDefaultCommand(coralarm.HoldPos());
+
   // coralarm.SetDefaultCommand(coralarm.CoralArmBaseIntake(0.01));
   // // elevator.SetDefaultCommand(elevator.HoldPos());
   // // coralarm.SetDefaultCommand(coralarm.HoldPos());
 
+  // Mate Controls
+
   mate.Circle().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
+        printf("Running circle!\n");
         if (robotState.targetState == STATE_DELIVER_LOW && robotState.currentState == STATE_DELIVER_LOW)
         {return 0;}
         if (robotState.targetState == STATE_FUNNEL && robotState.currentState == STATE_FUNNEL)
@@ -94,7 +101,7 @@ void RobotContainer::ConfigureBindings()
 
         
       },
-      std::pair{0, 
+      std::pair{0,
         robotState.SetTargetState(STATE_NEUTRAL)
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
@@ -107,7 +114,7 @@ void RobotContainer::ConfigureBindings()
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
           .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
       }
-    )
+    ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
   mate.Triangle().OnTrue(
@@ -125,6 +132,7 @@ void RobotContainer::ConfigureBindings()
           .AndThen(robotState.SetCurrentState(STATE_DELIVER_LOW))
       }
     )
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
   mate.Square().OnTrue(
@@ -141,26 +149,31 @@ void RobotContainer::ConfigureBindings()
           .AndThen(robotState.SetCurrentState(STATE_FUNNEL))
       }
     )
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
+
+  mate.Share().OnTrue(frc2::cmd::RunOnce([this] {
+    elevator.GetCurrentCommand()->Cancel();
+  }));
 
   mate.POVUp().OnTrue(
     elevator.SetHeightProvider([this] {return clamp(elevator.target + 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW);})
+    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
   );
 
   mate.POVDown().OnTrue(
     elevator.SetHeightProvider([this] {return clamp(elevator.target - 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW);})
+    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
   );
   
   mate.POVLeft().OnTrue(
     elevator.SetHeightProvider([this] {return clamp(elevator.target - 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW);})
+    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
   );
 
   mate.POVRight().OnTrue(
     elevator.SetHeightProvider([this] {return clamp(elevator.target + 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW);})
+    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
   );
 
   mate.R1().WhileTrue(winch.DrivePower([this]() -> float {
@@ -170,6 +183,14 @@ void RobotContainer::ConfigureBindings()
   mate.L1().WhileTrue(winch.DrivePower([this]() -> float {
     return -0.5f;
   }));
+  
+  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(10_tps)); //intake
+  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-10_tps)); //outake
+
+  // driver.Square().OnTrue(winch.GotoPosition(100_tr));
+  // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
+
+  // Tests
 
   // // For smartdashboard control, comment the normal default task and uncomment these
   // coralarm.SetDefaultCommand(coralarm.SetPositionProvider([] () -> units::angle::turn_t {
@@ -182,16 +203,25 @@ void RobotContainer::ConfigureBindings()
   //     frc::SmartDashboard::GetNumber("ElevatorPos", 0.0)
   //   };
   // }));
-
-  // driver.Square().OnTrue(winch.GotoPosition(100_tr));
-  // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
   
-  // winch.SetDefaultCommand(winch.DrivePower([this]() -> float {
-  //   return (driver.GetR2Axis() - driver.GetL2Axis()) * 0.5;
-  // }));
+  driver.POVUp().OnTrue(winch.TestCommand());
+  
+  // driver.POVDown().OnTrue(winch.TestCommand2().Unless([this] {return winch.iscool;}));
 
-  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(10_tps)); //intake
-  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-10_tps)); //outake
+  // driver.POVDown().OnTrue(
+  //   frc2::cmd::Select<int>(
+  //     [this] {
+  //       if (1)
+  //       {return 0;}
+
+  //       return 1;
+  //     },
+  //     std::pair{0, 
+  //       winch.TestCommand2().Unless([this] {return winch.iscool;})
+  //     }
+  //   )
+  // );
+
   // mate.Triangle().WhileTrue(coralarm.CoralArmRunIntake(1.0));
 }
 

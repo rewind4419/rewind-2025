@@ -5,12 +5,13 @@
 - Binding something to a function that is supposed to
   return a CommandPtr but returns nothing causes a bootloop!
 
-## TODO List
+- Queueing a new command will cancel all the currently running commands,
+  unless the currently running commands are configured to not be interruptable!
+  to configure them, go to the place where the CommandPtr is created, and do
+  .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+  before returning it.
 
-- Diagnose driver code issue - doing rn
-    - For some reason, pressing circle while the elevator moves sets the target state to 0
-    and sometimes even moves the arm or the elevator, but then give up half way
-    and gets into a garbage state where the target and current states are mismatched
+## TODO List
 
 - Fix the black and red swapped wire!
     - it's on motor ID 4, on the elevator
@@ -23,7 +24,7 @@
     - Add feedforwards
     - Prototype more advanced control algorithms
 
-
+    
 
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot

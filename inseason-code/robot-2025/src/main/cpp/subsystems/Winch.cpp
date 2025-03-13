@@ -1,5 +1,9 @@
 #include "subsystems/Winch.h"
+
 #include <frc2/command/FunctionalCommand.h>
+
+#include <frc2/command/Command.h>
+#include <frc2/command/Commands.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -52,4 +56,25 @@ frc2::CommandPtr Winch::GotoPosition(units::angle::turn_t position){
                 return fabsf(this->winchMotor.GetPosition().GetValueAsDouble() - position.value()) < 1.0;},
             {this}
     ).ToPtr();
+}
+
+frc2::CommandPtr Winch::TestCommand()
+{
+    return this->StartEnd(
+        [this] {
+            printf("Started\n");
+            this->iscool = true;
+        }, 
+        [] {
+            printf("Interrupted!\n");
+        }
+    );
+}
+
+frc2::CommandPtr Winch::TestCommand2()
+{
+    return frc2::cmd::StartEnd(
+        [] {printf("Started2\n");},
+        [] {printf("Interrupted2!\n");}
+    );
 }
