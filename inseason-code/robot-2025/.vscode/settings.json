@@ -93,7 +93,9 @@
     "typeinfo": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
-    "xtr1common": "cpp"
+    "xtr1common": "cpp",
+    "*.inc": "cpp",
+    "charconv": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",
