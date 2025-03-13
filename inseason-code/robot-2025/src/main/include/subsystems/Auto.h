@@ -10,11 +10,8 @@ class AutoManager
 public:
     photon::PhotonCamera Cam1{"Cam1"};
     frc::Transform3d robotToCam = frc::Transform3d(frc::Translation3d(0.30_m, 0.28_m, 0.17_m), frc::Rotation3d(0_rad, 0_rad, 0_rad));
-    std::vector<
-    std::pair<photon::PhotonCamera, frc::Transform3d>> cameras;
     frc::AprilTagFieldLayout aprilTagFieldLayout = frc::LoadAprilTagLayoutField(frc::AprilTagField::k2025Reefscape);
-    
-    void Init();
+    std::optional<photon::EstimatedRobotPose> Estimate(photon::PhotonPipelineResult result);
 };
 
  
