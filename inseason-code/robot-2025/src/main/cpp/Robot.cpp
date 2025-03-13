@@ -11,7 +11,7 @@
 #include <frc2/command/PrintCommand.h>
 #include <photon/PhotonUtils.h>
 #include <subsystems/Auto.h>
-
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/SmartDashboard/SmartDashboard.h>
 
 #include "Config.h"
@@ -28,6 +28,8 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::DisabledExit() {}
 
+frc::Field2d m_field;
+
 void Robot::AutonomousInit() {
   // m_autonomousCommand = m_container.GetAutonomousCommand();
 
@@ -36,9 +38,11 @@ void Robot::AutonomousInit() {
     // m_autonomousCommand.value()->Schedule();
     //m_autonomousCommand->Schedule();
   }
+  frc::SmartDashboard::PutData("Field", &m_field);
 }
 
 AutoManager m;
+
 
 void Robot::AutonomousPeriodic() {
   photon::PhotonPipelineResult result = m.Cam1.GetLatestResult();
@@ -49,14 +53,17 @@ void Robot::AutonomousPeriodic() {
     printf("Got a target, checking if it has a value\n");
     if (optional.has_value()){
       printf("I got a value!\n");
+      m_field.SetRobotPose(optional.value().estimatedPose.ToPose2d());
+
     // photon::EstimatedRobotPose estimation = m.Estimate(result).value();
-    frc::SmartDashboard::PutNumber("Photon pose X", m.Estimate(result).value().estimatedPose.X().value());
-    frc::SmartDashboard::PutNumber("Photon pose Y", m.Estimate(result).value().estimatedPose.Y().value());
-    frc::SmartDashboard::PutNumber("Photon pose Z", m.Estimate(result).value().estimatedPose.Z().value());
+    frc::SmartDashboard::PutNumber("Photon pose X", optional.value().estimatedPose.X().value());
+    frc::SmartDashboard::PutNumber("Photon pose Y", optional.value().estimatedPose.Y().value());
+    frc::SmartDashboard::PutNumber("Photon pose Z", optional.value().estimatedPose.Z().value());
     } else {
       printf("No value here.   ");
     }
   }
+  
 }
 
 void Robot::AutonomousExit() {}
