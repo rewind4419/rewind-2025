@@ -29,7 +29,7 @@ void Robot::DisabledPeriodic() {}
 void Robot::DisabledExit() {}
 
 void Robot::AutonomousInit() {
-  m_autonomousCommand = m_container.GetAutonomousCommand();
+  // m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
     m_autonomousCommand.value().get()->Schedule();
@@ -44,6 +44,19 @@ void Robot::AutonomousPeriodic() {
   photon::PhotonPipelineResult result = m.Cam1.GetLatestResult();
   bool hasTargets = result.HasTargets();
   photon::PhotonTrackedTarget target = result.GetBestTarget();
+  std::optional<photon::EstimatedRobotPose> optional = m.Estimate(result);
+  if (hasTargets){
+    printf("Got a target, checking if it has a value\n");
+    if (optional.has_value()){
+      printf("I got a value!\n");
+    // photon::EstimatedRobotPose estimation = m.Estimate(result).value();
+    frc::SmartDashboard::PutNumber("Photon pose X", m.Estimate(result).value().estimatedPose.X().value());
+    frc::SmartDashboard::PutNumber("Photon pose Y", m.Estimate(result).value().estimatedPose.Y().value());
+    frc::SmartDashboard::PutNumber("Photon pose Z", m.Estimate(result).value().estimatedPose.Z().value());
+    } else {
+      printf("No value here.   ");
+    }
+  }
 }
 
 void Robot::AutonomousExit() {}
