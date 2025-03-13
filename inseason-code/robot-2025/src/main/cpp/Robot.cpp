@@ -54,7 +54,6 @@ void Robot::AutonomousPeriodic() {
     if (optional.has_value()){
       printf("I got a value!\n");
       m_field.SetRobotPose(optional.value().estimatedPose.ToPose2d());
-
     // photon::EstimatedRobotPose estimation = m.Estimate(result).value();
     frc::SmartDashboard::PutNumber("Photon pose X", optional.value().estimatedPose.X().value());
     frc::SmartDashboard::PutNumber("Photon pose Y", optional.value().estimatedPose.Y().value());

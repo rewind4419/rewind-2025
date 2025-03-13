@@ -14,12 +14,11 @@
 
 ## TODO List
 
-- Fix the black and red swapped wire!
-    - it's on motor ID 4, on the elevator
+- ~~Fix the black and red swapped wire!~~
+    - ~~It's on motor ID 4, on the elevator~~
 
-- Create commands for positioning elevator/arm to specific reef level
-    - Seperate button to move elevator and arm to each level
-^ Done, needs Conner review
+- ~~Create commands for positioning elevator/arm to specific reef level~~
+    - ~~Seperate button to move elevator and arm to each level~~
 
 - Make swervepather not absolutely garbage
     - Add rotation PID
@@ -27,10 +26,13 @@
     - Prototype more advanced control algorithms
 
 - PhotonVision integration
-    - Create kraken-based swerve drive vision code on new bot
-    - ~~Find out what is needed for pather~~ ***(DONE)***
-        - Figure out how to access the Pose3d from the returned EstimatedRobotPose ***(IN PROGRESS)***
+    - ~~Find out what is needed for pather~~
+        - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
+    - Clean up autonomousperiodic() ***(IN PROGRESS)***
+        1. Make all of it a function
+        2. Make auto a subsystem
     - Measure camera rotation in rads
+
 
 - Write an auto code that simply moves the robot forward
 

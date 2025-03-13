@@ -243,8 +243,19 @@ void RobotContainer::ConfigureBindings()
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  return this->pather.Test();
-
+  std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+  std::optional<int> location = frc::DriverStation::GetLocation();
+  if (alliance.has_value()){
+    if(alliance.value() == 0){
+      printf("red");
+    } else if(alliance.value() == 1){
+      printf("blue");
+    }
+    
+  } else {
+    printf("doesnt exist");
+  }
+  
   // return this->pather.ResetPose(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_rad)))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(0_rad)}))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{-1_m, 1_m, frc::Rotation2d(0_rad)}))
