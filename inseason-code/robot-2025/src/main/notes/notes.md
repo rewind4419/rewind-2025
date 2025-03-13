@@ -17,14 +17,15 @@
 - Fix the black and red swapped wire!
     - it's on motor ID 4, on the elevator
 
-- Create commands for positioning elevator/arm to specific reef level
-    - Seperate button to move elevator and arm to each level
-^ Done, needs Conner review
+- ~~Create commands for positioning elevator/arm to specific reef level~~
+    - ~~Seperate button to move elevator and arm to each level~~
 
-- Make swervepather not absolutely garbage
-    - Add rotation PID
-    - Add feedforwards
-    - Prototype more advanced control algorithms
+- Make swervepather not absolutely garbage ***(IN PROGRESS)***
+    - Make sure the closed loop task uses FOC
+    - Tune the closed loop task
+    - Add point following
+    - Prototype more advanced algorithm for line following
+    - Add bezier curves?? (might not do)
 
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot

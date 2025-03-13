@@ -43,6 +43,7 @@ RobotContainer::RobotContainer()
 
 void RobotContainer::ConfigureBindings()
 {
+  
   // Drivetrain //
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
@@ -243,7 +244,7 @@ void RobotContainer::ConfigureBindings()
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  return this->pather.Test();
+  return this->pather.DriveFor(3_s, 1_mps);
 
   // return this->pather.ResetPose(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_rad)))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(0_rad)}))

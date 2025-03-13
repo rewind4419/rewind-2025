@@ -22,15 +22,15 @@ class TunerConstants {
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants::DriveMotorClosedLoopOutput
     static constexpr configs::Slot0Configs driveGains = configs::Slot0Configs{}
-        .WithKP(10.0).WithKI(0).WithKD(0)
-        .WithKS(0).WithKV(0.124);
+        .WithKP(0.1).WithKI(0).WithKD(0)
+        .WithKS(0.0).WithKV(0.0);
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
     static constexpr swerve::ClosedLoopOutputType kSteerClosedLoopOutput = swerve::ClosedLoopOutputType::Voltage;
     // The closed-loop output type to use for the drive motors;
     // This affects the PID/FF gains for the drive motors
-    static constexpr swerve::ClosedLoopOutputType kDriveClosedLoopOutput = swerve::ClosedLoopOutputType::TorqueCurrentFOC;
+    static constexpr swerve::ClosedLoopOutputType kDriveClosedLoopOutput = swerve::ClosedLoopOutputType::Voltage;
 
     // The type of motor used for the drive motor
     static constexpr swerve::DriveMotorArrangement kDriveMotorType = swerve::DriveMotorArrangement::TalonFX_Integrated;

@@ -46,20 +46,6 @@ void SwervePather::Periodic()
     // ); 
 }
 
-frc2::CommandPtr SwervePather::Test()
-{
-    return this->StartRun(
-        [] {
-            printf("Starting test\n");
-        },
-        [this] {
-            this->drivetrain->SetControl(
-                this->drive_closedloop.WithVelocityX(1_mps)
-            );
-        }
-    );
-}
-
 frc2::CommandPtr SwervePather::ResetPose(frc::Pose2d r)
 {
     return this->RunOnce([this, r] {
@@ -95,7 +81,7 @@ void SwerveCmdDriveFor::Initialize()
 void SwerveCmdDriveFor::Execute()
 {
     this->m_pather->drivetrain->SetControl(
-        this->m_pather->drive_openloop.WithVelocityY(0_mps) // Drive forward with negative Y (forward)
+        this->m_pather->drive_closedloop.WithVelocityY(0_mps) // Drive forward with negative Y (forward)
         .WithVelocityX(this->v) // Drive left with positive X, forward
         .WithRotationalRate(0.0_rad_per_s)
     ); // Drive counterclockwise with negative X (left)
