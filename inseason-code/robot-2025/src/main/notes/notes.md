@@ -1,6 +1,6 @@
 # Notes
 ## Guide
-__Underlined text__
+
 ## Reminders
 
 - Binding something to a function that is supposed to
@@ -26,8 +26,8 @@ __Underlined text__
 
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot
-    - Find out what is needed for pather ***(DONE)***
-        - Figure out how to access the Pose3d from the returned EstimatedRobotPose ***(IN PROGRESS)*** *HEAVY IMPORTANCE*
+    - ~~Find out what is needed for pather~~ ***(DONE)***
+        - Figure out how to access the Pose3d from the returned EstimatedRobotPose ***(IN PROGRESS)***
     - Measure camera rotation in rads
 
 - Write an auto code that simply moves the robot forward
