@@ -63,8 +63,6 @@ public:
   // TODO: add a robot config here
   //pathplanner::RobotConfig config {}s
 
-  float yeet = 0.0f;
-
   /*
   FL Encoder - 8
   FR Encoder - 9

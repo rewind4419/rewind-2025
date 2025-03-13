@@ -46,6 +46,20 @@ void SwervePather::Periodic()
     // ); 
 }
 
+frc2::CommandPtr SwervePather::Test()
+{
+    return this->StartRun(
+        [] {
+            printf("Starting test\n");
+        },
+        [this] {
+            this->drivetrain->SetControl(
+                this->drive_closedloop.WithVelocityX(1_mps)
+            );
+        }
+    );
+}
+
 frc2::CommandPtr SwervePather::ResetPose(frc::Pose2d r)
 {
     return this->RunOnce([this, r] {

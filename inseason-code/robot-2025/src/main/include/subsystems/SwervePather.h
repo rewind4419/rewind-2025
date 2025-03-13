@@ -29,9 +29,11 @@ public:
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
 
     frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target);
+
+    frc2::CommandPtr Test();
     
-    PID translationPID{0.0, 0.0, 0.0};
-    PID rotationPID{0.0, 0.0, 0.0};
+    PID translationPID {0.0, 0.0, 0.0};
+    PID rotationPID {0.0, 0.0, 0.0};
 public:
     // These could be private with a getter but im just making them public so the driving tasks can access this stuff with a pointer to this class easily
     CommandSwerveDrivetrain* drivetrain;
@@ -39,7 +41,8 @@ public:
     swerve::requests::RobotCentric drive_openloop = swerve::requests::RobotCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
 
-    //swerve::requests::RobotCentric drive_pid = swerve::requests::
+    swerve::requests::RobotCentric drive_closedloop = swerve::requests::RobotCentric{}
+        .WithDriveRequestType(swerve::DriveRequestType::Velocity);
 };
 
 // Swerve Pather Commands
