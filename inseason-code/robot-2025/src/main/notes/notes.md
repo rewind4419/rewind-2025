@@ -23,16 +23,14 @@
     - Add feedforwards
     - Prototype more advanced control algorithms
 
-
-
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot
-    - Find out what is needed for pather
-    - Measure camera offset from drivebase midpoint
+    - Find out what is needed for pather ***(DONE)***
+        - Figure out how to access the Pose3d from the returned EstimatedRobotPose ***(IN PROGRESS)***
+    - Measure camera offset from drivebase midpoint ***(DONE)***
+        - Measure camera rotation in rads
 
 - Write an auto code that simply moves the robot forward
-
-- Increase the speed of the wheels of the Coral Arm ***(IN PROGRESS)***
 
 - Lower the default position for intaking coral
 
