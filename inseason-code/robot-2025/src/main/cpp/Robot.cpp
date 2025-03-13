@@ -35,8 +35,6 @@ void Robot::AutonomousInit() {
 
   if (m_autonomousCommand) {
     m_autonomousCommand.value().get()->Schedule();
-    // m_autonomousCommand.value()->Schedule();
-    //m_autonomousCommand->Schedule();
   }
   frc::SmartDashboard::PutData("Field", &m_field);
 }

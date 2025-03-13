@@ -20,10 +20,12 @@
 - ~~Create commands for positioning elevator/arm to specific reef level~~
     - ~~Seperate button to move elevator and arm to each level~~
 
-- Make swervepather not absolutely garbage
-    - Add rotation PID
-    - Add feedforwards
-    - Prototype more advanced control algorithms
+- Make swervepather not absolutely garbage ***(IN PROGRESS)***
+    - Make sure the closed loop task uses FOC
+    - Tune the closed loop task
+    - Add point following
+    - Prototype more advanced algorithm for line following
+    - Add bezier curves?? (might not do)
 
 - PhotonVision integration
     - ~~Find out what is needed for pather~~
