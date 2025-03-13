@@ -94,25 +94,24 @@ void RobotContainer::ConfigureBindings()
     frc2::cmd::Select<int>(
       [this] {
         printf("Running circle!\n");
-        if (robotState.targetState == STATE_DELIVER_LOW && robotState.currentState == STATE_DELIVER_LOW)
+        if (robotState.currentState == STATE_DELIVER_LOW)
         {return 0;}
-        if (robotState.targetState == STATE_FUNNEL && robotState.currentState == STATE_FUNNEL)
+        if (robotState.currentState == STATE_FUNNEL)
         {return 1;}
 
         
       },
       std::pair{0,
-        robotState.SetTargetState(STATE_NEUTRAL)
+        robotState.SetCurrentState(STATE_NEUTRAL)
+          .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
-          .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
       },
       std::pair{1,
-        robotState.SetTargetState(STATE_NEUTRAL)
+        robotState.SetCurrentState(STATE_NEUTRAL)
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-          .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
       }
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
@@ -120,16 +119,15 @@ void RobotContainer::ConfigureBindings()
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
-        if (robotState.targetState == STATE_NEUTRAL && robotState.currentState == STATE_NEUTRAL)
+        if (robotState.currentState == STATE_NEUTRAL)
         {return 0;}
 
         return 1;
       },
       std::pair{0, 
-        robotState.SetTargetState(STATE_DELIVER_LOW)
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
           .AndThen(elevator.SetHeight(2_tr))
-          .AndThen(robotState.SetCurrentState(STATE_DELIVER_LOW))
       }
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -138,15 +136,14 @@ void RobotContainer::ConfigureBindings()
   mate.Square().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
-        if (robotState.targetState == STATE_NEUTRAL && robotState.currentState == STATE_NEUTRAL)
+        if (robotState.currentState == STATE_NEUTRAL)
         {return 0;}
 
         return 1;
       },
       std::pair{0, 
-        robotState.SetTargetState(STATE_FUNNEL)
+        robotState.SetCurrentState(STATE_FUNNEL)
           .AndThen(elevator.SetHeight(1.5_tr))
-          .AndThen(robotState.SetCurrentState(STATE_FUNNEL))
       }
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -157,24 +154,42 @@ void RobotContainer::ConfigureBindings()
   }));
 
   mate.POVUp().OnTrue(
-    elevator.SetHeightProvider([this] {return clamp(elevator.target + 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
-  );
-
-  mate.POVDown().OnTrue(
-    elevator.SetHeightProvider([this] {return clamp(elevator.target - 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
+    robotState.IncrementDeliverHeight()
+    .AndThen(elevator.SetHeightProvider([this] {
+      return robotState.GetDeliverHeight();
+    }, false))
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
+    .Unless([this] {return robotState.currentState != STATE_DELIVER_LOW;})
   );
   
-  mate.POVLeft().OnTrue(
-    elevator.SetHeightProvider([this] {return clamp(elevator.target - 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
+  mate.POVDown().OnTrue(
+    robotState.DecrementDeliverHeight()
+    .AndThen(elevator.SetHeightProvider([this] {
+      return robotState.GetDeliverHeight();
+    }, false))
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
+    .Unless([this] {return robotState.currentState != STATE_DELIVER_LOW;})
   );
 
-  mate.POVRight().OnTrue(
-    elevator.SetHeightProvider([this] {return clamp(elevator.target + 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
-    .Unless([this] {return (robotState.targetState != STATE_DELIVER_LOW) || (robotState.currentState != STATE_DELIVER_LOW);})
-  );
+//   mate.POVUp().OnTrue(
+//     elevator.SetHeightProvider([this] {return clamp(elevator.target + 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
+//     .Unless([this] {return (robotState.currentState != STATE_DELIVER_LOW);})
+//   );
+
+//   mate.POVDown().OnTrue(
+//     elevator.SetHeightProvider([this] {return clamp(elevator.target - 1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
+//     .Unless([this] {return (robotState.currentState != STATE_DELIVER_LOW);})
+//   );
+  
+//   mate.POVLeft().OnTrue(
+//     elevator.SetHeightProvider([this] {return clamp(elevator.target - 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
+//     .Unless([this] {return (robotState.currentState != STATE_DELIVER_LOW);})
+//   );
+
+//   mate.POVRight().OnTrue(
+//     elevator.SetHeightProvider([this] {return clamp(elevator.target + 0.1_tr, ELEVATOR_MIN, ELEVATOR_SAFE_MAX);})
+//     .Unless([this] {return (robotState.currentState != STATE_DELIVER_LOW);})
+//   );
 
   mate.R1().WhileTrue(winch.DrivePower([this]() -> float {
     return 0.5f;

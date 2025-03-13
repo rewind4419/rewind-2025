@@ -71,7 +71,7 @@ frc2::CommandPtr Elevator::HoldPos() {
     });
 }
 
-frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
+frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos, bool wait)
 {
     return frc2::FunctionalCommand(
             [this, pos] () {
@@ -86,7 +86,8 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
             [this, pos] (bool interrupted) {
                 printf("Ended elevator pos\n");
             },
-            [this, pos] () -> bool {
+            [this, pos, wait] () -> bool {
+                if (wait == false) {return true;}
                 //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
                 bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos.value()) < this->epsilon;
                 // Once we reached the goal, update the current
@@ -96,7 +97,7 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos)
     ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
-frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos)
+frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait)
 {
     return frc2::FunctionalCommand(
         [this, pos] () {
@@ -107,14 +108,15 @@ frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t(
             this->motor2.SetControl(elevatorFollower);
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
-        [this, pos] () -> bool {
+        [this, pos, wait] () -> bool {
+            if (wait == false) {return true;}
             //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
             bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;
             // Once we reached the goal, update the current
             return done;
         },
         {this}
-    ).ToPtr();
+    ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
 frc2::CommandPtr Elevator::DrivePower(std::function<float()> powerProvider){

@@ -19,8 +19,12 @@ public:
     // Height is in meters
     frc2::CommandPtr Home();
     frc2::CommandPtr HoldPos();
-    frc2::CommandPtr SetHeight(units::angle::turn_t pos);
-    frc2::CommandPtr SetHeightProvider(std::function<units::angle::turn_t()> pos);
+
+    // If wait is true, the task doesn't finish until the elevator reaches its target.
+    // If wait is false, the task tells the elevator to start moving and then finishes immediately.
+    // Wait is true by default, so if you don't specify, it will wait.
+    frc2::CommandPtr SetHeight(units::angle::turn_t pos, bool wait = true);
+    frc2::CommandPtr SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait = true);
     frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
     units::angle::turn_t target;

@@ -15,6 +15,14 @@ enum State
     STATE_DELIVER_LOW
 };
 
+enum DeliverHeight
+{
+    DELIVER_ZERO,
+    DELIVER_LOW,
+    DELIVER_MID,
+    DELIVER_HIGH
+};
+
 class RobotState : public frc2::SubsystemBase
 {
 public:
@@ -23,9 +31,17 @@ public:
     void Periodic() override;
 
     State currentState = STATE_NEUTRAL;
-    State targetState = STATE_NEUTRAL;
+    // State targetState = STATE_NEUTRAL;
+
+    DeliverHeight deliverHeight = DELIVER_ZERO;
     
     frc2::CommandPtr SetCurrentState(State state);
-    frc2::CommandPtr SetTargetState(State state);
+    
+    frc2::CommandPtr SetDeliverHeight(DeliverHeight height);
+    frc2::CommandPtr IncrementDeliverHeight();
+    frc2::CommandPtr DecrementDeliverHeight();
+
+    units::angle::turn_t GetDeliverHeight();
+    // frc2::CommandPtr SetTargetState(State state);
 private:
 };

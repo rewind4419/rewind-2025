@@ -38,6 +38,8 @@ public:
 
     swerve::requests::RobotCentric drive_openloop = swerve::requests::RobotCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
+
+    swerve::requests::RobotCentric drive_pid = swerve::requests::
 };
 
 // Swerve Pather Commands

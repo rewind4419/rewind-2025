@@ -23,6 +23,10 @@
 #define ELEVATOR_IN_MAX 4.0_tr // Highest elevator can go when coral arm at 0
 #define ELEVATOR_SAFE_MAX 18_tr // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 
+#define ELEVATOR_DELIVER_LOW 3_tr
+#define ELEVATOR_DELIVER_MID 6_tr
+#define ELEVATOR_DELIVER_HIGH 9_tr
+
 #define CORAL_ARM_MIN 0_tr
 #define CORAL_ARM_INTAKING_MAX 0.025_tr
 #define CORAL_ARM_SAFE 0.3_tr // Any less than this, and can't extend elevator all the way

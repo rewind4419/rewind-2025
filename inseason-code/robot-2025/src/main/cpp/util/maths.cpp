@@ -17,6 +17,13 @@ float lenSq(float x, float y)
     return(x*x+y*y);
 }
 
+int clamp(int x, int min, int max)
+{
+    if (x < min) {return min;}
+    if (x > max) {return max;}
+    return x;
+}
+
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max)
 {
     if (x < min) {return min;}

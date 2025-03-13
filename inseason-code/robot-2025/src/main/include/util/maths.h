@@ -10,6 +10,8 @@ float clamp(float x, float min, float max);
 float len(float x, float y);
 float lenSq(float x, float y);
 
+int clamp(int x, int min, int max);
+
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max);
 // General purpose vector 2 class
 class V2

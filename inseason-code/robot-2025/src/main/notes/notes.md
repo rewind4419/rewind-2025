@@ -18,13 +18,12 @@
 
 - Create commands for positioning elevator/arm to specific reef level
     - Seperate button to move elevator and arm to each level
+^ Done, needs Conner review
 
 - Make swervepather not absolutely garbage
     - Add rotation PID
     - Add feedforwards
     - Prototype more advanced control algorithms
-
-    
 
 - PhotonVision integration
     - Create kraken-based swerve drive vision code on new bot
