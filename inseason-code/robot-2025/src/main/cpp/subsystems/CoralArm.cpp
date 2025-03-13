@@ -142,7 +142,7 @@ frc2::CommandPtr CoralArm::CoralArmRunIntake(units::angular_velocity::turns_per_
     return this->RunEnd(
     [this, speed] {
         // On task start
-        printf("Start \n");
+        //printf("Start \n");
         //coralIntakeMotorL.Set(speed);
         //coralIntakeMotorR.Set(-speed);
         //coralIntakeMotor.Set(speed);
@@ -150,7 +150,7 @@ frc2::CommandPtr CoralArm::CoralArmRunIntake(units::angular_velocity::turns_per_
         //coralIntakeMotor.SetInverted(true); //invert the second set of wheels
     }, 
     [this] {
-        printf("End \n");
+        //printf("End \n");
         // On task end/cancel
         //coralIntakeMotorL.Set(0.0);
         //coralIntakeMotorR.Set(0.0);
