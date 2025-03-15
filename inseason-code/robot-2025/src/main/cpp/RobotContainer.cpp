@@ -81,7 +81,7 @@ void RobotContainer::ConfigureBindings()
   // Hold Pos (defaults)
 
   winch.SetDefaultCommand(winch.HoldPos());
-
+  coralwrist.SetDefaultCommand(coralwrist.HoldPos());
   elevator.SetDefaultCommand(elevator.HoldPos());
   coralarm.SetDefaultCommand(coralarm.HoldPos());
 
@@ -116,6 +116,11 @@ void RobotContainer::ConfigureBindings()
       }
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
+
+  if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0){
+    units::angular_velocity::turns_per_second_t turns(mate.GetLeftY());
+    coralwrist.SetWristVelocity(turns);
+  }
 
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(

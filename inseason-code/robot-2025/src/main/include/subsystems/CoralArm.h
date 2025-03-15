@@ -31,6 +31,7 @@ public:
     frc2::CommandPtr SetPosition(units::angle::turn_t pos, bool wait = true);
     frc2::CommandPtr SetPositionProvider(std::function<units::angle::turn_t()> pos, bool wait = true);
 
+    // Set wrist turn speed
     // Base intake motor speed to hold coral in arm
     frc2::CommandPtr CoralArmBaseIntake(double speed);
     // Runs the Coral Intake motors at the specified POWER until the task is canceled
@@ -46,7 +47,6 @@ public:
     ctre::phoenix6::hardware::TalonFX motor1 {CORAL_ARM_MOTOR_ID, "rio"};
 
     ctre::phoenix6::hardware::TalonFX coralIntakeMotor {CORAL_INTAKE_MOTOR_ID};
-    //ctre::phoenix6::hardware::TalonFX coralIntakeMotorR {CORAL_INTAKE_MOTOR_ID_2}; Just in case we need another Kraken
 
     ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
     

@@ -15,6 +15,7 @@
 #include "subsystems/SwervePather.h"
 #include "subsystems/CoralArm.h"
 #include "subsystems/Winch.h"
+#include "subsystems/CoralWrist.h"
 
 #include "subsystems/RobotState.h"
 
@@ -52,6 +53,7 @@ public:
   Elevator elevator {};
   CoralArm coralarm {};
   Winch winch;
+  CoralWrist coralwrist;
 
   RobotState robotState;
 

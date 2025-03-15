@@ -27,6 +27,10 @@
     - Prototype more advanced algorithm for line following
     - Add bezier curves?? (might not do)
 
+- Wrist code
+    - Make a function for turning the wrist
+    - New zero
+
 - PhotonVision integration
     - ~~Find out what is needed for pather~~
         - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~

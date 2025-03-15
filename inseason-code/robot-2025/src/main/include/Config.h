@@ -6,6 +6,7 @@
 //#define CORAL_INTAKE_MOTOR_ID_2 2
 
 #define CORAL_ARM_MOTOR_ID 5
+#define CORAL_WRIST_MOTOR_ID 10 // Needs to be set, placeholder
 
 #define ELEVATOR_MOTOR_1_ID 3
 #define ELEVATOR_MOTOR_2_ID 4
@@ -26,6 +27,11 @@
 #define ELEVATOR_DELIVER_LOW 3_tr
 #define ELEVATOR_DELIVER_MID 6_tr
 #define ELEVATOR_DELIVER_HIGH 9_tr
+
+#define CORAL_WRIST_MIN 0_tr
+#define CORAL_WRIST_INTAKING_MAX 0.025_tr // All 3 of these are arbitrary at the moment 
+#define CORAL_WRIST_SAFE 0.3_tr // Arbitrary
+#define CORAL_WRIST_MAX 0.40_tr // Arbitrar
 
 #define CORAL_ARM_MIN 0_tr
 #define CORAL_ARM_INTAKING_MAX 0.025_tr
