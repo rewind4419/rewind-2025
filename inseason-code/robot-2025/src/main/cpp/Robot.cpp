@@ -31,7 +31,7 @@ void Robot::DisabledExit() {}
 frc::Field2d m_field;
 
 void Robot::AutonomousInit() {
-  // m_autonomousCommand = m_container.GetAutonomousCommand();
+  m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
     m_autonomousCommand.value().get()->Schedule();
@@ -84,20 +84,6 @@ void Robot::TeleopInit() {
     m_autonomousCommand.value().get()->Cancel();
   }
 
-  // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-  // slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-  // slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-  // slot0Configs.kP = 0.2; // A position error of 2.5 rotations results in 12 V output
-  // // slot0Configs.kI = 0; // no output for integrated error
-  // // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-
-  // motionMagicConfigs.MotionMagicCruiseVelocity = 10_tps; // Target cruise velocity of 80 rps
-  // motionMagicConfigs.MotionMagicAcceleration = 160_tr_per_s_sq; // Target acceleration of 160 rps/s (0.5 seconds)
-  // motionMagicConfigs.MotionMagicJerk = 1600_tr_per_s_cu; // Target jerk of 1600 rps/s/s (0.1 seconds)
-
-  // winchMotor.GetConfigurator().Apply(talonFXConfigs);
-
-  // winchMotor.SetPosition(100_tr);
 }
 
 void Robot::TeleopPeriodic() {

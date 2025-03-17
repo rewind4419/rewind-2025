@@ -14,22 +14,18 @@
 
 ## TODO List
 
-- ~~Fix the black and red swapped wire!~~
-    - ~~It's on motor ID 4, on the elevator~~
-
-- ~~Create commands for positioning elevator/arm to specific reef level~~
-    - ~~Seperate button to move elevator and arm to each level~~
-
 - Make swervepather not absolutely garbage ***(IN PROGRESS)***
-    - Make sure the closed loop task uses FOC
-    - Tune the closed loop task
-    - Add point following
-    - Prototype more advanced algorithm for line following
-    - Add bezier curves?? (might not do)
+    - Tune closed loop task to go at the target velocity, especially at low velocities
+    - Add point following with tasks that end after reaching goal or stalling
+    - Test navigation between multiple points with tasks
+    - Integrate vision
 
 - Wrist code
-    - Make a function for turning the wrist
-    - New zero
+    - Switch wrist to use a position PID for everything
+    - Set zero on init using the rev encoder
+
+- Full driver code
+    - Fix chassis control sensitivity
 
 - PhotonVision integration
     - ~~Find out what is needed for pather~~

@@ -81,7 +81,7 @@ void RobotContainer::ConfigureBindings()
   // Hold Pos (defaults)
 
   winch.SetDefaultCommand(winch.HoldPos());
-  coralwrist.SetDefaultCommand(coralwrist.HoldPos());
+  //coralwrist.SetDefaultCommand(coralwrist.HoldPos());
   elevator.SetDefaultCommand(elevator.HoldPos());
   coralarm.SetDefaultCommand(coralarm.HoldPos());
 
@@ -117,10 +117,10 @@ void RobotContainer::ConfigureBindings()
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
-  if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0){
-    units::angular_velocity::turns_per_second_t turns(mate.GetLeftY());
-    coralwrist.SetWristVelocity(turns);
-  }
+  // if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0){
+  //   units::angular_velocity::turns_per_second_t turns(mate.GetLeftY());
+  //   coralwrist.SetWristVelocity(turns);
+  // }
 
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(
@@ -249,7 +249,10 @@ void RobotContainer::ConfigureBindings()
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  return this->pather.DriveFor(3_s, 1_mps);
+  return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
+    //.AndThen(this->pather.DriveFor(3_s, 0.5_mps));
+    .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{1_rad}}, 1_mps));
+
   // return this->pather.ResetPose(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_rad)))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(0_rad)}))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{-1_m, 1_m, frc::Rotation2d(0_rad)}))

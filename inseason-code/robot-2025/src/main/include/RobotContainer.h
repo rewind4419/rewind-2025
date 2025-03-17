@@ -34,9 +34,7 @@ private:
   swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
     .WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
-    
-
-    
+  
   swerve::requests::SwerveDriveBrake brake{};
   swerve::requests::PointWheelsAt point{};
 
@@ -53,7 +51,7 @@ public:
   Elevator elevator {};
   CoralArm coralarm {};
   Winch winch;
-  CoralWrist coralwrist;
+  //CoralWrist coralwrist;
 
   RobotState robotState;
 
@@ -75,9 +73,4 @@ public:
 
 private:
   void ConfigureBindings();
-
-  // frc2::CommandPtr first;
-  // frc2::CommandPtr second;
-  // frc2::CommandPtr third;
-  // frc2::CommandPtr parallel;
 };

@@ -5,6 +5,10 @@
 
 #include "util/maths.h"
 
+#include <units/length.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+
 #include <frc2/command/Commands.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -12,14 +16,14 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
 {
     this->drivetrain = drivetrain;
 
-    // SmartDashboard PID Tuning
-    frc::SmartDashboard::PutNumber("Translation kP", 0.0);
-    frc::SmartDashboard::PutNumber("Translation kI", 0.0);
-    frc::SmartDashboard::PutNumber("Translation kD", 0.0);
+    // // SmartDashboard PID Tuning
+    // frc::SmartDashboard::PutNumber("Translation kP", 0.0);
+    // frc::SmartDashboard::PutNumber("Translation kI", 0.0);
+    // frc::SmartDashboard::PutNumber("Translation kD", 0.0);
 
-    frc::SmartDashboard::PutNumber("Rotation kP", 0.0);
-    frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
-    frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
+    // frc::SmartDashboard::PutNumber("Rotation kP", 0.0);
+    // frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
+    // frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
 
     
 }
@@ -58,9 +62,9 @@ frc2::CommandPtr SwervePather::DriveFor(units::time::second_t timer, units::velo
     return SwerveCmdDriveFor(this, timer, v).ToPtr();
 }
 
-frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target)
+frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV)
 {
-    return SwerveCmdDriveWaypointSimple(this, target).ToPtr();
+    return SwerveCmdDriveWaypointSimple(this, target, maxV).ToPtr();
 }
 
 SwerveCmdDriveFor::SwerveCmdDriveFor(SwervePather* pather, units::time::second_t timer, units::velocity::meters_per_second_t v)
@@ -74,16 +78,19 @@ SwerveCmdDriveFor::SwerveCmdDriveFor(SwervePather* pather, units::time::second_t
 void SwerveCmdDriveFor::Initialize()
 {
     //printf("Starting drive with speed %f\n", this->v.value());
-    frc::SmartDashboard::PutString("Status", "Starting periodic drive");
+    // frc::SmartDashboard::PutString("Status", "Starting periodic drive");
     this->startTime = frc::Timer::GetFPGATimestamp().value();
 }
 
 void SwerveCmdDriveFor::Execute()
 {
+    units::angular_velocity::radians_per_second_t rVel {this->v.value()};
+
     this->m_pather->drivetrain->SetControl(
         this->m_pather->drive_closedloop.WithVelocityY(0_mps) // Drive forward with negative Y (forward)
-        .WithVelocityX(this->v) // Drive left with positive X, forward
-        .WithRotationalRate(0.0_rad_per_s)
+        .WithVelocityX(0_mps) // Drive left with positive X, forward
+
+        .WithRotationalRate(rVel)
     ); // Drive counterclockwise with negative X (left)
     
     //printf("Elapsed %f seconds\n", frc::Timer::GetFPGATimestamp().value() - startTime);
@@ -91,7 +98,7 @@ void SwerveCmdDriveFor::Execute()
 
 void SwerveCmdDriveFor::End(bool interrupted)
 {
-    frc::SmartDashboard::PutString("Status", "Finished periodic drive");
+    // frc::SmartDashboard::PutString("Status", "Finished periodic drive");
     //printf("Stopping, %s\n", interrupted ? "interrupted" : "not interrupted");
 }
 
@@ -100,16 +107,19 @@ bool SwerveCmdDriveFor::IsFinished()
     return (frc::Timer::GetFPGATimestamp().value() > startTime + this->timer.value());
 }
 
-SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target)
+SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV)
 {
     AddRequirements(pather->drivetrain);
     this->m_pather = pather;
+    this->maxV = maxV;
     this->target = target;
 }
 
 void SwerveCmdDriveWaypointSimple::Initialize()
 {
     frc::SmartDashboard::PutString("Status", "Started waypoint");
+
+    this->startTime = frc::Timer::GetFPGATimestamp().value();
 }
 
 void SwerveCmdDriveWaypointSimple::Execute()
@@ -127,17 +137,39 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     frc::SmartDashboard::PutNumber("DiffX", diffTranslation.X().value());
     frc::SmartDashboard::PutNumber("DiffY", diffTranslation.Y().value());
+    frc::SmartDashboard::PutNumber("DiffR", diffRot.Radians().value());
 
-    float diffMagnitude = sqrtf(diffTranslation.X().value() * diffTranslation.X().value() + diffTranslation.Y().value() * diffTranslation.Y().value());
+    float distanceToGoal = sqrtf(diffTranslation.X().value() * diffTranslation.X().value() + diffTranslation.Y().value() * diffTranslation.Y().value());
 
-    float factor = clamp(diffMagnitude, -0.5, 0.5) / diffMagnitude;
+    float velocityTarget = clamp(distanceToGoal * 3.0f, -1.0f, 1.0f);
+
+    // start time in seconds
+    double elapsedTime = frc::Timer::GetFPGATimestamp().value() - this->startTime;
+    elapsedTime *= 2.0;
+    velocityTarget = clamp(velocityTarget, -elapsedTime, elapsedTime);
+
+    float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
+
+    float rotationVelocityTarget = clamp(rotationDistanceToGoal * 3.0f, -1.0f, 1.0f);
+
+    rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
+
+    frc::SmartDashboard::PutNumber("DistanceToTarget", distanceToGoal);
+    frc::SmartDashboard::PutNumber("VelocityTarget", velocityTarget);
+
+    frc::SmartDashboard::PutNumber("RotationDistanceToTarget", rotationDistanceToGoal);
+    frc::SmartDashboard::PutNumber("RotationVelocityTarget", rotationVelocityTarget);
 
     this->m_pather->drivetrain->SetControl(
-        this->m_pather->drive_openloop
-        .WithVelocityY((diffTranslation.Y().value() * factor) * 1_mps)
-        .WithVelocityX((diffTranslation.X().value() * factor) * 1_mps)
-        .WithRotationalRate(0.0_rad_per_s)
+        this->m_pather->drive_closedloop
+        .WithVelocityX((diffTranslation.X().value() / distanceToGoal * velocityTarget) * 1_mps)
+        .WithVelocityY((diffTranslation.Y().value() / distanceToGoal * velocityTarget) * 1_mps)
+        .WithRotationalRate((diffRot.Radians().value() * rotationVelocityTarget) * 1_rad_per_s)
     );
+
+    frc::SmartDashboard::PutNumber("ApplyingX", (diffTranslation.X().value() / distanceToGoal * velocityTarget));
+    frc::SmartDashboard::PutNumber("ApplyingY", (diffTranslation.Y().value() / distanceToGoal * velocityTarget));
+    frc::SmartDashboard::PutNumber("ApplyingR", (diffRot.Radians().value() * rotationVelocityTarget));
 
     this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
     frc::SmartDashboard::PutNumber("Distance to goal", this->lastDistance);
@@ -152,6 +184,6 @@ void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
 {
-   // return false;
-    return (this->lastDistance < 0.35);
+    return false;
+    //return (this->lastDistance < 0.35);
 }

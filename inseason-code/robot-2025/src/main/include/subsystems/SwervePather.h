@@ -28,7 +28,7 @@ public:
     frc2::CommandPtr ResetPose(frc::Pose2d r);
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
 
-    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target);
+    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV);
 
     frc2::CommandPtr Test();
     
@@ -41,7 +41,7 @@ public:
     swerve::requests::RobotCentric drive_openloop = swerve::requests::RobotCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage);
 
-    swerve::requests::RobotCentric drive_closedloop = swerve::requests::RobotCentric{}
+    swerve::requests::FieldCentric drive_closedloop = swerve::requests::FieldCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::Velocity);
 };
 
@@ -66,7 +66,7 @@ private:
 class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveWaypointSimple>
 {
 public:
-    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target);
+    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV);
 
     void Initialize() override;
     void Execute() override;
@@ -76,5 +76,6 @@ private:
     SwervePather* m_pather;
     double startTime;
     frc::Pose2d target;
+    units::velocity::meters_per_second_t maxV;
     double lastDistance = 10.0;
 };

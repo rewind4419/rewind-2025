@@ -7,8 +7,10 @@ CoralWrist::CoralWrist(){
 }
 frc2::CommandPtr CoralWrist::SetWristVelocity(units::angular_velocity::turns_per_second_t speed){
     return this->Run([this, speed] {
-        this->coralWristMotor.SetControl(coralWristVelRequest.WithVelocity(speed * maxspeed));
-        this->pos = coralWristMotor.GetPosition().GetValue();
+        // // Commented out for now, there is some weird compile error from here involving unit conversions - Sherwin
+        // // I also commented out the CoralWrist from RobotContainer.h and all references to it in RobotContainer.cpp
+        // this->coralWristMotor.SetControl(coralWristVelRequest.WithVelocity(speed * maxspeed));
+        // this->pos = coralWristMotor.GetPosition().GetValue();
     }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 frc2::CommandPtr CoralWrist::HoldPos(){
