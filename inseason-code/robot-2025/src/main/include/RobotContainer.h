@@ -51,7 +51,7 @@ public:
   Elevator elevator {};
   CoralArm coralarm {};
   Winch winch;
-  //CoralWrist coralwrist;
+  CoralWrist coralwrist;
 
   RobotState robotState;
 

@@ -39,6 +39,7 @@ RobotContainer::RobotContainer()
 
   frc::SmartDashboard::PutNumber("ElevatorPos", 0.0);
   frc::SmartDashboard::PutNumber("CoralArmPos", 0.0);
+  frc::SmartDashboard::PutNumber("WristPos", 0.0);
 }
 
 void RobotContainer::ConfigureBindings()
@@ -224,6 +225,12 @@ void RobotContainer::ConfigureBindings()
   //     frc::SmartDashboard::GetNumber("ElevatorPos", 0.0)
   //   };
   // }));
+
+  coralwrist.SetDefaultCommand(coralwrist.SetPositionProvider([] () -> units::angle::turn_t {
+    return units::angle::turn_t{
+      frc::SmartDashboard::GetNumber("WristPos", 0.0)
+    };
+  }));
   
   driver.POVUp().OnTrue(winch.TestCommand());
   
