@@ -23,7 +23,8 @@ configs::TalonFXConfiguration abcdetalonFXConfigs{}; //Wheels
 CoralArm::CoralArm() {
     printf("Initialized coral arm\n");
 
-    this->motor1.SetPosition(0_tr);
+    this->motor1.SetPosition(CORAL_ARM_MIN);
+    this->target = CORAL_ARM_MIN;
 
     // in init function
     
@@ -67,8 +68,6 @@ CoralArm::CoralArm() {
     this->motor1.GetConfigurator().Apply(feedback);
 
     this->coralIntakeMotor.GetConfigurator().Apply(abcdetalonFXConfigs);
-
-    this->target = 0.0_tr;
 }
 
 void CoralArm::Periodic() {

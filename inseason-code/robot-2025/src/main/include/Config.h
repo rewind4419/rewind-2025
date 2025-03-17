@@ -33,7 +33,7 @@
 #define CORAL_WRIST_SAFE 0.3_tr // Arbitrary
 #define CORAL_WRIST_MAX 0.40_tr // Arbitrar
 
-#define CORAL_ARM_MIN 0_tr
+#define CORAL_ARM_MIN 0.04444444444_tr // The angle of the arm when its resting on the hard stop
 #define CORAL_ARM_INTAKING_MAX 0.025_tr
 #define CORAL_ARM_SAFE 0.3_tr // Any less than this, and can't extend elevator all the way
 #define CORAL_ARM_MAX 0.40_tr // Arbitrary

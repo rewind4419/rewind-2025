@@ -14,34 +14,35 @@
 
 ## TODO List
 
-- Make swervepather not absolutely garbage ***(IN PROGRESS)***
+- Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
     - Tune closed loop task to go at the target velocity, especially at low velocities
     - Add point following with tasks that end after reaching goal or stalling
     - Test navigation between multiple points with tasks
     - Integrate vision
 
 - Wrist code
-    - Switch wrist to use a position PID for everything
+    - Switch wrist to use a position PID for everything ***(IN PROGRESS)***
     - Set zero on init using the rev encoder
 
-- Full driver code
+- Full driver code [Sherwin]
     - Fix chassis control sensitivity
 
-- PhotonVision integration
+- PhotonVision integration [Sam]
     - ~~Find out what is needed for pather~~
         - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
     - Clean up autonomousperiodic() ***(IN PROGRESS)***
         1. Make all of it a function
         2. Make auto a subsystem
-    - Measure camera rotation in rads
+    - Measure camera rotation in rads ***(IN PROGRESS)***
+    - Tell the odometry whats its new pose is
 
-
-- Write an auto code that simply moves the robot forward
+- Wrist [Nethra]
+    - Find positions for wrist
+    - Add positions to the buttons
+    (look at how its done in the CoralArm and Elevator and do the same for the coralwrist)
+    - Joystick control using SetPositionProvider()
 
 - Lower the default position for intaking coral
-
-- Fix driver code
-    - Sometimes triangle doesn't work until pressing circle first
 
 ## Subsystems
 
