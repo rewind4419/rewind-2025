@@ -22,6 +22,15 @@ Winch::Winch()
     winchMotor.GetConfigurator().Apply(slot0Configs);
 
     this->winchMotor.SetPosition(0_tr);
+
+    // Set Current Limits
+    ctre::phoenix6::configs::CurrentLimitsConfigs currentLimitConfigs;
+    currentLimitConfigs.StatorCurrentLimit = 40_A;
+    currentLimitConfigs.StatorCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLimit = 40_A;
+    currentLimitConfigs.SupplyCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLowerLimit = 0_A;
+    this->winchMotor.GetConfigurator().Apply(currentLimitConfigs);
 }
 
 void Winch::Periodic()

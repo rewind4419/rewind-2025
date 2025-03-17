@@ -30,6 +30,16 @@ Elevator::Elevator() {
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
     slot0Configs.kG = 0.3;
 
+    // Set Current Limits
+    ctre::phoenix6::configs::CurrentLimitsConfigs currentLimitConfigs;
+    currentLimitConfigs.StatorCurrentLimit = 40_A;
+    currentLimitConfigs.StatorCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLimit = 40_A;
+    currentLimitConfigs.SupplyCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLowerLimit = 0_A;
+    this->motor1.GetConfigurator().Apply(currentLimitConfigs);
+    this->motor2.GetConfigurator().Apply(currentLimitConfigs);
+
     // set Motion Magic settings
     auto& motionMagicConfigs = abcdtalonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 80_tps; // Target cruise velocity of 80 rps

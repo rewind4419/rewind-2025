@@ -41,6 +41,16 @@ CoralArm::CoralArm() {
     auto& slot1Configs = abcdetalonFXConfigs.Slot0;
     slot1Configs.kP = 0.3;
 
+    // Set Current Limits
+    ctre::phoenix6::configs::CurrentLimitsConfigs currentLimitConfigs;
+    currentLimitConfigs.StatorCurrentLimit = 40_A;
+    currentLimitConfigs.StatorCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLimit = 40_A;
+    currentLimitConfigs.SupplyCurrentLimitEnable = true;
+    currentLimitConfigs.SupplyCurrentLowerLimit = 0_A;
+    this->motor1.GetConfigurator().Apply(currentLimitConfigs);
+    this->coralIntakeMotor.GetConfigurator().Apply(currentLimitConfigs);
+
     // set Motion Magic settings
     auto& motionMagicConfigs = abctalonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 100_tps; // Target cruise velocity of 80 rps
