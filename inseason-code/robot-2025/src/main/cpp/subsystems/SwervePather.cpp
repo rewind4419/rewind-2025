@@ -25,7 +25,9 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
     // frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
     // frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
 
-    
+    // frc::SmartDashboard::PutNumber("Manual X Target", 0.0);
+    // frc::SmartDashboard::PutNumber("Manual Y Target", 0.0);
+    // frc::SmartDashboard::PutNumber("Manual R Target", 0.0);
 }
 
 void SwervePather::Periodic()
@@ -50,6 +52,18 @@ void SwervePather::Periodic()
     // ); 
 }
 
+frc2::CommandPtr SwervePather::Debug()
+{
+    return this->Run([this] {
+        this->drivetrain->SetControl(
+            this->drive_closedloop
+            .WithVelocityX(frc::SmartDashboard::GetNumber("Manual X Target", 0.0) * 1_mps)
+            .WithVelocityY(frc::SmartDashboard::GetNumber("Manual Y Target", 0.0) * 1_mps)
+            .WithRotationalRate(frc::SmartDashboard::GetNumber("Manual R Target", 0.0) * 1_rad_per_s)
+        );
+    });
+}
+
 frc2::CommandPtr SwervePather::ResetPose(frc::Pose2d r)
 {
     return this->RunOnce([this, r] {
@@ -62,9 +76,9 @@ frc2::CommandPtr SwervePather::DriveFor(units::time::second_t timer, units::velo
     return SwerveCmdDriveFor(this, timer, v).ToPtr();
 }
 
-frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV)
+frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance)
 {
-    return SwerveCmdDriveWaypointSimple(this, target, maxV).ToPtr();
+    return SwerveCmdDriveWaypointSimple(this, target, maxV, slopDistance).ToPtr();
 }
 
 SwerveCmdDriveFor::SwerveCmdDriveFor(SwervePather* pather, units::time::second_t timer, units::velocity::meters_per_second_t v)
@@ -107,12 +121,13 @@ bool SwerveCmdDriveFor::IsFinished()
     return (frc::Timer::GetFPGATimestamp().value() > startTime + this->timer.value());
 }
 
-SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV)
+SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance)
 {
     AddRequirements(pather->drivetrain);
     this->m_pather = pather;
     this->maxV = maxV;
     this->target = target;
+    this->slopDistance = slopDistance;
 }
 
 void SwerveCmdDriveWaypointSimple::Initialize()
@@ -141,7 +156,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float distanceToGoal = sqrtf(diffTranslation.X().value() * diffTranslation.X().value() + diffTranslation.Y().value() * diffTranslation.Y().value());
 
-    float velocityTarget = clamp(distanceToGoal * 3.0f, -1.0f, 1.0f);
+    double velocityTarget = clamp(distanceToGoal * 3.0f, -1.0f, 1.0f);
 
     // start time in seconds
     double elapsedTime = frc::Timer::GetFPGATimestamp().value() - this->startTime;
@@ -150,7 +165,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
 
-    float rotationVelocityTarget = clamp(rotationDistanceToGoal * 3.0f, -1.0f, 1.0f);
+    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 10.0f, -2.0f, 2.0f);
 
     rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
 
@@ -172,6 +187,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
     frc::SmartDashboard::PutNumber("ApplyingR", (diffRot.Radians().value() * rotationVelocityTarget));
 
     this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
+    this->lastRotDistance = diffRot.Radians().value();
     frc::SmartDashboard::PutNumber("Distance to goal", this->lastDistance);
 
     // printf("Distance: %f\n", this->lastDistance);
@@ -184,6 +200,5 @@ void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
 {
-    return false;
-    //return (this->lastDistance < 0.35);
+    return (this->lastDistance < slopDistance && this->lastRotDistance < 0.15f);
 }

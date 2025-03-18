@@ -34,8 +34,9 @@ CommandSwerveDrivetrain drivetrain;
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
-  if (m_autonomousCommand) {
+  if (m_autonomousCommand.has_value()) {
     m_autonomousCommand.value().get()->Schedule();
+    //m_autonomousCommand.value().get()->Schedule();
   }
   frc::SmartDashboard::PutData("Field", &m_field);
 }
@@ -67,8 +68,8 @@ auto& motionMagicConfigs = talonFXConfigs.MotionMagic;
 controls::MotionMagicTorqueCurrentFOC b{0_tr};
 
 void Robot::TeleopInit() {
-  if (m_autonomousCommand) {
-    m_autonomousCommand.value().get()->Cancel();
+  if (m_autonomousCommand.has_value()) {
+    m_autonomousCommand->Cancel();
   }
 
 }

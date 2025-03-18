@@ -32,7 +32,7 @@ private:
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-    .WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
+    //.WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
   
   swerve::requests::SwerveDriveBrake brake{};
@@ -42,6 +42,9 @@ private:
   //  *       define a destructor to un-register the telemetry from the drivetrain */
   // Telemetry logger{MaxSpeed};
 
+  frc::SendableChooser<std::function<frc2::CommandPtr()>> autoChooser;
+
+  void AddAutos();
 public:
   frc2::CommandPS4Controller driver{0};
   frc2::CommandPS4Controller mate{1};
@@ -58,7 +61,6 @@ public:
   RobotContainer();
 
   frc2::CommandPtr GetAutonomousCommand();
-  // frc::SendableChooser<frc2::Command> autoChooser;
 
   // TODO: add a robot config here
   //pathplanner::RobotConfig config {}s
