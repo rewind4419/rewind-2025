@@ -20,7 +20,7 @@ public:
     frc2::CommandPtr SetWristVelocity(units::angular_velocity::turns_per_second_t speed);
 
     frc2::CommandPtr ResetPosition();
-    frc2::CommandPtr HoldPos();
+    frc2::CommandPtr HoldPos(std::function<units::angle::turn_t()> offset);
 
     // If wait is true, the task doesn't finish until the arm reaches its target.
     // If wait is false, the task tells the arm to start moving and then finishes immediately.
@@ -30,7 +30,7 @@ public:
 
     units::angle::turn_t target;
 
-    const float epsilon = 0.04f; // in turns
+    const float epsilon = 0.06f; // in turns
 
 public:
     // units::angular_velocity::turns_per_second_t maxspeed {0.2_tps};

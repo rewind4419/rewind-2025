@@ -39,14 +39,11 @@ CoralWrist::CoralWrist() {
     // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
     // slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
     // slot0Configs.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kP = 1; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 16; // A position error of 2.5 rotations results in 12 V output
     // slot0Configs.kI = 0; // no output for integrated error
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
     //slot0Configs.kG = 0.7;
     //slot0Configs.GravityType = signals::GravityTypeValue::Arm_Cosine;
-
-    auto& slot1Configs = coralWristTalonFXConfigs.Slot0;
-    slot1Configs.kP = 0.3;
 
     // set Motion Magic settings
     auto& motionMagicConfigs = coralWristTalonFXConfigs.MotionMagic;
@@ -59,6 +56,7 @@ CoralWrist::CoralWrist() {
     configs::FeedbackConfigs feedback;
 
     feedback.SensorToMechanismRatio = 4.0;
+
 
     this->coralWristMotor.GetConfigurator().Apply(coralWristTalonFXConfigs);
     this->coralWristMotor.GetConfigurator().Apply(feedback);
@@ -88,11 +86,11 @@ frc2::CommandPtr CoralWrist::ResetPosition()
     }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
-frc2::CommandPtr CoralWrist::HoldPos()
+frc2::CommandPtr CoralWrist::HoldPos(std::function<units::angle::turn_t()> offset)
 {
-    return this->Run([this]{
+    return this->Run([this, offset]{
         //printf("Holding\n");
-        this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(target, CORAL_WRIST_MIN, CORAL_WRIST_MAX)));
+        this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(target + offset(), CORAL_WRIST_MIN, CORAL_WRIST_MAX)));
     });
 }
 
@@ -128,10 +126,10 @@ frc2::CommandPtr CoralWrist::SetPositionProvider(std::function<units::angle::tur
         [this, pos] () {
             this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
-        [] (bool interrupted) {printf("Finished going!\n");},
+        [] (bool interrupted) {},//printf("Finished going!\n");},
         [this, pos, wait] () -> bool {
             if (wait == false) {return true;}
-            printf("Wrist distance %f\n", this->coralWristMotor.GetPosition().GetValueAsDouble() - pos().value());
+            //printf("Wrist distance %f\n", this->coralWristMotor.GetPosition().GetValueAsDouble() - pos().value());
             bool done = fabsf(this->coralWristMotor.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;
             return done;
         },

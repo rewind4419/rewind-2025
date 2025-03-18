@@ -62,9 +62,9 @@ frc2::CommandPtr SwervePather::DriveFor(units::time::second_t timer, units::velo
     return SwerveCmdDriveFor(this, timer, v).ToPtr();
 }
 
-frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV)
+frc2::CommandPtr SwervePather::DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance)
 {
-    return SwerveCmdDriveWaypointSimple(this, target, maxV).ToPtr();
+    return SwerveCmdDriveWaypointSimple(this, target, maxV, slopDistance).ToPtr();
 }
 
 SwerveCmdDriveFor::SwerveCmdDriveFor(SwervePather* pather, units::time::second_t timer, units::velocity::meters_per_second_t v)
@@ -107,12 +107,13 @@ bool SwerveCmdDriveFor::IsFinished()
     return (frc::Timer::GetFPGATimestamp().value() > startTime + this->timer.value());
 }
 
-SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV)
+SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance)
 {
     AddRequirements(pather->drivetrain);
     this->m_pather = pather;
     this->maxV = maxV;
     this->target = target;
+    this->slopDistance = slopDistance;
 }
 
 void SwerveCmdDriveWaypointSimple::Initialize()
@@ -141,7 +142,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float distanceToGoal = sqrtf(diffTranslation.X().value() * diffTranslation.X().value() + diffTranslation.Y().value() * diffTranslation.Y().value());
 
-    float velocityTarget = clamp(distanceToGoal * 3.0f, -1.0f, 1.0f);
+    double velocityTarget = clamp(distanceToGoal * 3.0f, -1.0f, 1.0f);
 
     // start time in seconds
     double elapsedTime = frc::Timer::GetFPGATimestamp().value() - this->startTime;
@@ -150,7 +151,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
 
-    float rotationVelocityTarget = clamp(rotationDistanceToGoal * 3.0f, -1.0f, 1.0f);
+    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 3.0f, -1.0f, 1.0f);
 
     rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
 
@@ -184,6 +185,5 @@ void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
 {
-    return false;
-    //return (this->lastDistance < 0.35);
+    return (this->lastDistance < slopDistance);
 }

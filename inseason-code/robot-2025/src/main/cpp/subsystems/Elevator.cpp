@@ -28,7 +28,7 @@ Elevator::Elevator() {
     slot0Configs.kP = 2.0; // A position error of 2.5 rotations results in 12 V output
     // slot0Configs.kI = 0; // no output for integrated error
     // slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
-    slot0Configs.kG = 0.3;
+    slot0Configs.kG = 0.5;
 
     // Set Current Limits
     ctre::phoenix6::configs::CurrentLimitsConfigs currentLimitConfigs;

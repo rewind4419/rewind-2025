@@ -15,17 +15,19 @@
 ## TODO List
 
 - Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
-    - Tune closed loop task to go at the target velocity, especially at low velocities
-    - Add point following with tasks that end after reaching goal or stalling
+    ~~- Tune closed loop task to go at the target velocity, especially at low velocities~~
+    ~~- Add point following with tasks that end after reaching goal or stalling~~
     - Test navigation between multiple points with tasks
     - Integrate vision
 
 - Wrist code
-    - Switch wrist to use a position PID for everything ***(IN PROGRESS)***
+    ~~- Switch wrist to use a position PID for everything~~
     - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
 
 - Full driver code [Sherwin]
-    - Fix chassis control sensitivity
+    ~~- Fix chassis control sensitivity~~
+    - Find out what controls we need
+    - Set heights
 
 - PhotonVision integration [Sam]
     - ~~Find out what is needed for pather~~
@@ -39,8 +41,8 @@
 - Wrist [Nethra]
     - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
     - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
-        (look at how its done in the CoralArm and Elevator and do the same for the coralwrist)
-    - Joystick control using SetPositionProvider() ***(IN PROGRESS)***
+        ~~(look at how its done in the CoralArm and Elevator and do the same for the coralwrist)~~
+    ~~- Joystick control using SetPositionProvider()~~ ***(IN PROGRESS)***
 
 Robot Efficiency [Nethra]
     - controller up/down button does not move elevator/arm after pressing triangle

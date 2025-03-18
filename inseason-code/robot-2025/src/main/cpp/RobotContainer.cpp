@@ -25,6 +25,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 
 #include "util/maths.h"
+#include <math.h>
 
 RobotContainer::RobotContainer()
 {
@@ -37,33 +38,47 @@ RobotContainer::RobotContainer()
 
   ConfigureBindings();
 
-  frc::SmartDashboard::PutNumber("ElevatorPos", 0.0);
-  frc::SmartDashboard::PutNumber("CoralArmPos", 0.0);
-  frc::SmartDashboard::PutNumber("WristPos", 0.0);
+  AddAutos();
+
+  frc::SmartDashboard::PutNumber("Elevator Manual Position", 0.0);
+  frc::SmartDashboard::PutNumber("Coral Arm Manual Position", 0.0);
+  frc::SmartDashboard::PutNumber("Wrist Manual Position", 0.0);
+}
+
+double deadzone(double x, double deadzoneMax)
+{
+  if (abs(x) < deadzoneMax)
+  {
+    return 0.0;
+  }
+
+  return clamp(abs(x)-deadzoneMax, 0.0, 1.0-deadzoneMax) / (1.0 - deadzoneMax) * (x > 0.0 ? 1.0 : -1.0);
 }
 
 void RobotContainer::ConfigureBindings()
 {
   
+  
+
   // Drivetrain //
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
       if (driver.R1().Get())
       {
-        // if (lenSq(driver.GetLeftY()+driver.GetLeftX()) > 0.05*0.05)
-        // {}
-        // Surgery Mode
-        return drive.WithVelocityX(-driver.GetLeftY() * SurgeryModeSpeed) // Drive forward with negative Y (forward)
-            .WithVelocityY(-driver.GetLeftX() * SurgeryModeSpeed) // Drive left with negative X (left)
-            .WithRotationalRate(-driver.GetRightX() * SurgeryModeAngularRate); // Drive counterclockwise with negative X (left)
+        return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * SurgeryModeSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * SurgeryModeSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * SurgeryModeAngularRate); // Drive counterclockwise with negative X (left)
       } else {
-        return drive.WithVelocityX(-driver.GetLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-            .WithVelocityY(-driver.GetLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .WithRotationalRate(-driver.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+        return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * MaxAngularRate); // Drive counterclockwise with negative X (left)
       }
     })
 
-    
+    // drivetrain.Run([this] {
+    //   frc::SmartDashboard::PutNumber("DriverXRaw", driver.GetLeftX());
+    //   frc::SmartDashboard::PutNumber("DriverXDeadzoned", deadzone(driver.GetLeftX(), 0.1));
+    // })
   );
   
   // // reset the field-centric heading on left bumper press
@@ -84,13 +99,15 @@ void RobotContainer::ConfigureBindings()
   // Hold Pos (defaults)
 
   winch.SetDefaultCommand(winch.HoldPos());
-  //coralwrist.SetDefaultCommand(coralwrist.HoldPos());
+  coralwrist.SetDefaultCommand(coralwrist.HoldPos([this] () -> units::angle::turn_t {
+    // Coral Wrist offset
+    if (robotState.currentState == STATE_DELIVER_LOW) {
+      return mate.GetRightY() * 0.2_tr;
+    }
+    else {return 0_tr;}
+  }));
   elevator.SetDefaultCommand(elevator.HoldPos());
   coralarm.SetDefaultCommand(coralarm.HoldPos());
-
-  // coralarm.SetDefaultCommand(coralarm.CoralArmBaseIntake(0.01));
-  // // elevator.SetDefaultCommand(elevator.HoldPos());
-  // // coralarm.SetDefaultCommand(coralarm.HoldPos());
 
   // Mate Controls
 
@@ -107,16 +124,20 @@ void RobotContainer::ConfigureBindings()
         
       },
       std::pair{0,
+        // Currently in STATE_DELIVER_LOW
         robotState.SetCurrentState(STATE_NEUTRAL)
           .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_MIN))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
       },
       std::pair{1,
+        // Currently in STATE_FUNNEL
         robotState.SetCurrentState(STATE_NEUTRAL)
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_MIN, true))
       }
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
@@ -156,7 +177,7 @@ void RobotContainer::ConfigureBindings()
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
   );
   
-  //Intake
+  //Going to funnel
   mate.Square().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
@@ -167,6 +188,7 @@ void RobotContainer::ConfigureBindings()
       },
       std::pair{0, 
         robotState.SetCurrentState(STATE_FUNNEL)
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, true))
           .AndThen(elevator.SetHeight(1.5_tr))
       }
     )
@@ -239,51 +261,44 @@ void RobotContainer::ConfigureBindings()
   // // For smartdashboard control, comment the normal default task and uncomment these
   // coralarm.SetDefaultCommand(coralarm.SetPositionProvider([] () -> units::angle::turn_t {
   //   return units::angle::turn_t{
-  //     frc::SmartDashboard::GetNumber("CoralArmPos", 0.0)
+  //     frc::SmartDashboard::GetNumber("Coral Arm Manual Position", 0.0)
   //   };
   // }));
   // elevator.SetDefaultCommand(elevator.SetHeightProvider([] () -> units::angle::turn_t {
   //   return units::angle::turn_t{
-  //     frc::SmartDashboard::GetNumber("ElevatorPos", 0.0)
+  //     frc::SmartDashboard::GetNumber("Elevator Manual Position", 0.0)
   //   };
   // }));
 
-  coralwrist.SetDefaultCommand(coralwrist.SetPositionProvider([] () -> units::angle::turn_t {
-    return units::angle::turn_t{
-      frc::SmartDashboard::GetNumber("WristPos", 0.0)
-    };
-  }));
-  
-  driver.POVUp().OnTrue(winch.TestCommand());
-  
-  // driver.POVDown().OnTrue(winch.TestCommand2().Unless([this] {return winch.iscool;}));
-
-  // driver.POVDown().OnTrue(
-  //   frc2::cmd::Select<int>(
-  //     [this] {
-  //       if (1)
-  //       {return 0;}
-
-  //       return 1;
-  //     },
-  //     std::pair{0, 
-  //       winch.TestCommand2().Unless([this] {return winch.iscool;})
-  //     }
-  //   )
-  // );
-
-  // mate.Triangle().WhileTrue(coralarm.CoralArmRunIntake(1.0));
+  // coralwrist.SetDefaultCommand(coralwrist.SetPositionProvider([] () -> units::angle::turn_t {
+  //   return units::angle::turn_t{
+  //     frc::SmartDashboard::GetNumber("Wrist Manual Position", 0.0)
+  //   };
+  // }));
 }
 
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
-  return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-    //.AndThen(this->pather.DriveFor(3_s, 0.5_mps));
-    .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{1_rad}}, 1_mps));
+  return (autoChooser.GetSelected())();
+  
 
   // return this->pather.ResetPose(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_rad)))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{4_m, 3_m, frc::Rotation2d(0_rad)}))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{-1_m, 1_m, frc::Rotation2d(0_rad)}))
   //   .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d{0_m, 0_m, frc::Rotation2d(0_rad)}));
+}
+
+void RobotContainer::AddAutos()
+{    
+  autoChooser.SetDefaultOption("Print Auto", [this] () -> frc2::CommandPtr {
+    return frc2::cmd::Print("Print auto ran");
+  });
+
+  autoChooser.AddOption("Test Auto", [this] () -> frc2::CommandPtr {
+    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{1_rad}}, 1_mps, 0.2));
+  });
+
+  frc::SmartDashboard::PutData(&autoChooser);
 }

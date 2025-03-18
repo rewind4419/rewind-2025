@@ -24,6 +24,13 @@ int clamp(int x, int min, int max)
     return x;
 }
 
+double clamp(double x, double min, double max)
+{
+    if (x < min) {return min;}
+    if (x > max) {return max;}
+    return x;
+}
+
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max)
 {
     if (x < min) {return min;}

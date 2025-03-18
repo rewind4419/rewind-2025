@@ -49,7 +49,7 @@ CoralArm::CoralArm() {
     currentLimitConfigs.SupplyCurrentLimit = 40_A;
     //currentLimitConfigs.SupplyCurrentLimitEnable = true;
     currentLimitConfigs.SupplyCurrentLowerLimit = 0_A;
-    this->motor1.GetConfigurator().Apply(currentLimitConfigs);
+
     this->coralIntakeMotor.GetConfigurator().Apply(currentLimitConfigs);
 
     // set Motion Magic settings

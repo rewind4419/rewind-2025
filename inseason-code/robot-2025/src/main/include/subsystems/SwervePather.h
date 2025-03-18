@@ -28,7 +28,7 @@ public:
     frc2::CommandPtr ResetPose(frc::Pose2d r);
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
 
-    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV);
+    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance);
 
     frc2::CommandPtr Test();
     
@@ -66,7 +66,7 @@ private:
 class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveWaypointSimple>
 {
 public:
-    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV);
+    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance);
 
     void Initialize() override;
     void Execute() override;
@@ -78,4 +78,5 @@ private:
     frc::Pose2d target;
     units::velocity::meters_per_second_t maxV;
     double lastDistance = 10.0;
+    double slopDistance;
 };
