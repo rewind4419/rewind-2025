@@ -29,6 +29,7 @@ void Robot::DisabledPeriodic() {}
 void Robot::DisabledExit() {}
 
 frc::Field2d m_field;
+CommandSwerveDrivetrain drivetrain;
 
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
@@ -43,24 +44,10 @@ AutoManager m;
 
 
 void Robot::AutonomousPeriodic() {
-  photon::PhotonPipelineResult result = m.Cam1.GetLatestResult();
-  bool hasTargets = result.HasTargets();
-  photon::PhotonTrackedTarget target = result.GetBestTarget();
-  std::optional<photon::EstimatedRobotPose> optional = m.Estimate(result);
-  if (hasTargets){
-    printf("Got a target, checking if it has a value\n");
-    if (optional.has_value()){
-      printf("I got a value!\n");
-      m_field.SetRobotPose(optional.value().estimatedPose.ToPose2d());
-    // photon::EstimatedRobotPose estimation = m.Estimate(result).value();
-    frc::SmartDashboard::PutNumber("Photon pose X", optional.value().estimatedPose.X().value());
-    frc::SmartDashboard::PutNumber("Photon pose Y", optional.value().estimatedPose.Y().value());
-    frc::SmartDashboard::PutNumber("Photon pose Z", optional.value().estimatedPose.Z().value());
-    } else {
-      printf("No value here.   ");
-    }
+  m.updRoutine();
+  if (m.optional.has_value()){
+    drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
   }
-  
 }
 
 void Robot::AutonomousExit() {}
@@ -120,3 +107,4 @@ int main() {
   return frc::StartRobot<Robot>();
 }
 #endif
+
