@@ -1,7 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
+#include <iostream>
 #include "RobotContainer.h"
 
 #include <frc2/command/button/Trigger.h>
@@ -62,6 +62,8 @@ void RobotContainer::ConfigureBindings()
             .WithRotationalRate(-driver.GetRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
       }
     })
+
+    
   );
   
   // // reset the field-centric heading on left bumper press
@@ -119,9 +121,17 @@ void RobotContainer::ConfigureBindings()
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
-  // if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0){
-  //   units::angular_velocity::turns_per_second_t turns(mate.GetLeftY());
-  //   coralwrist.SetWristVelocity(turns);
+
+  // // This code needs to be put in a command
+  // // Currently, it only runs once when the robot turns on, so it wont work
+  // if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0) {
+  //   coralwrist.SetPositionProvider ([] () -> units::angle::turn_t {
+  //     return units::angle::turn_t{
+  //       frc::SmartDashboard::GetNumber("CoralArmPos", 0.0)}
+  //   ;});
+  //   coralwrist.SetPosition(units::angle::turn_t{mate.GetLeftY()});
+  // } else {
+  //   coralwrist.SetPosition(units::angle::turn_t{0.0});
   // }
 
   //Extends the arm out
@@ -129,8 +139,11 @@ void RobotContainer::ConfigureBindings()
     frc2::cmd::Select<int>(
       [this] {
         if (robotState.currentState == STATE_NEUTRAL)
-        {return 0;}
-
+        {
+          std::cout << "Current state is NEUTRAL" << std::endl;
+          return 0;
+        }
+        std::cout << "Current state is not NEUTRAL" << std::endl;
         return 1;
       },
       std::pair{0, 
@@ -139,7 +152,8 @@ void RobotContainer::ConfigureBindings()
           .AndThen(elevator.SetHeight(2_tr))
       }
     )
-    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+    //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
   );
   
   //Intake

@@ -22,7 +22,7 @@
 
 - Wrist code
     - Switch wrist to use a position PID for everything ***(IN PROGRESS)***
-    - Set zero on init using the rev encoder
+    - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
 
 - Full driver code [Sherwin]
     - Fix chassis control sensitivity
@@ -41,7 +41,10 @@
     - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
         (look at how its done in the CoralArm and Elevator and do the same for the coralwrist)
     - Joystick control using SetPositionProvider() ***(IN PROGRESS)***
- 
+
+Robot Efficiency [Nethra]
+    - controller up/down button does not move elevator/arm after pressing triangle
+
 ## Subsystems
 
 - Elevator
