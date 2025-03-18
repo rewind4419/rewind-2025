@@ -31,6 +31,8 @@ public:
     frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance);
 
     frc2::CommandPtr Test();
+
+    frc2::CommandPtr Debug();
     
     PID translationPID {0.0, 0.0, 0.0};
     PID rotationPID {0.0, 0.0, 0.0};
@@ -78,5 +80,6 @@ private:
     frc::Pose2d target;
     units::velocity::meters_per_second_t maxV;
     double lastDistance = 10.0;
+    double lastRotDistance = 10.0;
     double slopDistance;
 };

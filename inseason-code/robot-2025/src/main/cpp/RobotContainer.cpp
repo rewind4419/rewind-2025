@@ -80,6 +80,8 @@ void RobotContainer::ConfigureBindings()
     //   frc::SmartDashboard::PutNumber("DriverXDeadzoned", deadzone(driver.GetLeftX(), 0.1));
     // })
   );
+
+  // pather.SetDefaultCommand(pather.Debug());
   
   // // reset the field-centric heading on left bumper press
   driver.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
@@ -298,6 +300,15 @@ void RobotContainer::AddAutos()
   autoChooser.AddOption("Test Auto", [this] () -> frc2::CommandPtr {
     return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
       .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{1_rad}}, 1_mps, 0.2));
+  });
+
+  autoChooser.AddOption("Multipoint Auto", [this] () -> frc2::CommandPtr {
+    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, -1_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, -1_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, 0_m, frc::Rotation2d{2_rad}}, 1_mps, 0.2))
+    ;
   });
 
   frc::SmartDashboard::PutData(&autoChooser);

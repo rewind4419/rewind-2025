@@ -25,7 +25,9 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
     // frc::SmartDashboard::PutNumber("Rotation kI", 0.0);
     // frc::SmartDashboard::PutNumber("Rotation kD", 0.0);
 
-    
+    // frc::SmartDashboard::PutNumber("Manual X Target", 0.0);
+    // frc::SmartDashboard::PutNumber("Manual Y Target", 0.0);
+    // frc::SmartDashboard::PutNumber("Manual R Target", 0.0);
 }
 
 void SwervePather::Periodic()
@@ -48,6 +50,18 @@ void SwervePather::Periodic()
     //     this->rotationPID.kI,
     //     this->rotationPID.kD
     // ); 
+}
+
+frc2::CommandPtr SwervePather::Debug()
+{
+    return this->Run([this] {
+        this->drivetrain->SetControl(
+            this->drive_closedloop
+            .WithVelocityX(frc::SmartDashboard::GetNumber("Manual X Target", 0.0) * 1_mps)
+            .WithVelocityY(frc::SmartDashboard::GetNumber("Manual Y Target", 0.0) * 1_mps)
+            .WithRotationalRate(frc::SmartDashboard::GetNumber("Manual R Target", 0.0) * 1_rad_per_s)
+        );
+    });
 }
 
 frc2::CommandPtr SwervePather::ResetPose(frc::Pose2d r)
@@ -151,7 +165,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
 
-    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 3.0f, -1.0f, 1.0f);
+    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 10.0f, -2.0f, 2.0f);
 
     rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
 
@@ -173,6 +187,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
     frc::SmartDashboard::PutNumber("ApplyingR", (diffRot.Radians().value() * rotationVelocityTarget));
 
     this->lastDistance = diffTranslation.Distance(frc::Translation2d{0_m, 0_m}).value();
+    this->lastRotDistance = diffRot.Radians().value();
     frc::SmartDashboard::PutNumber("Distance to goal", this->lastDistance);
 
     // printf("Distance: %f\n", this->lastDistance);
@@ -185,5 +200,5 @@ void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 
 bool SwerveCmdDriveWaypointSimple::IsFinished()
 {
-    return (this->lastDistance < slopDistance);
+    return (this->lastDistance < slopDistance && this->lastRotDistance < 0.15f);
 }
