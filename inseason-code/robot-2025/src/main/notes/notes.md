@@ -37,13 +37,11 @@
     - Tell the odometry whats its new pose is
 
 - Wrist [Nethra]
-    - Find positions for wrist
-    - Add positions to the buttons
-    (look at how its done in the CoralArm and Elevator and do the same for the coralwrist)
-    - Joystick control using SetPositionProvider()
-
-- Lower the default position for intaking coral
-
+    - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
+    - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
+        (look at how its done in the CoralArm and Elevator and do the same for the coralwrist)
+    - Joystick control using SetPositionProvider() ***(IN PROGRESS)***
+ 
 ## Subsystems
 
 - Elevator

@@ -128,10 +128,10 @@ frc2::CommandPtr CoralWrist::SetPositionProvider(std::function<units::angle::tur
         [this, pos] () {
             this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
-        [] (bool interrupted) {/*printf("Finished going!\n");*/},
+        [] (bool interrupted) {printf("Finished going!\n");},
         [this, pos, wait] () -> bool {
             if (wait == false) {return true;}
-            //printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos().value());
+            printf("Wrist distance %f\n", this->coralWristMotor.GetPosition().GetValueAsDouble() - pos().value());
             bool done = fabsf(this->coralWristMotor.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;
             return done;
         },

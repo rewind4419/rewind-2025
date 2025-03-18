@@ -92,6 +92,7 @@ void RobotContainer::ConfigureBindings()
 
   // Mate Controls
 
+  //Resets the Robot
   mate.Circle().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
@@ -123,6 +124,7 @@ void RobotContainer::ConfigureBindings()
   //   coralwrist.SetWristVelocity(turns);
   // }
 
+  //Extends the arm out
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
@@ -139,7 +141,8 @@ void RobotContainer::ConfigureBindings()
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
-
+  
+  //Intake
   mate.Square().OnTrue(
     frc2::cmd::Select<int>(
       [this] {
@@ -156,10 +159,12 @@ void RobotContainer::ConfigureBindings()
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
+  //Cancels current command
   mate.Share().OnTrue(frc2::cmd::RunOnce([this] {
     elevator.GetCurrentCommand()->Cancel();
   }));
 
+  //Moves the elevator up 1 level
   mate.POVUp().OnTrue(
     robotState.IncrementDeliverHeight()
     .AndThen(elevator.SetHeightProvider([this] {
@@ -169,6 +174,7 @@ void RobotContainer::ConfigureBindings()
     .Unless([this] {return robotState.currentState != STATE_DELIVER_LOW;})
   );
   
+  //Moves the elevator down 1 level
   mate.POVDown().OnTrue(
     robotState.DecrementDeliverHeight()
     .AndThen(elevator.SetHeightProvider([this] {
@@ -198,10 +204,12 @@ void RobotContainer::ConfigureBindings()
 //     .Unless([this] {return (robotState.currentState != STATE_DELIVER_LOW);})
 //   );
 
+  //Right bumper pulls climber upwards
   mate.R1().WhileTrue(winch.DrivePower([this]() -> float {
     return 0.5f;
   }));
 
+  //Left bumper pulls climber downwards
   mate.L1().WhileTrue(winch.DrivePower([this]() -> float {
     return -0.5f;
   }));
