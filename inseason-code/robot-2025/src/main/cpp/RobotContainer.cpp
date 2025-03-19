@@ -142,6 +142,34 @@ void RobotContainer::ConfigureBindings()
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
+  //Resets the Robot
+  mate.Cross().OnTrue(
+    frc2::cmd::Select<int>(
+      [this] {
+        printf("Running Cross!\n");
+        if (robotState.currentState == STATE_DELIVER_LOW)
+        {return 0;}
+        return 1;
+
+        
+      },
+      std::pair{0,
+        // Currently in STATE_DELIVER_LOW
+        robotState.SetCurrentState(STATE_NEUTRAL)
+          .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_DELIVER, false))
+          .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+
+          
+
+          .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+          .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+          .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      }
+    ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+  );
 
   // // This code needs to be put in a command
   // // Currently, it only runs once when the robot turns on, so it wont work
@@ -169,13 +197,14 @@ void RobotContainer::ConfigureBindings()
       },
       std::pair{0, 
         robotState.SetCurrentState(STATE_DELIVER_LOW)
-          .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+          .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED))
+          .AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
       }
     )
     //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
-  );
+  ); 
   
   //Going to funnel
   mate.Square().OnTrue(
@@ -250,8 +279,8 @@ void RobotContainer::ConfigureBindings()
     return -0.5f;
   }));
   
-  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(10_tps)); //intake
-  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(-10_tps)); //outake
+  mate.R2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_INTAKE_SPEED)); //intake
+  mate.L2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_OUTTAKE_SPEED)); //outake
 
   // driver.Square().OnTrue(winch.GotoPosition(100_tr));
   // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
@@ -295,18 +324,43 @@ void RobotContainer::AddAutos()
     return frc2::cmd::Print("Print auto ran");
   });
 
-  autoChooser.AddOption("Test Auto", [this] () -> frc2::CommandPtr {
-    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{1_rad}}, 1_mps, 0.2));
-  });
-
   autoChooser.AddOption("Multipoint Auto", [this] () -> frc2::CommandPtr {
     return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, 0_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {1_m, -1_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, -1_m, frc::Rotation2d{0_rad}}, 1_mps, 0.2))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, 0_m, frc::Rotation2d{2_rad}}, 1_mps, 0.2))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, 0_m, frc::Rotation2d{0_rad}}, 3_mps, 0.1_m, 0.5_rad, 5.0, 5.0))
+      .AndThen(frc2::cmd::Wait(1.0_s))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, -2_m, frc::Rotation2d{-1.57_rad}}, 1_mps, 0.1_m, 0.2_rad, 5.0, 5.0))
+      .AndThen(frc2::cmd::Wait(1.0_s))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, 0_m, frc::Rotation2d{-1.57_rad}}, 1_mps, 0.1_m, 0.5_rad, 5.0, 5.0))
+      .AndThen(frc2::cmd::Wait(1.0_s))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, 0_m, frc::Rotation2d{0_rad}}, 1_mps, 0.05_m, 0.5_rad, 2.0, 2.0))
     ;
+  });
+
+  autoChooser.AddOption("Score Auto", [this] () -> frc2::CommandPtr {
+    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
+      .AndThen(robotState.SetCurrentState(STATE_DELIVER_LOW))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED))
+      .AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+      .AndThen(elevator.SetHeightProvider([this] {
+        return robotState.GetDeliverHeight();
+      }, false))
+      .AndThen(frc2::cmd::Wait(2_s))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_DELIVER, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(2.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+    ;
+  });
+
+  autoChooser.AddOption("Bezier Testing", [this] () -> frc2::CommandPtr {
+    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
+      .AndThen(this->pather.DriveBezier());
   });
 
   frc::SmartDashboard::PutData(&autoChooser);

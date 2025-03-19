@@ -21,6 +21,9 @@ Winch::Winch()
 
     winchMotor.GetConfigurator().Apply(slot0Configs);
 
+    talonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
+    winchMotor.GetConfigurator().Apply(talonFXConfigs);
+
     this->winchMotor.SetPosition(0_tr);
 
     // Set Current Limits

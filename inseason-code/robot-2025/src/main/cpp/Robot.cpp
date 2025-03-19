@@ -41,11 +41,11 @@ AutoManager m;
 
 
 void Robot::AutonomousPeriodic() {
-  m.updRoutine();
-  if (m.optional.has_value()){
-    //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
-  }
+  // m.updRoutine();
+  // if (m.optional.has_value()){
+  //   //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  // }
 }
 
 void Robot::AutonomousExit() {}

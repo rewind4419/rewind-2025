@@ -57,6 +57,7 @@ CoralWrist::CoralWrist() {
 
     feedback.SensorToMechanismRatio = 4.0;
 
+    coralWristTalonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
 
     this->coralWristMotor.GetConfigurator().Apply(coralWristTalonFXConfigs);
     this->coralWristMotor.GetConfigurator().Apply(feedback);
@@ -102,7 +103,7 @@ frc2::CommandPtr CoralWrist::SetPosition(units::angle::turn_t pos, bool wait)
             this->target = pos;
         },
         [this, pos] () {
-            this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos, CORAL_ARM_MIN, CORAL_ARM_MAX)));
+            this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos, CORAL_WRIST_MIN, CORAL_WRIST_MAX)));
         },
         [] (bool interrupted) {
             printf("Finished coral pos\n");
@@ -124,7 +125,7 @@ frc2::CommandPtr CoralWrist::SetPositionProvider(std::function<units::angle::tur
             this->target = pos();
         },
         [this, pos] () {
-            this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
+            this->coralWristMotor.SetControl(coralWristPosRequest.WithPosition(clamp(pos(), CORAL_WRIST_MIN, CORAL_WRIST_MAX)));
         },
         [] (bool interrupted) {},//printf("Finished going!\n");},
         [this, pos, wait] () -> bool {

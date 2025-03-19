@@ -26,9 +26,14 @@ public:
 public:
     // Drive tasks
     frc2::CommandPtr ResetPose(frc::Pose2d r);
+    frc2::CommandPtr ResetPoseID(int id);
     frc2::CommandPtr DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v);
 
-    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance);
+    frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, 
+    units::velocity::meters_per_second_t maxV, units::length::meter_t slop, 
+    units::angle::radian_t rSlop, double accelVperTime, double decelVperDistance);
+
+    frc2::CommandPtr DriveBezier();
 
     frc2::CommandPtr Test();
 
@@ -68,7 +73,9 @@ private:
 class SwerveCmdDriveWaypointSimple : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveWaypointSimple>
 {
 public:
-    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, units::velocity::meters_per_second_t maxV, double slopDistance);
+    SwerveCmdDriveWaypointSimple(SwervePather* pather, frc::Pose2d target, 
+    units::velocity::meters_per_second_t maxV, units::length::meter_t slop, 
+    units::angle::radian_t rSlop, double accelVperTime, double decelVperDistance);
 
     void Initialize() override;
     void Execute() override;
@@ -78,8 +85,26 @@ private:
     SwervePather* m_pather;
     double startTime;
     frc::Pose2d target;
+    
     units::velocity::meters_per_second_t maxV;
-    double lastDistance = 10.0;
-    double lastRotDistance = 10.0;
-    double slopDistance;
+    units::length::meter_t slop;
+    units::angle::radian_t rSlop;
+    double accelVperTime;
+    double decelVperDistance;
+
+    units::length::meter_t lastDistance = 0_m;
+    units::angle::radian_t lastRDistance = 0_rad;
+};
+
+class SwerveCmdDriveBezier : public frc2::CommandHelper<frc2::Command, SwerveCmdDriveBezier>
+{
+public:
+    SwerveCmdDriveBezier(SwervePather* pather);
+
+    void Initialize() override;
+    void Execute() override;
+    void End(bool interrupted) override;
+    bool IsFinished() override;
+private:
+    SwervePather* m_pather;
 };

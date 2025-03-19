@@ -39,6 +39,7 @@ CoralArm::CoralArm() {
     slot0Configs.kG = 0.7;
     slot0Configs.GravityType = signals::GravityTypeValue::Arm_Cosine;
 
+    abcdetalonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
     auto& slot1Configs = abcdetalonFXConfigs.Slot0;
     slot1Configs.kP = 0.3;
 
@@ -64,8 +65,11 @@ CoralArm::CoralArm() {
 
     feedback.SensorToMechanismRatio = 33.333333333;
 
+    abctalonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
+
     this->motor1.GetConfigurator().Apply(abctalonFXConfigs);
     this->motor1.GetConfigurator().Apply(feedback);
+
 
     this->coralIntakeMotor.GetConfigurator().Apply(abcdetalonFXConfigs);
 }
@@ -99,7 +103,8 @@ frc2::CommandPtr CoralArm::HoldPos()
     return this->Run([this]{
         //printf("Holding\n");
         this->motor1.SetControl(coralArmRequest.WithPosition(clamp(target, CORAL_ARM_MIN, CORAL_ARM_MAX)));
-    });
+        //this->coralIntakeMotor.SetControl(coralIntakeRequest.WithVelocity(CORAL_ARM_IDLE_SPEED));
+    }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf);
 }
 
 frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos, bool wait)
@@ -147,7 +152,6 @@ frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_
 
 // Run intake, positive pulls in, negative yeets out
 frc2::CommandPtr CoralArm::CoralArmRunIntake(units::angular_velocity::turns_per_second_t speed) {
-
     return this->RunEnd(
     [this, speed] {
         // On task start

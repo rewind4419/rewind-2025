@@ -40,6 +40,10 @@ Elevator::Elevator() {
     this->motor1.GetConfigurator().Apply(currentLimitConfigs);
     this->motor2.GetConfigurator().Apply(currentLimitConfigs);
 
+    abcdtalonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
+    this->motor1.GetConfigurator().Apply(abcdtalonFXConfigs);
+    this->motor2.GetConfigurator().Apply(abcdtalonFXConfigs);
+
     // set Motion Magic settings
     auto& motionMagicConfigs = abcdtalonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 80_tps; // Target cruise velocity of 80 rps
