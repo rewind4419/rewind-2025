@@ -34,9 +34,9 @@
         
 
 - Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
-    ~~- Tune closed loop task to go at the target velocity, especially at low velocities~~
-    ~~- Add point following with tasks that end after reaching goal or stalling~~
-    ~~- Test navigation between multiple points with tasks~~
+    - ~~ Tune closed loop task to go at the target velocity, especially at low velocities~~
+    - ~~ Add point following with tasks that end after reaching goal or stalling~~
+    - ~~ Test navigation between multiple points with tasks~~
     - Test larger scale waypoint nav, esp once camera is good angle
     - Further tune PIDs
     - Integrate vision
@@ -46,18 +46,21 @@
     - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
 
 - Full driver code [Sherwin] ***(IN PROGRESS)***
-    ~~- Fix chassis control sensitivity~~
+    - ~~Fix chassis control sensitivity~~
     - Find out what controls we need
     - Set heights
 
-~~- PhotonVision integration [Sam]~~
+- ~~PhotonVision integration [Sam]~~
+    - Get new camera mount at 15 degrees
+        - Change rotation value in auto.h
     - ~~Find out what is needed for pather~~
         - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
-    ~~- Clean up autonomousperiodic()~~
-        ~~1. Make all of it a function~~
-        ~~2. Make auto a subsystem~~
-    ~~- Measure camera rotation in rads~~
-    ~~- Tell the odometry whats its new pose is~~
+    - ~~Clean up autonomousperiodic()~~
+        1. ~~Make all of it a function~~
+        2. ~~Make auto a subsystem~~
+    - ~~Measure camera rotation in rads~~
+    - ~~Tell the odometry whats its new pose is~~
+    
 
 - Wrist [Nethra]
     - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
