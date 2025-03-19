@@ -25,13 +25,18 @@
 #define ELEVATOR_SAFE_MAX 18_tr // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 
 #define ELEVATOR_DELIVER_LOW 3_tr
-#define ELEVATOR_DELIVER_MID 6_tr
-#define ELEVATOR_DELIVER_HIGH 9_tr
+#define ELEVATOR_DELIVER_MID 8.6_tr
+#define ELEVATOR_DELIVER_HIGH 18_tr
 
 #define CORAL_WRIST_MIN 0_tr
+#define CORAL_WRIST_MAX 0.5_tr
 #define CORAL_WRIST_INTAKING_MAX 0.025_tr // All 3 of these are arbitrary at the moment 
-#define CORAL_WRIST_SAFE 0.3_tr // Arbitrary
-#define CORAL_WRIST_MAX 0.40_tr // Arbitrary
+
+#define CORAL_WRIST_DELIVER_LOW 0.2_tr
+#define CORAL_WRIST_DELIVER_MID 0.1_tr
+#define CORAL_WRIST_DELIVER_HIGH 0.1_tr
+
+
 #define CORAL_WRIST_FUNNEL 0.1_tr
 
 #define CORAL_ARM_MIN 0.04444444444_tr // The angle of the arm when its resting on the hard stop

@@ -28,9 +28,6 @@ void Robot::DisabledPeriodic() {}
 
 void Robot::DisabledExit() {}
 
-frc::Field2d m_field;
-CommandSwerveDrivetrain drivetrain;
-
 void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
@@ -38,7 +35,6 @@ void Robot::AutonomousInit() {
     m_autonomousCommand.value().get()->Schedule();
     //m_autonomousCommand.value().get()->Schedule();
   }
-  frc::SmartDashboard::PutData("Field", &m_field);
 }
 
 AutoManager m;
@@ -47,7 +43,8 @@ AutoManager m;
 void Robot::AutonomousPeriodic() {
   m.updRoutine();
   if (m.optional.has_value()){
-    drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+    //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
   }
 }
 
@@ -81,15 +78,11 @@ void Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
   // frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
 
-  
-  // if (m_container.joystick.Cross().Get())
-  // {
-  //   winchMotor.SetControl(b.WithPosition(200_tr));
-  // }
-  
-  // if (m_container.joystick.Square().Get())
-  // {
-  //   winchMotor.SetControl(b.WithPosition(0_tr));
+  // m.updRoutine();
+  // if (m.optional.has_value()){
+  //   //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
+  //   //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
   // }
 }
 
