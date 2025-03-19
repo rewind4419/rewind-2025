@@ -24,13 +24,13 @@ public:
     // If wait is false, the task tells the elevator to start moving and then finishes immediately.
     // Wait is true by default, so if you don't specify, it will wait.
     frc2::CommandPtr SetHeight(units::angle::turn_t pos, bool wait = true);
-    frc2::CommandPtr SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait = true);
+    frc2::CommandPtr SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait = true, bool neverEnd = false);
     frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
     units::angle::turn_t target;
 
     const float epsilon = 0.25;
-private:
+
     ctre::phoenix6::hardware::TalonFX motor1 {ELEVATOR_MOTOR_1_ID};
     ctre::phoenix6::hardware::TalonFX motor2 {ELEVATOR_MOTOR_2_ID};
 

@@ -130,7 +130,7 @@ frc2::CommandPtr CoralArm::SetPosition(units::angle::turn_t pos, bool wait)
     ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
-frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_t()> pos, bool wait)
+frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_t()> pos, bool wait, bool neverEnd)
 {
     return frc2::FunctionalCommand(
         [this, pos] () {
@@ -140,7 +140,8 @@ frc2::CommandPtr CoralArm::SetPositionProvider(std::function<units::angle::turn_
             this->motor1.SetControl(coralArmRequest.WithPosition(clamp(pos(), CORAL_ARM_MIN, CORAL_ARM_MAX)));
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
-        [this, pos, wait] () -> bool {
+        [this, pos, wait, neverEnd] () -> bool {
+            if (neverEnd == true) {return false;}
             if (wait == false) {return true;}
             //printf("Arm distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos().value());
             bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;

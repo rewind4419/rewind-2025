@@ -111,7 +111,7 @@ frc2::CommandPtr Elevator::SetHeight(units::angle::turn_t pos, bool wait)
     ).ToPtr().WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming);
 }
 
-frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait)
+frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t()> pos, bool wait, bool neverEnd)
 {
     return frc2::FunctionalCommand(
         [this, pos] () {
@@ -122,7 +122,9 @@ frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t(
             this->motor2.SetControl(elevatorFollower);
         },
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
-        [this, pos, wait] () -> bool {
+        [this, pos, wait, neverEnd] () -> bool {
+            if (neverEnd == true) {printf("Never ending\n"); return false;}
+            printf("Yes ending\n");
             if (wait == false) {return true;}
             //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
             bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;

@@ -224,10 +224,10 @@ void RobotContainer::ConfigureBindings()
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
-  //Cancels current command
-  mate.Share().OnTrue(frc2::cmd::RunOnce([this] {
-    elevator.GetCurrentCommand()->Cancel();
-  }));
+  // //Cancels current command
+  // mate.Share().OnTrue(frc2::cmd::RunOnce([this] {
+  //   elevator.GetCurrentCommand()->Cancel();
+  // }));
 
   //Moves the elevator up 1 level
   mate.POVUp().OnTrue(
@@ -281,6 +281,29 @@ void RobotContainer::ConfigureBindings()
   
   mate.R2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_INTAKE_SPEED)); //intake
   mate.L2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_OUTTAKE_SPEED)); //outake
+
+  // Recovery Mode
+  mate.Share().OnTrue(
+    frc2::cmd::RunOnce([this] {
+      printf("Running recovery\n");
+      frc2::CommandScheduler::GetInstance().CancelAll();
+      elevator.target = elevator.motor1.GetPosition().GetValue();
+      coralarm.target = coralarm.motor1.GetPosition().GetValue();
+    })
+    .AndThen(
+      elevator.SetHeightProvider([this] {
+        return elevator.target + (mate.GetRightY()) * 0.03_tr;
+      }, true, true).AlongWith(coralarm.SetPositionProvider([this] {
+        return coralarm.target + (mate.GetLeftY()) * 0.01_tr;
+      }, true, true))
+    )
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+    // .Until([this] {
+    //   bool optionVal = mate.Circle().Get();
+    //   if (optionVal) {printf("Option pressed! ending\n"); return true;}
+    //   return false;
+    // })
+  );
 
   // driver.Square().OnTrue(winch.GotoPosition(100_tr));
   // driver.Cross().OnTrue(winch.GotoPosition(0_tr));
