@@ -145,18 +145,6 @@ void RobotContainer::ConfigureBindings()
   );
 
 
-  // // This code needs to be put in a command
-  // // Currently, it only runs once when the robot turns on, so it wont work
-  // if (mate.GetLeftY() > 0 || mate.GetLeftY() < 0) {
-  //   coralwrist.SetPositionProvider ([] () -> units::angle::turn_t {
-  //     return units::angle::turn_t{
-  //       frc::SmartDashboard::GetNumber("CoralArmPos", 0.0)}
-  //   ;});
-  //   coralwrist.SetPosition(units::angle::turn_t{mate.GetLeftY()});
-  // } else {
-  //   coralwrist.SetPosition(units::angle::turn_t{0.0});
-  // }
-
   //Extends the arm out
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(

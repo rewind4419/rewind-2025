@@ -1,5 +1,19 @@
 # Notes
+
 ## Guide
+
+- "- " to make a bullet point
+    - Bullet points after indents become subtasks, signified by an empty dot instead of a filled dot
+- [Brackets] for assigning people to a task
+- ***\*\*\*3 asterisks on both sides\*\*\**** to bolden and italicize for in progress tasks
+- #\#\# Hashtags followed by a space for headers: 1 for main header, 2 for sub header, 3 for mini header
+1. "1.", "2." and so on for ordered lists
+- \~\~Two tildes on both sides\~\~ for strikethrough texts
+- Bullet points BEFORE strikethrough text, otherwise the indentation breaks
+    - Example: These 2 are on different lines in the .md, but show as one line due to improper bullet pointing
+        - ~~Correct~~
+        ~~- Incorrect~~
+        - Note how the incorrect one has the "- " in the strikethroughed text instead of outside it
 
 ## Reminders
 
@@ -14,35 +28,35 @@
 
 ## TODO List
 
+- Notes cleanup and maintainment [Everyone] ***(CONTINUOUS)***
+    - Create bindings.md for controller bindings [Sam] ***(IN PROGRESS)***
+    - Update bindings.md whenever controls are changed [Everyone] ***(CONTINUOUS)***
+        
+
 - Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
-    ~~- Tune closed loop task to go at the target velocity, especially at low velocities~~
-    ~~- Add point following with tasks that end after reaching goal or stalling~~
+    - ~~Tune closed loop task to go at the target velocity, especially at low velocities~~
+    - ~~Add point following with tasks that end after reaching goal or stalling~~
     - Test navigation between multiple points with tasks
     - Integrate vision
 
 - Wrist code
-    ~~- Switch wrist to use a position PID for everything~~
+    - ~~Switch wrist to use a position PID for everything~~
     - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
 
 - Full driver code [Sherwin]
-    ~~- Fix chassis control sensitivity~~
+    - ~~Fix chassis control sensitivity~~
     - Find out what controls we need
     - Set heights
 
 - PhotonVision integration [Sam]
-    - ~~Find out what is needed for pather~~
-        - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
-    - Clean up autonomousperiodic() ***(IN PROGRESS)***
-        1. Make all of it a function
-        2. Make auto a subsystem
-    - Measure camera rotation in rads ***(IN PROGRESS)***
-    - Tell the odometry whats its new pose is
+    - Get new camera mount at 15 degrees yaw so we can see reef tags from farther back ***(IN PROGRESS)***
+        - Once mount is made and placed, change relative position in auto.h
 
 - Wrist [Nethra]
     - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
     - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
-        ~~(look at how its done in the CoralArm and Elevator and do the same for the coralwrist)~~
-    ~~- Joystick control using SetPositionProvider()~~ ***(IN PROGRESS)***
+        - ~~(look at how its done in the CoralArm and Elevator and do the same for the coralwrist)~~
+    - ~~Joystick control using SetPositionProvider()~~
 
 Robot Efficiency [Nethra]
     - controller up/down button does not move elevator/arm after pressing triangle
@@ -54,3 +68,4 @@ Robot Efficiency [Nethra]
 - Arm
 - Climber
 - Algae Handler
+---
