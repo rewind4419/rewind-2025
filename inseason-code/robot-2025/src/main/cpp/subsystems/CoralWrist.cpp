@@ -30,7 +30,7 @@ CoralWrist::CoralWrist() {
 
     this->coralWristMotor.SetPosition(CORAL_WRIST_MIN);
 
-    this->target = 0.0_tr;
+    this->target = CORAL_WRIST_FUNNEL;
 
     // in init function
     

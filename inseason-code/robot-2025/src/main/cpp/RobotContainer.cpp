@@ -81,8 +81,6 @@ void RobotContainer::ConfigureBindings()
     // })
   );
 
-  // pather.SetDefaultCommand(pather.Debug());
-  
   // // reset the field-centric heading on left bumper press
   driver.Triangle().OnTrue(drivetrain.RunOnce([this] { drivetrain.SeedFieldCentric(); }));
 
@@ -104,7 +102,7 @@ void RobotContainer::ConfigureBindings()
   coralwrist.SetDefaultCommand(coralwrist.HoldPos([this] () -> units::angle::turn_t {
     // Coral Wrist offset
     if (robotState.currentState == STATE_DELIVER_LOW) {
-      return mate.GetRightY() * 0.2_tr;
+      return mate.GetRightY() * -0.2_tr;
     }
     else {return 0_tr;}
   }));
@@ -130,7 +128,7 @@ void RobotContainer::ConfigureBindings()
         robotState.SetCurrentState(STATE_NEUTRAL)
           .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
-          .AndThen(coralwrist.SetPosition(CORAL_WRIST_MIN))
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
       },
@@ -139,7 +137,7 @@ void RobotContainer::ConfigureBindings()
         robotState.SetCurrentState(STATE_NEUTRAL)
           .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-          .AndThen(coralwrist.SetPosition(CORAL_WRIST_MIN, true))
+          .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, true))
       }
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
@@ -172,7 +170,7 @@ void RobotContainer::ConfigureBindings()
       std::pair{0, 
         robotState.SetCurrentState(STATE_DELIVER_LOW)
           .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
-          .AndThen(elevator.SetHeight(2_tr))
+          .AndThen(elevator.SetHeight(ELEVATOR_MIN))
       }
     )
     //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
