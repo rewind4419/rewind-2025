@@ -29,7 +29,7 @@
 ## TODO List
 
 - Notes cleanup and maintainment [Everyone] ***(CONTINUOUS)***
-    - Create bindings.md for controller bindings [Sam] ***(IN PROGRESS)***
+    - ~~Create bindings.md for controller bindings~~
     - Update bindings.md whenever controls are changed [Everyone] ***(CONTINUOUS)***
         
 
@@ -78,4 +78,5 @@ Robot Efficiency [Nethra]
 - Arm
 - Climber
 - Algae Handler
+
 ---
