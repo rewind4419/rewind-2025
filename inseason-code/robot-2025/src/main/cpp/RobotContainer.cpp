@@ -191,6 +191,49 @@ void RobotContainer::ConfigureBindings()
     ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   );
 
+  // mate.Touchpad().OnTrue(
+  //   frc2::cmd::Select<int>(
+  //     [this] {
+  //       if (robotState.currentState == STATE_NEUTRAL)
+  //       {
+  //         std::cout << "Current state is NEUTRAL" << std::endl;
+  //         return 0;
+  //       }
+  //       std::cout << "Current state is not NEUTRAL" << std::endl;
+  //       return 1;
+  //     },
+  //     std::pair{0,
+  //     printf("Running Touchpad\n");
+  //     coralarm.SetPosition(CORAL_ARM_CLIMB)
+  //     .AndThen(coralwrist.SetPosition(CORAL_WRIST_CLIMB));
+  //     }
+  //   )
+  //   .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+  // );
+
+  //Extends the arm out
+  mate.Touchpad().OnTrue(
+    frc2::cmd::Select<int>(
+      [this] {
+        if (robotState.currentState == STATE_NEUTRAL)
+        {
+          std::cout << "Current state is NEUTRAL" << std::endl;
+          return 0;
+        }
+        std::cout << "Current state is not NEUTRAL" << std::endl;
+        return 1;
+      },
+      std::pair{0, 
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+          .AndThen(coralarm.SetPosition(CORAL_ARM_CLIMB))
+          .AlongWith(coralwrist.SetPosition(CORAL_WRIST_CLIMB))
+          .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      }
+    )
+    //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
+  ); 
+
   //Extends the arm out
   mate.Triangle().OnTrue(
     frc2::cmd::Select<int>(
@@ -284,7 +327,7 @@ void RobotContainer::ConfigureBindings()
 
   //Left bumper pulls climber downwards
   mate.L1().WhileTrue(winch.DrivePower([this]() -> float {
-    return -0.5f;
+    return -0.25f;
   }));
   
   mate.R2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_INTAKE_SPEED)); //intake

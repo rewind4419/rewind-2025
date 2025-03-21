@@ -35,6 +35,7 @@
 
 #define CORAL_WRIST_EXTENDED 0.3_tr
 #define CORAL_WRIST_DELIVER 0.25_tr
+#define CORAL_WRIST_CLIMB 0.2_tr
 
 // #define CORAL_WRIST_FUNNEL 0.05_tr
 #define CORAL_WRIST_FUNNEL 0.02_tr
@@ -44,6 +45,7 @@
 #define CORAL_ARM_SAFE 0.3_tr // Any less than this, and can't extend elevator all the way
 #define CORAL_ARM_EXTENDED 0.35_tr
 #define CORAL_ARM_MAX 0.40_tr // Arbitrary
+#define CORAL_ARM_CLIMB 0.20_tr
 
 #define CORAL_ARM_INTAKE_SPEED 10_tps
 #define CORAL_ARM_OUTTAKE_SPEED -10_tps
