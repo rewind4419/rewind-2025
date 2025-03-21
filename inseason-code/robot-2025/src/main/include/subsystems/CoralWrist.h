@@ -24,7 +24,7 @@ public:
 
     // If wait is true, the task doesn't finish until the arm reaches its target.
     // If wait is false, the task tells the arm to start moving and then finishes immediately.
-    // Wait is true by default, so if you don't specify, it will wait.
+    // Wai\t is true by default, so if you don't specify, it will wait.
     frc2::CommandPtr SetPosition(units::angle::turn_t pos, bool wait = true);
     frc2::CommandPtr SetPositionProvider(std::function<units::angle::turn_t()> pos, bool wait = true);
 

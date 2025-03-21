@@ -38,6 +38,20 @@ units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, uni
     return x;
 }
 
+units::velocity::meters_per_second_t clamp(units::velocity::meters_per_second_t x, units::velocity::meters_per_second_t min, units::velocity::meters_per_second_t max)
+{
+    if (x < min) {return min;}
+    if (x > max) {return max;}
+    return x;
+}
+
+units::angular_velocity::radians_per_second_t clamp(units::angular_velocity::radians_per_second_t x, units::angular_velocity::radians_per_second_t min, units::angular_velocity::radians_per_second_t max)
+{
+    if (x < min) {return min;}
+    if (x > max) {return max;}
+    return x;
+}
+
 RPose RPosefromFRCPose(frc::Pose2d pose)
 {
     return RPose {

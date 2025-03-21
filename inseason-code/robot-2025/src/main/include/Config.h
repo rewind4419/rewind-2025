@@ -20,7 +20,8 @@
 
 // TODO: implement all the safeties! only basic ones exist now
 #define ELEVATOR_MIN 0_tr
-#define ELEVATOR_FUNNEL 1.5_tr // Position to grab from funnel
+//#define ELEVATOR_FUNNEL 1.5_tr // Position to grab from funnel
+#define ELEVATOR_FUNNEL 1.0_tr // Position to grab from funnel
 #define ELEVATOR_IN_MAX 4.0_tr // Highest elevator can go when coral arm at 0
 #define ELEVATOR_SAFE_MAX 18_tr // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 
@@ -35,7 +36,8 @@
 #define CORAL_WRIST_EXTENDED 0.3_tr
 #define CORAL_WRIST_DELIVER 0.25_tr
 
-#define CORAL_WRIST_FUNNEL 0.0_tr
+// #define CORAL_WRIST_FUNNEL 0.05_tr
+#define CORAL_WRIST_FUNNEL 0.02_tr
 
 #define CORAL_ARM_MIN 0.04444444444_tr // The angle of the arm when its resting on the hard stop
 #define CORAL_ARM_INTAKING_MAX 0.025_tr

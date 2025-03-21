@@ -27,8 +27,10 @@ class RobotContainer {
 private:
   units::meters_per_second_t SurgeryModeSpeed = TunerConstants::kSpeedAt12Volts * 0.35;
   units::meters_per_second_t MaxSpeed = TunerConstants::kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
-  units::radians_per_second_t SurgeryModeAngularRate = 0.75_tps * 0.35;
+  units::meters_per_second_t CurrentSpeed = TunerConstants::kSpeedAt12Volts;
+  units::radians_per_second_t SurgeryModeAngularRate = 0.75_tps * 0.25;
   units::radians_per_second_t MaxAngularRate = 0.75_tps; // 3/4 of a rotation per second max angular velocity
+  units::radians_per_second_t CurrentAngularRate = 0.75_tps;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}

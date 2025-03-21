@@ -14,6 +14,27 @@
 
 #include <frc/smartdashboard/Field2d.h>
 
+// Field length and width from the season field JSON file
+frc::Pose2d FIELD_CENTER_POSE { 17.548_m * 0.5, 8.052_m * 0.5, frc::Rotation2d {0_rad}};
+
+frc::Pose2d SwapFieldSide(frc::Pose2d x)
+{
+    frc::Pose2d flippedRobotPose {FIELD_CENTER_POSE.X() - (x.X() - FIELD_CENTER_POSE.X()), FIELD_CENTER_POSE.Y() - (x.Y() - FIELD_CENTER_POSE.Y()), x.Rotation() + frc::Rotation2d {M_PI * 1_rad}};
+    return flippedRobotPose;
+}
+
+frc::Pose2d MirrorLongWays(frc::Pose2d x)
+{
+    frc::Pose2d mirrored {x.X(), FIELD_CENTER_POSE.Y() - (x.Y() - FIELD_CENTER_POSE.Y()), frc::Rotation2d{-1.0 * x.Rotation().Radians()}};
+    return mirrored;
+}
+
+frc::Pose2d MirrorShortWays(frc::Pose2d x)
+{
+    frc::Pose2d mirrored {FIELD_CENTER_POSE.X() - (x.X() - FIELD_CENTER_POSE.X()), x.Y(), frc::Rotation2d{M_PI * 1_rad - x.Rotation().Radians()}};
+    return mirrored;
+}
+
 SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
 {
     this->drivetrain = drivetrain;
@@ -78,6 +99,13 @@ frc2::CommandPtr SwervePather::ResetPoseID(int id)
     
 }
 
+frc2::CommandPtr SwervePather::LockWheels()
+{
+    return this->RunOnce([this] {
+        this->drivetrain->SetControl(this->brake);
+    });
+}
+
 frc2::CommandPtr SwervePather::DriveFor(units::time::second_t timer, units::velocity::meters_per_second_t v)
 {
     return SwerveCmdDriveFor(this, timer, v).ToPtr();
@@ -114,13 +142,10 @@ void SwerveCmdDriveFor::Initialize()
 
 void SwerveCmdDriveFor::Execute()
 {
-    units::angular_velocity::radians_per_second_t rVel {this->v.value()};
 
     this->m_pather->drivetrain->SetControl(
-        this->m_pather->drive_closedloop.WithVelocityY(0_mps) // Drive forward with negative Y (forward)
-        .WithVelocityX(0_mps) // Drive left with positive X, forward
-
-        .WithRotationalRate(rVel)
+        this->m_pather->drive_openloop.WithVelocityY(0_mps) // Drive forward with negative Y (forward)
+        .WithVelocityX(v) // Drive left with positive X, forward
     ); // Drive counterclockwise with negative X (left)
     
     //printf("Elapsed %f seconds\n", frc::Timer::GetFPGATimestamp().value() - startTime);
@@ -189,7 +214,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
     float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
 
-    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 10.0f, -2.0f, 2.0f);
+    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 12.0f, -2.0f, 2.0f);
 
     rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
 

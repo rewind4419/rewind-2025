@@ -1,15 +1,19 @@
 #include "subsystems/Auto.h"
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/SmartDashboard/SmartDashboard.h>
+#include <frc/DriverStation.h>
 
-frc::Field2d m_field;
+
+//frc::Field2d m_field {};
 
 
 
 
 void AutoManager::Init()
 {
-  frc::SmartDashboard::PutData("Field", &m_field);
+  
+  
+  //frc::SmartDashboard::PutData("Field", &m_field);
 }
 
 /*
@@ -25,12 +29,14 @@ void AutoManager::updRoutine(){
   photon::PhotonTrackedTarget target = result.GetBestTarget();
   this->optional = this->Estimate(result);
 
+  frc::SmartDashboard::PutNumber("Tags Detected (vision disabled in teleop)", result.targets.size());
+
   if (hasTargets){
     //printf("Got a target, checking if it has a value\n");
     if (this->optional.has_value()){
-      printf("I got a value!, %f, %f\n", this->optional.value().estimatedPose.ToPose2d().X(), this->optional.value().estimatedPose.ToPose2d().Y());
+      //printf("I got a value!, %f, %f\n", this->optional.value().estimatedPose.ToPose2d().X(), this->optional.value().estimatedPose.ToPose2d().Y());
       
-      m_field.SetRobotPose(this->optional.value().estimatedPose.ToPose2d());
+      //m_field.SetRobotPose(this->optional.value().estimatedPose.ToPose2d());
     // photon::EstimatedRobotPose estimation = m.Estimate(result).value();
         frc::SmartDashboard::PutNumber("Photon pose X", this->optional.value().estimatedPose.X().value());
         frc::SmartDashboard::PutNumber("Photon pose Y", this->optional.value().estimatedPose.Y().value());
@@ -39,4 +45,6 @@ void AutoManager::updRoutine(){
       // printf("No value here.   ");
     }
   }
+
+  
 }

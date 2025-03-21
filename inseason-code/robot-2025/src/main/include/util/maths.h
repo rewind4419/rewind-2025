@@ -5,6 +5,8 @@
 
 #include <units/length.h>
 #include <units/angle.h>
+#include <units/velocity.h>
+#include <units/angular_velocity.h>
 
 float clamp(float x, float min, float max);
 float len(float x, float y);
@@ -14,6 +16,8 @@ int clamp(int x, int min, int max);
 double clamp(double x, double min, double max);
 
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max);
+units::velocity::meters_per_second_t clamp(units::velocity::meters_per_second_t x, units::velocity::meters_per_second_t min, units::velocity::meters_per_second_t max);units::velocity::meters_per_second_t clamp(units::velocity::meters_per_second_t x, units::velocity::meters_per_second_t min, units::velocity::meters_per_second_t max);
+units::angular_velocity::radians_per_second_t clamp(units::angular_velocity::radians_per_second_t x, units::angular_velocity::radians_per_second_t min, units::angular_velocity::radians_per_second_t max);
 // General purpose vector 2 class
 class V2
 {

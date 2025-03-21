@@ -124,7 +124,7 @@ frc2::CommandPtr Elevator::SetHeightProvider(std::function<units::angle::turn_t(
         [] (bool interrupted) {/*printf("Finished going!\n");*/},
         [this, pos, wait, neverEnd] () -> bool {
             if (neverEnd == true) {printf("Never ending\n"); return false;}
-            printf("Yes ending\n");
+            //printf("Yes ending\n");
             if (wait == false) {return true;}
             //printf("Elev distance %f\n", this->motor1.GetPosition().GetValueAsDouble() - pos.value());
             bool done = fabsf(this->motor1.GetPosition().GetValueAsDouble() - pos().value()) < this->epsilon;

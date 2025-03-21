@@ -16,6 +16,10 @@
 #include <units/length.h>
 #include <units/time.h>
 
+frc::Pose2d SwapFieldSide(frc::Pose2d x);
+frc::Pose2d MirrorLongWays(frc::Pose2d x);
+frc::Pose2d MirrorShortWays(frc::Pose2d x);
+
 class SwervePather : public frc2::SubsystemBase
 {
 public:
@@ -32,6 +36,8 @@ public:
     frc2::CommandPtr DriveWaypointSimple(frc::Pose2d target, 
     units::velocity::meters_per_second_t maxV, units::length::meter_t slop, 
     units::angle::radian_t rSlop, double accelVperTime, double decelVperDistance);
+
+    frc2::CommandPtr LockWheels();
 
     frc2::CommandPtr DriveBezier();
 
@@ -50,6 +56,8 @@ public:
 
     swerve::requests::FieldCentric drive_closedloop = swerve::requests::FieldCentric{}
         .WithDriveRequestType(swerve::DriveRequestType::Velocity);
+
+    swerve::requests::SwerveDriveBrake brake {};
 };
 
 // Swerve Pather Commands

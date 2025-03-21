@@ -14,17 +14,47 @@
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/SmartDashboard/SmartDashboard.h>
 
+#include "subsystems/SwervePather.h"
+
 #include "Config.h"
 
-Robot::Robot() {}
+frc::Field2d m_field {};
+
+frc::FieldObject2d* m_object;
+
+AutoManager m;
+
+Robot::Robot() {
+  m.Init();
+  frc::SmartDashboard::PutData("Field", &m_field);
+  m_object = m_field.GetObject("bob");
+}
 
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+
+  //m_field.SetRobotPose(m_container.drivetrain.GetState().Pose);
+
+  frc::Pose2d robotPose = m_container.drivetrain.GetState().Pose;
+
+  // frc::Pose2d centerPose {m.aprilTagFieldLayout.GetFieldLength() * 0.5, m.aprilTagFieldLayout.GetFieldWidth() * 0.5, frc::Rotation2d {0_rad}};
+
+  // frc::Pose2d flippedRobotPose {centerPose.X() - (robotPose.X() - centerPose.X()), centerPose.Y() - (robotPose.Y() - centerPose.Y()), robotPose.Rotation() + frc::Rotation2d {M_PI * 1_rad}};
+
+  m_field.SetRobotPose(robotPose);
+
+  //m_object->SetPose(robotPose);
 }
 
 void Robot::DisabledInit() {}
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+  m.updRoutine();
+  if (m.optional.has_value()){
+    //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  }
+}
 
 void Robot::DisabledExit() {}
 
@@ -37,15 +67,12 @@ void Robot::AutonomousInit() {
   }
 }
 
-AutoManager m;
-
-
 void Robot::AutonomousPeriodic() {
-  // m.updRoutine();
-  // if (m.optional.has_value()){
-  //   //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
-  // }
+  m.updRoutine();
+  if (m.optional.has_value()){
+    //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  }
 }
 
 void Robot::AutonomousExit() {}
@@ -77,27 +104,25 @@ void Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
   // frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
 
-  // m.updRoutine();
-  // if (m.optional.has_value()){
-  //   //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
-  //   //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
-  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
-  // }
+  m.updRoutine();
+  if (m.optional.has_value()){
+    //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
+    //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  }
 }
 
 void Robot::TeleopExit() {}
 
 void Robot::TestInit() {
   frc2::CommandScheduler::GetInstance().CancelAll();
-
-
   
 }
 void Robot::TestPeriodic() {}
 
 void Robot::TestExit() {}
 
-#ifndef RUNNI NG_FRC_TESTS
+#ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();
 }

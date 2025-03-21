@@ -24,6 +24,8 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/SequentialCommandGroup.h>
 
+#include <frc/smartdashboard/Field2d.h>
+
 #include "util/maths.h"
 #include <math.h>
 
@@ -43,6 +45,9 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutNumber("Elevator Manual Position", 0.0);
   frc::SmartDashboard::PutNumber("Coral Arm Manual Position", 0.0);
   frc::SmartDashboard::PutNumber("Wrist Manual Position", 0.0);
+
+  frc::SmartDashboard::PutNumber("Surgery Ramp Rate", 0.0);
+  frc::SmartDashboard::PutNumber("Surgery Rot Ramp Rate", 0.0);
 }
 
 double deadzone(double x, double deadzoneMax)
@@ -63,16 +68,31 @@ void RobotContainer::ConfigureBindings()
   // Drivetrain //
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {
+      // if (driver.R1().Get())
+      // {
+      //   return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * SurgeryModeSpeed) // Drive forward with negative Y (forward)
+      //       .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * SurgeryModeSpeed) // Drive left with negative X (left)
+      //       .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * SurgeryModeAngularRate); // Drive counterclockwise with negative X (left)
+      // } else {
+      //   return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
+      //       .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
+      //       .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+      // }
       if (driver.R1().Get())
       {
-        return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * SurgeryModeSpeed) // Drive forward with negative Y (forward)
-            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * SurgeryModeSpeed) // Drive left with negative X (left)
-            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * SurgeryModeAngularRate); // Drive counterclockwise with negative X (left)
+        CurrentSpeed = CurrentSpeed + clamp(SurgeryModeSpeed - CurrentSpeed, -0.25_mps, 0.25_mps);
+        CurrentAngularRate = CurrentAngularRate + clamp(SurgeryModeAngularRate - CurrentAngularRate, -0.2_rad_per_s, 0.2_rad_per_s);
       } else {
-        return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * MaxSpeed) // Drive forward with negative Y (forward)
-            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * MaxSpeed) // Drive left with negative X (left)
-            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * MaxAngularRate); // Drive counterclockwise with negative X (left)
+        CurrentSpeed = CurrentSpeed + clamp(MaxSpeed - CurrentSpeed, -0.25_mps, 0.25_mps);
+        CurrentAngularRate = CurrentAngularRate + clamp(MaxAngularRate - CurrentAngularRate, -0.2_rad_per_s, 0.2_rad_per_s); 
       }
+
+      frc::SmartDashboard::PutNumber("Current Speed", CurrentSpeed.value());
+      frc::SmartDashboard::PutNumber("Current Angular Rate", CurrentAngularRate.value());
+
+      return drive.WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * CurrentSpeed) // Drive forward with negative Y (forward)
+            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * CurrentSpeed) // Drive left with negative X (left)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * CurrentAngularRate); // Drive counterclockwise with negative X (left)
     })
 
     // drivetrain.Run([this] {
@@ -102,7 +122,7 @@ void RobotContainer::ConfigureBindings()
   coralwrist.SetDefaultCommand(coralwrist.HoldPos([this] () -> units::angle::turn_t {
     // Coral Wrist offset
     if (robotState.currentState == STATE_DELIVER_LOW) {
-      return mate.GetRightY() * -0.2_tr;
+      return mate.GetRightY() * -0.1_tr;
     }
     else {return 0_tr;}
   }));
@@ -206,7 +226,7 @@ void RobotContainer::ConfigureBindings()
       std::pair{0, 
         robotState.SetCurrentState(STATE_FUNNEL)
           .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, true))
-          .AndThen(elevator.SetHeight(1.5_tr))
+          .AndThen(elevator.SetHeight(1.3_tr))
       }
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -331,47 +351,111 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 
 void RobotContainer::AddAutos()
 {    
-  autoChooser.SetDefaultOption("Print Auto", [this] () -> frc2::CommandPtr {
-    return frc2::cmd::Print("Print auto ran");
+  autoChooser.SetDefaultOption("No Auto", [this] () -> frc2::CommandPtr {
+    return frc2::cmd::Print("Ran the no auto");
   });
 
   autoChooser.AddOption("Multipoint Auto", [this] () -> frc2::CommandPtr {
-    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, 0_m, frc::Rotation2d{0_rad}}, 3_mps, 0.1_m, 0.5_rad, 5.0, 5.0))
+    return this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 6.5_m, frc::Rotation2d{3.14_rad}}, 2.5_mps, 0.5_m, 0.5_rad, 2.0, 1.0)
+      .AndThen(this->pather.LockWheels())
       .AndThen(frc2::cmd::Wait(1.0_s))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, -2_m, frc::Rotation2d{-1.57_rad}}, 1_mps, 0.1_m, 0.2_rad, 5.0, 5.0))
-      .AndThen(frc2::cmd::Wait(1.0_s))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {3_m, 0_m, frc::Rotation2d{-1.57_rad}}, 1_mps, 0.1_m, 0.5_rad, 5.0, 5.0))
-      .AndThen(frc2::cmd::Wait(1.0_s))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {0_m, 0_m, frc::Rotation2d{0_rad}}, 1_mps, 0.05_m, 0.5_rad, 2.0, 2.0))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 3.6_m, frc::Rotation2d{3.14_rad}}, 3.0_mps, 1.0_m, 0.5_rad, 2.0, 100.0))
+      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {14.23_m, 2.0_m, frc::Rotation2d{2.0_rad}}, 3.0_mps, 0.1_m, 0.2_rad, 100.0, 1.0))
+      .AndThen(this->pather.LockWheels())
     ;
   });
 
-  autoChooser.AddOption("Score Auto", [this] () -> frc2::CommandPtr {
-    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-      .AndThen(robotState.SetCurrentState(STATE_DELIVER_LOW))
-      .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED))
-      .AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED))
+  // 14.414805, 4.710612, -3.103120  
+
+  autoChooser.AddOption("Front L2 L3 Auto", [this] () -> frc2::CommandPtr {
+    return 
+      pather.DriveWaypointSimple(
+        frc::Pose2d{11.052824_m, 4.566236_m, frc::Rotation2d {-0.204760_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 2.0, 100.0
+      )
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{11.942582_m, 6.385897_m, frc::Rotation2d {-1.57470_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
+      ))
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{15.586_m, 6.10892_m, frc::Rotation2d {-2.379003_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
+      ))
+      .AndThen(
+        pather.DriveWaypointSimple(
+          frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3.0_mps, 0.05_m, 0.2_rad, 100.0, 3.0
+        ).AndThen(pather.LockWheels()).AlongWith(
+          robotState.SetCurrentState(STATE_DELIVER_LOW)
+          .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+          
+          .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+          .AndThen(robotState.SetDeliverHeight(DELIVER_MID))
+          .AndThen(elevator.SetHeightProvider([this] {
+            return robotState.GetDeliverHeight();
+          }, false))
+        ))
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{14.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 1.5_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(0.5_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE, false))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, false))
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.5_m, 0.2_rad, 5.0, 3.0
+      ).AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{16.410535_m, 7.045300_m, frc::Rotation2d {-2.289_rad}}, 3.0_mps, 0.05_m, 0.1_rad, 2.0, 1.0
+      )).AlongWith(
+        elevator.SetHeight(ELEVATOR_MIN)
+        .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+        .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      )
+      // Go to human player, drive forward, and inatke
+      ).AndThen(pather.DriveFor(1_s, -0.2_mps).AlongWith(
+        elevator.SetHeight(0.8_tr)
+        .AndThen(coralwrist.SetPosition(0.03_tr))
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(2.0_s), coralarm.CoralArmRunIntake(-5_tps)))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(10_tps)))
       .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-      .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
-      .AndThen(elevator.SetHeightProvider([this] {
-        return robotState.GetDeliverHeight();
-      }, false))
-      .AndThen(frc2::cmd::Wait(2_s))
-      .AndThen(coralwrist.SetPosition(CORAL_WRIST_DELIVER, false))
-      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(2.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+
+      // Second Piece Score
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 4.0_mps, 0.05_m, 0.2_rad, 2.0, 2.0
+      ).AndThen(pather.LockWheels()).AlongWith(
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+        .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+        .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(elevator.SetHeightProvider([this] {
+          return robotState.GetDeliverHeight();
+        }, false))
+      ))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{14.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
       .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
       .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.2_m, 0.2_rad, 5.0, 3.0
+      ))
       .AndThen(elevator.SetHeight(ELEVATOR_MIN))
       .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
       .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
       .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
     ;
-  });
-
-  autoChooser.AddOption("Bezier Testing", [this] () -> frc2::CommandPtr {
-    return this->pather.ResetPose(frc::Pose2d {0_m, 0_m, frc::Rotation2d {0_rad}})
-      .AndThen(this->pather.DriveBezier());
   });
 
   frc::SmartDashboard::PutData(&autoChooser);
