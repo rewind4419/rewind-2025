@@ -22,10 +22,14 @@ public:
     frc2::CommandPtr HoldPos();
     frc2::CommandPtr DrivePower(std::function<float()> powerProvider);
 
+    frc2::CommandPtr SetFlipperPosition(units::angle::turn_t position);
+
     frc2::CommandPtr TestCommand();
     frc2::CommandPtr TestCommand2();
 
     units::angle::turn_t target = 0.0_tr;
+
+    units::angle::turn_t flipperTarget = 0.0_tr;
 
     bool iscool = false;
 private:
@@ -36,6 +40,10 @@ private:
 
 
     ctre::phoenix6::hardware::TalonFX winchMotor {WINCH_MOTOR_ID, "rio"};
+
+    ctre::phoenix6::controls::PositionVoltage funnelFlipperPosition {0.0_tr};
+
+    ctre::phoenix6::hardware::TalonFX funnelFlipperMotor {FUNNEL_FLIPPER_ID, "rio"};
 
     //ctre::phoenix6::controls::MotionMagicVoltage coralArmRequest {0_tr};
 };

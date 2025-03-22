@@ -20,6 +20,7 @@ frc::Pose2d FIELD_CENTER_POSE { 17.548_m * 0.5, 8.052_m * 0.5, frc::Rotation2d {
 frc::Pose2d SwapFieldSide(frc::Pose2d x)
 {
     frc::Pose2d flippedRobotPose {FIELD_CENTER_POSE.X() - (x.X() - FIELD_CENTER_POSE.X()), FIELD_CENTER_POSE.Y() - (x.Y() - FIELD_CENTER_POSE.Y()), x.Rotation() + frc::Rotation2d {M_PI * 1_rad}};
+    
     return flippedRobotPose;
 }
 
@@ -51,6 +52,8 @@ SwervePather::SwervePather(CommandSwerveDrivetrain* drivetrain)
     // frc::SmartDashboard::PutNumber("Manual X Target", 0.0);
     // frc::SmartDashboard::PutNumber("Manual Y Target", 0.0);
     // frc::SmartDashboard::PutNumber("Manual R Target", 0.0);
+
+    frc::SmartDashboard::PutNumber("TeamColorOverride (1 is red, 2 is blue)", 0.0);
 }
 
 void SwervePather::Periodic()
@@ -117,6 +120,46 @@ frc2::CommandPtr SwervePather::DriveWaypointSimple(
     units::angle::radian_t rSlop, double accelVperTime, double decelVperDistance
 )
 {
+    // bool flipped = false;
+
+    // std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+
+    // frc::Pose2d potentiallyFlippedTarget = target;
+
+    // double smartDashboardOverride = frc::SmartDashboard::GetNumber("TeamColorOverride (1 is red, 2 is blue)", 0.0);
+
+    // if (smartDashboardOverride > 0.1)
+    // {
+    //     printf("Using smartdashboard override: %f\n", smartDashboardOverride);
+    //     if (smartDashboardOverride > 1.5) {
+    //         printf("Smartdashboard override is 2, forcing blue\n");
+    //         potentiallyFlippedTarget = SwapFieldSide(target);
+    //     }
+    //     else
+    //     {
+    //         printf("Smartdashboard override is 1, keeping red\n");
+    //     }
+    // }
+    // else
+    // {
+    //     if (!alliance.has_value()) {printf("Bruh the optional returned no field color\n");}
+
+    //     if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kBlue)
+    //     {
+    //         printf("Flipping field side for blue!\n");
+    //         potentiallyFlippedTarget = SwapFieldSide(target);
+    //     }
+
+    //     if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kRed)
+    //     {
+    //         printf("Keeping red side!\n");
+    //     }
+    // }
+
+    
+    
+    // return SwerveCmdDriveWaypointSimple(this, potentiallyFlippedTarget, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
+
     return SwerveCmdDriveWaypointSimple(this, target, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
 }
 
@@ -181,6 +224,7 @@ SwerveCmdDriveWaypointSimple::SwerveCmdDriveWaypointSimple(
 
 void SwerveCmdDriveWaypointSimple::Initialize()
 {
+    printf("Started waypoint\n");
     frc::SmartDashboard::PutString("Status", "Started waypoint");
 
     this->startTime = frc::Timer::GetFPGATimestamp().value();
@@ -247,6 +291,7 @@ void SwerveCmdDriveWaypointSimple::Execute()
 
 void SwerveCmdDriveWaypointSimple::End(bool interrupted)
 {
+    printf("Finished waypoint\n");
     frc::SmartDashboard::PutString("Status", "Finished waypoint");
 }
 

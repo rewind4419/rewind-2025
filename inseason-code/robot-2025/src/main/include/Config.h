@@ -18,6 +18,8 @@
 
 #define INTAKE_MOTOR_ID 9
 
+#define FUNNEL_FLIPPER_ID 12
+
 // TODO: implement all the safeties! only basic ones exist now
 #define ELEVATOR_MIN 0_tr
 //#define ELEVATOR_FUNNEL 1.5_tr // Position to grab from funnel
@@ -27,7 +29,10 @@
 
 #define ELEVATOR_DELIVER_LOW 3_tr
 #define ELEVATOR_DELIVER_MID 8.6_tr
-#define ELEVATOR_DELIVER_HIGH 18_tr
+//#define ELEVATOR_DELIVER_HIGH 18_tr
+#define ELEVATOR_DELIVER_HIGH 17.5_tr
+
+// just for HIGH, mamke the wrist 0.26 and the arm 0.32
 
 #define CORAL_WRIST_MIN 0_tr
 #define CORAL_WRIST_MAX 0.5_tr
@@ -48,5 +53,5 @@
 #define CORAL_ARM_CLIMB 0.20_tr
 
 #define CORAL_ARM_INTAKE_SPEED 10_tps
-#define CORAL_ARM_OUTTAKE_SPEED -10_tps
+#define CORAL_ARM_OUTTAKE_SPEED -11_tps //-10_tps
 #define CORAL_ARM_IDLE_SPEED 5_tps

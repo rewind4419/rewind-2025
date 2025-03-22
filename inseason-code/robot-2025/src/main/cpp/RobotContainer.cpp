@@ -46,8 +46,8 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutNumber("Coral Arm Manual Position", 0.0);
   frc::SmartDashboard::PutNumber("Wrist Manual Position", 0.0);
 
-  frc::SmartDashboard::PutNumber("Surgery Ramp Rate", 0.0);
-  frc::SmartDashboard::PutNumber("Surgery Rot Ramp Rate", 0.0);
+  // frc::SmartDashboard::PutNumber("Surgery Ramp Rate", 0.0);
+  // frc::SmartDashboard::PutNumber("Surgery Rot Ramp Rate", 0.0);
 }
 
 double deadzone(double x, double deadzoneMax)
@@ -211,6 +211,9 @@ void RobotContainer::ConfigureBindings()
   //   .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   // );
 
+  mate.POVRight().OnTrue(winch.SetFlipperPosition(0.3_tr));
+  mate.POVLeft().OnTrue(winch.SetFlipperPosition(0.0_tr));
+
   //Extends the arm out
   mate.Touchpad().OnTrue(
     frc2::cmd::Select<int>(
@@ -228,6 +231,7 @@ void RobotContainer::ConfigureBindings()
           .AndThen(coralarm.SetPosition(CORAL_ARM_CLIMB))
           .AlongWith(coralwrist.SetPosition(CORAL_WRIST_CLIMB))
           .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+          .AndThen(winch.SetFlipperPosition(0.25_tr))
       }
     )
     //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -254,7 +258,7 @@ void RobotContainer::ConfigureBindings()
       }
     )
     //.WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
-    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf)
+    .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   ); 
   
   //Going to funnel
@@ -269,7 +273,7 @@ void RobotContainer::ConfigureBindings()
       std::pair{0, 
         robotState.SetCurrentState(STATE_FUNNEL)
           .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, true))
-          .AndThen(elevator.SetHeight(1.3_tr))
+          .AndThen(elevator.SetHeight(0.7_tr)) //1.3_tr
       }
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -333,25 +337,35 @@ void RobotContainer::ConfigureBindings()
   mate.R2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_INTAKE_SPEED)); //intake
   mate.L2().WhileTrue(coralarm.CoralArmRunIntake(CORAL_ARM_OUTTAKE_SPEED)); //outake
 
+  mate.Options().OnTrue(
+    frc2::cmd::RunOnce([this] {
+      elevator.GetCurrentCommand()->Cancel();
+      coralarm.GetCurrentCommand()->Cancel();
+    })
+  );
+
   // Recovery Mode
-  mate.Share().OnTrue(
+  mate.Share().WhileTrue(
     frc2::cmd::RunOnce([this] {
       printf("Running recovery\n");
-      frc2::CommandScheduler::GetInstance().CancelAll();
+      
       elevator.target = elevator.motor1.GetPosition().GetValue();
       coralarm.target = coralarm.motor1.GetPosition().GetValue();
+      this->robotState.currentState = STATE_NEUTRAL;
     })
-    .AndThen(
-      elevator.SetHeightProvider([this] {
-        return elevator.target + (mate.GetRightY()) * 0.03_tr;
+    .AndThen(elevator.SetHeightProvider([this] {
+        printf("Incrementing elevator by %f, now at %f\n", mate.GetRightY(), elevator.target.value());
+        elevator.target += (mate.GetRightY()) * 0.03_tr;
+        return elevator.target;
       }, true, true).AlongWith(coralarm.SetPositionProvider([this] {
-        return coralarm.target + (mate.GetLeftY()) * 0.01_tr;
-      }, true, true))
-    )
+        printf("Incrementing arm by %f, now at %f\n", mate.GetLeftY(), coralarm.target.value());
+        coralarm.target += (mate.GetLeftY()) * 0.01_tr;
+        return coralarm.target;
+      }, true, true)))
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
     // .Until([this] {
     //   bool optionVal = mate.Circle().Get();
-    //   if (optionVal) {printf("Option pressed! ending\n"); return true;}
+    //   if (optionVal) {printf("Circle pressed! ending\n"); return true;}
     //   return false;
     // })
   );
@@ -379,7 +393,20 @@ void RobotContainer::ConfigureBindings()
   //   };
   // }));
 }
+// On Red
+// Left Side Human Player: 16.898, 1.342, 2.205
 
+// In front of Tag 6:
+// 14.286, 3.2579, 2.1289 - scoring on right tree
+
+// In front of Tag 11, left tree
+// 12.6723, 2.7138, 1.032
+
+// In front of tag 11, right tree (better)
+// 12.941693, 2.544800, 1.034950
+
+// Red starting left side
+// 9.667, 1.450, -0.044
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand()
 {
@@ -398,19 +425,195 @@ void RobotContainer::AddAutos()
     return frc2::cmd::Print("Ran the no auto");
   });
 
-  autoChooser.AddOption("Multipoint Auto", [this] () -> frc2::CommandPtr {
-    return this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 6.5_m, frc::Rotation2d{3.14_rad}}, 2.5_mps, 0.5_m, 0.5_rad, 2.0, 1.0)
-      .AndThen(this->pather.LockWheels())
-      .AndThen(frc2::cmd::Wait(1.0_s))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 3.6_m, frc::Rotation2d{3.14_rad}}, 3.0_mps, 1.0_m, 0.5_rad, 2.0, 100.0))
-      .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {14.23_m, 2.0_m, frc::Rotation2d{2.0_rad}}, 3.0_mps, 0.1_m, 0.2_rad, 100.0, 1.0))
-      .AndThen(this->pather.LockWheels())
+  // autoChooser.AddOption("Multipoint Auto", [this] () -> frc2::CommandPtr {
+  //   return this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 6.5_m, frc::Rotation2d{3.14_rad}}, 2.5_mps, 0.5_m, 0.5_rad, 2.0, 1.0)
+  //     .AndThen(this->pather.LockWheels())
+  //     .AndThen(frc2::cmd::Wait(1.0_s))
+  //     .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {16_m, 3.6_m, frc::Rotation2d{3.14_rad}}, 3.0_mps, 1.0_m, 0.5_rad, 2.0, 100.0))
+  //     .AndThen(this->pather.DriveWaypointSimple(frc::Pose2d {14.23_m, 2.0_m, frc::Rotation2d{2.0_rad}}, 3.0_mps, 0.1_m, 0.2_rad, 100.0, 1.0))
+  //     .AndThen(this->pather.LockWheels())
+  //   ;
+  // });
+
+  autoChooser.AddOption("RED One Piece Far Left L2", [this] () -> frc2::CommandPtr {
+    return 
+      frc2::cmd::Wait(5.0_s)
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{11.29_m,1.24_m, frc::Rotation2d {-0.044_rad}}, 2_mps, 0.2_m, 0.2_rad, 2.0, 3.0
+      ))
+      // Drive 1m away from scoring pose
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{12.441693_m,1.6787746_m, frc::Rotation2d {1.034950_rad}}, 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ).AndThen(pather.LockWheels()).AlongWith(
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+        .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+        .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(elevator.SetHeightProvider([this] {
+          return robotState.GetDeliverHeight();
+        }, false))
+      ))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      // Drive up to score
+      .AndThen(pather.DriveWaypointSimple(
+        frc::Pose2d{12.941693_m, 2.544800_m, frc::Rotation2d {1.034950_rad}}, 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(pather.DriveWaypointSimple(
+       frc::Pose2d{12.441693_m,1.6787746_m, frc::Rotation2d {1.034950_rad}}, 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      .AndThen(pather.DriveWaypointSimple(
+       frc::Pose2d{16.898_m, 1.342_m, frc::Rotation2d {2.205_rad}}, 3.0_mps, 0.05_m, 0.2_rad, 2.0, 1.0
+      ))
     ;
   });
 
-  // 14.414805, 4.710612, -3.103120  
+  autoChooser.AddOption("RED One Piece Far Right L2", [this] () -> frc2::CommandPtr {
+    return 
+      pather.DriveWaypointSimple(
+        MirrorLongWays(frc::Pose2d{11.29_m,1.24_m, frc::Rotation2d {-0.044_rad}}), 2_mps, 0.2_m, 0.2_rad, 2.0, 3.0
+      )
+      // Drive 1m away from scoring pose
+      .AndThen(pather.DriveWaypointSimple(
+        MirrorLongWays(frc::Pose2d{12.1723_m, 1.8477746_m, frc::Rotation2d {1.034950_rad}}), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ).AndThen(pather.LockWheels()).AlongWith(
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+        .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+        .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(elevator.SetHeightProvider([this] {
+          return robotState.GetDeliverHeight();
+        }, false))
+      ))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      // Drive up to score
+      .AndThen(pather.DriveWaypointSimple(
+        MirrorLongWays(frc::Pose2d{12.6723_m, 2.7138_m, frc::Rotation2d {1.034950_rad}}), 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(pather.DriveWaypointSimple(
+        MirrorLongWays(frc::Pose2d{12.1723_m, 1.8477746_m, frc::Rotation2d {1.034950_rad}}), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      .AndThen(pather.DriveWaypointSimple(
+       MirrorLongWays(frc::Pose2d{16.898_m, 1.342_m, frc::Rotation2d {2.205_rad}}), 3.0_mps, 0.05_m, 0.2_rad, 2.0, 1.0
+      ))
+    ;
+  });
 
-  autoChooser.AddOption("Front L2 L3 Auto", [this] () -> frc2::CommandPtr {
+  autoChooser.AddOption("BLUE One Piece Far Left L2", [this] () -> frc2::CommandPtr {
+    return 
+      frc2::cmd::Wait(5.0_s)
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(frc::Pose2d{11.29_m,1.24_m, frc::Rotation2d {-0.044_rad}}), 2_mps, 0.2_m, 0.2_rad, 2.0, 3.0
+      ))
+      // Drive 1m away from scoring pose
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(frc::Pose2d{12.441693_m,1.6787746_m, frc::Rotation2d {1.034950_rad}}), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ).AndThen(pather.LockWheels()).AlongWith(
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+        .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+        .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(elevator.SetHeightProvider([this] {
+          return robotState.GetDeliverHeight();
+        }, false))
+      ))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      // Drive up to score
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(frc::Pose2d{12.941693_m, 2.544800_m, frc::Rotation2d {1.034950_rad}}), 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(pather.DriveWaypointSimple(
+       SwapFieldSide(frc::Pose2d{12.441693_m,1.6787746_m, frc::Rotation2d {1.034950_rad}}), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      .AndThen(pather.DriveWaypointSimple(
+       SwapFieldSide(frc::Pose2d{16.898_m, 1.342_m, frc::Rotation2d {2.205_rad}}), 3.0_mps, 0.05_m, 0.2_rad, 2.0, 1.0
+      ))
+    ;
+  });
+
+  autoChooser.AddOption("BLUE One Piece Far Right L2", [this] () -> frc2::CommandPtr {
+    return 
+      pather.DriveWaypointSimple(
+        SwapFieldSide(MirrorLongWays(frc::Pose2d{11.29_m,1.24_m, frc::Rotation2d {-0.044_rad}})), 2_mps, 0.2_m, 0.2_rad, 2.0, 3.0
+      )
+      // Drive 1m away from scoring pose
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(MirrorLongWays(frc::Pose2d{12.1723_m, 1.8477746_m, frc::Rotation2d {1.034950_rad}})), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ).AndThen(pather.LockWheels()).AlongWith(
+        robotState.SetCurrentState(STATE_DELIVER_LOW)
+        .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+        .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(elevator.SetHeightProvider([this] {
+          return robotState.GetDeliverHeight();
+        }, false))
+      ))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      // Drive up to score
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(MirrorLongWays(frc::Pose2d{12.6723_m, 2.7138_m, frc::Rotation2d {1.034950_rad}})), 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+      ))
+      .AndThen(pather.LockWheels())
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralarm.SetPosition(0.4_tr, false))
+      .AndThen(frc2::cmd::Wait(0.1_s))
+      .AndThen(coralwrist.SetPosition(0.2_tr, false))
+      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+      .AndThen(pather.DriveWaypointSimple(
+        SwapFieldSide(MirrorLongWays(frc::Pose2d{12.1723_m, 1.8477746_m, frc::Rotation2d {1.034950_rad}})), 2.0_mps, 0.05_m, 0.2_rad, 2.0, 3.0
+      ))
+      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+      .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+      .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+      .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+      .AndThen(pather.DriveWaypointSimple(
+       SwapFieldSide(MirrorLongWays(frc::Pose2d{16.898_m, 1.342_m, frc::Rotation2d {2.205_rad}})), 3.0_mps, 0.05_m, 0.2_rad, 2.0, 1.0
+      ))
+    ;
+  });
+
+  autoChooser.AddOption("One Piece Close Right L3 (untested)", [this] () -> frc2::CommandPtr {
     return 
       pather.DriveWaypointSimple(
         frc::Pose2d{11.052824_m, 4.566236_m, frc::Rotation2d {-0.204760_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 2.0, 100.0
@@ -419,62 +622,17 @@ void RobotContainer::AddAutos()
         frc::Pose2d{11.942582_m, 6.385897_m, frc::Rotation2d {-1.57470_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
       ))
       .AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{15.586_m, 6.10892_m, frc::Rotation2d {-2.379003_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
+        frc::Pose2d{15.586_m, 6.10892_m, frc::Rotation2d {-2.379003_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 4.0
       ))
-      .AndThen(
-        pather.DriveWaypointSimple(
-          frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3.0_mps, 0.05_m, 0.2_rad, 100.0, 3.0
-        ).AndThen(pather.LockWheels()).AlongWith(
-          robotState.SetCurrentState(STATE_DELIVER_LOW)
-          .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
-          
-          .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-          .AndThen(robotState.SetDeliverHeight(DELIVER_MID))
-          .AndThen(elevator.SetHeightProvider([this] {
-            return robotState.GetDeliverHeight();
-          }, false))
-        ))
-      .AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{14.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 1.5_mps, 0.05_m, 0.05_rad, 2.0, 3.0
-      ))
-      .AndThen(pather.LockWheels())
-      .AndThen(frc2::cmd::Wait(0.1_s))
-      .AndThen(coralarm.SetPosition(0.4_tr, false))
-      .AndThen(frc2::cmd::Wait(0.1_s))
-      .AndThen(coralwrist.SetPosition(0.2_tr, false))
-      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(0.5_s), coralarm.CoralArmRunIntake(-10_tps)))
-      .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE, false))
-      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, false))
-      .AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.5_m, 0.2_rad, 5.0, 3.0
-      ).AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{16.410535_m, 7.045300_m, frc::Rotation2d {-2.289_rad}}, 3.0_mps, 0.05_m, 0.1_rad, 2.0, 1.0
-      )).AlongWith(
-        elevator.SetHeight(ELEVATOR_MIN)
-        .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
-        .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
-        .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
-      )
-      // Go to human player, drive forward, and inatke
-      ).AndThen(pather.DriveFor(1_s, -0.2_mps).AlongWith(
-        elevator.SetHeight(0.8_tr)
-        .AndThen(coralwrist.SetPosition(0.03_tr))
-      ))
-      .AndThen(pather.LockWheels())
-      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(2.0_s), coralarm.CoralArmRunIntake(-5_tps)))
-      .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(10_tps)))
-      .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-      .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
-
       // Second Piece Score
       .AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 4.0_mps, 0.05_m, 0.2_rad, 2.0, 2.0
+        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3.0_mps, 0.05_m, 0.2_rad, 2.0, 1.0
       ).AndThen(pather.LockWheels()).AlongWith(
         robotState.SetCurrentState(STATE_DELIVER_LOW)
         .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
         
         .AndThen(elevator.SetHeight(ELEVATOR_MIN))
-        .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+        .AndThen(robotState.SetDeliverHeight(DELIVER_MID))
         .AndThen(elevator.SetHeightProvider([this] {
           return robotState.GetDeliverHeight();
         }, false))
@@ -492,7 +650,7 @@ void RobotContainer::AddAutos()
       .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
       .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
       .AndThen(pather.DriveWaypointSimple(
-        frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.2_m, 0.2_rad, 5.0, 3.0
+       frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.2_m, 0.2_rad, 5.0, 3.0
       ))
       .AndThen(elevator.SetHeight(ELEVATOR_MIN))
       .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
@@ -500,6 +658,96 @@ void RobotContainer::AddAutos()
       .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
     ;
   });
+
+  // autoChooser.AddOption("2 Piece Close Right L2 L3 (DONT RUN, ITS WAY OVER 15 SECONDS)", [this] () -> frc2::CommandPtr {
+  //   return 
+  //     pather.DriveWaypointSimple(
+  //       frc::Pose2d{11.052824_m, 4.566236_m, frc::Rotation2d {-0.204760_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 2.0, 100.0
+  //     )
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{11.942582_m, 6.385897_m, frc::Rotation2d {-1.57470_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
+  //     ))
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{15.586_m, 6.10892_m, frc::Rotation2d {-2.379003_rad}}, 3.0_mps, 0.5_m, 2.0_rad, 100.0, 100.0
+  //     ))
+  //     .AndThen(
+  //       pather.DriveWaypointSimple(
+  //         frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3.0_mps, 0.05_m, 0.2_rad, 100.0, 3.0
+  //       ).AndThen(pather.LockWheels()).AlongWith(
+  //         robotState.SetCurrentState(STATE_DELIVER_LOW)
+  //         .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+          
+  //         .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+  //         .AndThen(robotState.SetDeliverHeight(DELIVER_MID))
+  //         .AndThen(elevator.SetHeightProvider([this] {
+  //           return robotState.GetDeliverHeight();
+  //         }, false))
+  //       ))
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{14.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 1.5_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+  //     ))
+  //     .AndThen(pather.LockWheels())
+  //     .AndThen(frc2::cmd::Wait(0.1_s))
+  //     .AndThen(coralarm.SetPosition(0.4_tr, false))
+  //     .AndThen(frc2::cmd::Wait(0.1_s))
+  //     .AndThen(coralwrist.SetPosition(0.2_tr, false))
+  //     .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(0.5_s), coralarm.CoralArmRunIntake(-10_tps)))
+  //     .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE, false))
+  //     .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, false))
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.5_m, 0.2_rad, 5.0, 3.0
+  //     ).AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{16.410535_m, 7.045300_m, frc::Rotation2d {-2.289_rad}}, 3.0_mps, 0.05_m, 0.1_rad, 2.0, 1.0
+  //     )).AlongWith(
+  //       elevator.SetHeight(ELEVATOR_MIN)
+  //       .AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+  //       .AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+  //       .AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+  //     )
+  //     // Go to human player, drive forward, and inatke
+  //     ).AndThen(pather.DriveFor(1_s, -0.2_mps).AlongWith(
+  //       elevator.SetHeight(0.8_tr)
+  //       .AndThen(coralwrist.SetPosition(0.03_tr))
+  //     ))
+  //     .AndThen(pather.LockWheels())
+  //     .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(2.0_s), coralarm.CoralArmRunIntake(-5_tps)))
+  //     .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(10_tps)))
+  //     .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+  //     .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL))
+
+  //     // Second Piece Score
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 4.0_mps, 0.05_m, 0.2_rad, 2.0, 2.0
+  //     ).AndThen(pather.LockWheels()).AlongWith(
+  //       robotState.SetCurrentState(STATE_DELIVER_LOW)
+  //       .AndThen(coralarm.SetPosition(CORAL_ARM_EXTENDED).AlongWith(coralwrist.SetPosition(CORAL_WRIST_EXTENDED)))
+        
+  //       .AndThen(elevator.SetHeight(ELEVATOR_MIN))
+  //       .AndThen(robotState.SetDeliverHeight(DELIVER_LOW))
+  //       .AndThen(elevator.SetHeightProvider([this] {
+  //         return robotState.GetDeliverHeight();
+  //       }, false))
+  //     ))
+  //     .AndThen(frc2::cmd::Wait(0.1_s))
+  //     .AndThen(pather.DriveWaypointSimple(
+  //       frc::Pose2d{14.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 1.0_mps, 0.05_m, 0.05_rad, 2.0, 3.0
+  //     ))
+  //     .AndThen(pather.LockWheels())
+  //     .AndThen(frc2::cmd::Wait(0.1_s))
+  //     .AndThen(coralarm.SetPosition(0.4_tr, false))
+  //     .AndThen(frc2::cmd::Wait(0.1_s))
+  //     .AndThen(coralwrist.SetPosition(0.2_tr, false))
+  //     .AndThen(frc2::cmd::Deadline(frc2::cmd::Wait(1.0_s), coralarm.CoralArmRunIntake(-10_tps)))
+  //     .AndThen(coralarm.SetPosition(CORAL_ARM_SAFE))
+  //     .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL));
+  //     //.AndThen(pather.DriveWaypointSimple(
+  //     //  frc::Pose2d{15.414805_m, 4.710612_m, frc::Rotation2d {-3.103120_rad}}, 3_mps, 0.2_m, 0.2_rad, 5.0, 3.0
+  //     //.AndThen(elevator.SetHeight(ELEVATOR_MIN))
+  //     //.AndThen(robotState.SetCurrentState(STATE_NEUTRAL))
+  //     //.AndThen(robotState.SetDeliverHeight(DELIVER_ZERO))
+  //     //.AndThen(coralarm.SetPosition(CORAL_ARM_MIN))
+  //   ;
+  // });
 
   frc::SmartDashboard::PutData(&autoChooser);
 }

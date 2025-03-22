@@ -43,7 +43,7 @@ void Robot::RobotPeriodic() {
 
   m_field.SetRobotPose(robotPose);
 
-  //m_object->SetPose(robotPose);
+  m_object->SetPose(SwapFieldSide(robotPose));
 }
 
 void Robot::DisabledInit() {}
@@ -104,12 +104,12 @@ void Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
   // frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
 
-  m.updRoutine();
-  if (m.optional.has_value()){
-    //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
-    //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
-    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
-  }
+  // m.updRoutine();
+  // if (m.optional.has_value()){
+  //   //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
+  //   //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  // }
 }
 
 void Robot::TeleopExit() {}

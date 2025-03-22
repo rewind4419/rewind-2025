@@ -103,7 +103,7 @@ frc2::CommandPtr CoralArm::HoldPos()
     return this->Run([this]{
         //printf("Holding\n");
         this->motor1.SetControl(coralArmRequest.WithPosition(clamp(target, CORAL_ARM_MIN, CORAL_ARM_MAX)));
-        //this->coralIntakeMotor.SetControl(coralIntakeRequest.WithVelocity(CORAL_ARM_IDLE_SPEED));
+        this->coralIntakeMotor.SetControl(coralIntakeRequest.WithVelocity(CORAL_ARM_IDLE_SPEED));
     }).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf);
 }
 

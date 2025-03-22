@@ -79,4 +79,21 @@ Robot Efficiency [Nethra]
 - Climber
 - Algae Handler
 
----
+## Notes during SDR
+
+### Backlog
+
+- Separate things like scoring into a separate task that can be added in chunks
+- Make tasks not built on auto run, instead on robot init
+    - See if maybe thats why auto is slow to start
+
+- Make the rotation motion profiling more robust
+
+### Current Tests
+
+- One Piece Auto Far Left needs to be tested, it was made using positions from calibration
+
+- Blue Side Flipping (done inside Swerve Pather) needs testing
+
+- One Piece Close Right is modified from our testing
+- 2 Piece CLose Right L2 L3 is the one from our testing, but its way too long

@@ -34,12 +34,31 @@ Winch::Winch()
     currentLimitConfigs.SupplyCurrentLimitEnable = true;
     currentLimitConfigs.SupplyCurrentLowerLimit = 0_A;
     this->winchMotor.GetConfigurator().Apply(currentLimitConfigs);
+
+    configs::TalonFXConfiguration flipperTalonFXConfigs{};
+
+    configs::Slot0Configs slot0ConfigsFlipper = flipperTalonFXConfigs.Slot0;
+
+    slot0ConfigsFlipper.kP = 3.5;
+
+    flipperTalonFXConfigs.Feedback.WithSensorToMechanismRatio(5.0);
+    flipperTalonFXConfigs.MotorOutput.WithInverted(ctre::phoenix6::signals::InvertedValue::Clockwise_Positive);
+
+    flipperTalonFXConfigs.MotorOutput.WithNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
+    
+    funnelFlipperMotor.GetConfigurator().Apply(flipperTalonFXConfigs);
+    funnelFlipperMotor.GetConfigurator().Apply(slot0ConfigsFlipper);
+
+    funnelFlipperMotor.SetPosition(0_tr);
 }
 
 void Winch::Periodic()
 {
     // frc::SmartDashboard::PutNumber("Winch current encoder position", this->winchMotor.GetPosition().GetValueAsDouble());
     // frc::SmartDashboard::PutNumber("Winch target", this->target.value());
+
+    frc::SmartDashboard::PutNumber("Flipper Position", funnelFlipperMotor.GetPosition().GetValue().value());
+    frc::SmartDashboard::PutNumber("Flipper Target", flipperTarget.value());
 }
 
 frc2::CommandPtr Winch::DrivePower(std::function<float()> powerProvider){
@@ -51,17 +70,28 @@ frc2::CommandPtr Winch::DrivePower(std::function<float()> powerProvider){
     });
 }
 
+frc2::CommandPtr Winch::SetFlipperPosition(units::angle::turn_t position)
+{
+    return this->RunOnce([this, position] {
+        this->flipperTarget = position;
+    });
+}
+
 frc2::CommandPtr Winch::HoldPos(){
     return this->Run([this]{
         //printf("Holding\n");
         this->winchMotor.SetControl(winchPosition.WithPosition(this->target));
+        this->funnelFlipperMotor.SetControl(funnelFlipperPosition.WithPosition(this->flipperTarget));
     });
 }
 
 frc2::CommandPtr Winch::GotoPosition(units::angle::turn_t position){
     return frc2::FunctionalCommand(
             [this, position] () {this->target = position;},
-            [this, position] () {this->winchMotor.SetControl(winchPosition.WithPosition(position));},
+            [this, position] () {
+                this->winchMotor.SetControl(winchPosition.WithPosition(position));
+                this->funnelFlipperMotor.SetControl(funnelFlipperPosition.WithPosition(this->flipperTarget));    
+            },
             [] (bool interrupted) {/*printf("Finished going!\n");*/},
             [this, position] () -> bool {
                 printf("Winch distance %f\n", this->winchMotor.GetPosition().GetValueAsDouble() - position.value());
