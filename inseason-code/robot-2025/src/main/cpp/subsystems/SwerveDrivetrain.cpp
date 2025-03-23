@@ -16,19 +16,20 @@ void CommandSwerveDrivetrain::Periodic()
      */
 
    
-    if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
-        auto const allianceColor = frc::DriverStation::GetAlliance();
-        if (allianceColor) {
-            SetOperatorPerspectiveForward(
-                *allianceColor == frc::DriverStation::Alliance::kRed
-                    ? kRedAlliancePerspectiveRotation
-                    : kBlueAlliancePerspectiveRotation
-            );
-            m_hasAppliedOperatorPerspective = true;
-        }
-    }
+    // if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
+    //     auto const allianceColor = frc::DriverStation::GetAlliance();
+    //     if (allianceColor) {
+    //         SetOperatorPerspectiveForward(
+    //             *allianceColor == frc::DriverStation::Alliance::kRed
+    //                 ? kRedAlliancePerspectiveRotation
+    //                 : kBlueAlliancePerspectiveRotation
+    //         );
+    //         m_hasAppliedOperatorPerspective = true;
+    //     }
+    // }
 
-    
+    SetOperatorPerspectiveForward(
+                kRedAlliancePerspectiveRotation);
 
     frc::Pose2d pose = this->GetState().Pose;
     

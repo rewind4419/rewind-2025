@@ -63,15 +63,17 @@ void Robot::AutonomousInit() {
 
   if (m_autonomousCommand.has_value()) {
     m_autonomousCommand.value().get()->Schedule();
-    //m_autonomousCommand.value().get()->Schedule();
   }
 }
 
 void Robot::AutonomousPeriodic() {
-  m.updRoutine();
-  if (m.optional.has_value()){
-    //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-    m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+  if (m_container.autoVisionEnabled)
+  {
+    m.updRoutine();
+    if (m.optional.has_value()){
+      //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+      m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+    }
   }
 }
 
@@ -103,13 +105,6 @@ void Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("FR Angle", this->fr.GetAbsolutePosition().GetValueAsDouble());
   // frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
   // frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
-
-  // m.updRoutine();
-  // if (m.optional.has_value()){
-  //   //printf("Yes, timestamp: %f\n", m.optional.value().timestamp.value());
-  //   //m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
-  //   m_container.drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
-  // }
 }
 
 void Robot::TeleopExit() {}

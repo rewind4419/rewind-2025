@@ -53,5 +53,5 @@
 #define CORAL_ARM_CLIMB 0.20_tr
 
 #define CORAL_ARM_INTAKE_SPEED 10_tps
-#define CORAL_ARM_OUTTAKE_SPEED -11_tps //-10_tps
+#define CORAL_ARM_OUTTAKE_SPEED -12_tps //-10_tps then -15_tps !NEED TO DEPLOY TO CLOYSTER!
 #define CORAL_ARM_IDLE_SPEED 5_tps

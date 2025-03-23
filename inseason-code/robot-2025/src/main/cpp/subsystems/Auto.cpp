@@ -11,7 +11,11 @@
 
 void AutoManager::Init()
 {
-  
+  // This puts our autos on tthe blue side!!!!!
+  // Comment out this code if you want to run on red again
+  //  
+  // aprilTagFieldLayout.SetOrigin(frc::AprilTagFieldLayout::OriginPosition::kRedAllianceWallRightSide);
+  // estimator = photon::PhotonPoseEstimator {aprilTagFieldLayout, photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, this->robotToCam};
   
   //frc::SmartDashboard::PutData("Field", &m_field);
 }
@@ -45,6 +49,4 @@ void AutoManager::updRoutine(){
       // printf("No value here.   ");
     }
   }
-
-  
 }

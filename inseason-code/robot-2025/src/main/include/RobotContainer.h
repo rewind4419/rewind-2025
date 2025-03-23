@@ -74,7 +74,7 @@ public:
   BR Encoder - 11
    */
 
-
+  bool autoVisionEnabled = false;
 private:
   void ConfigureBindings();
 };

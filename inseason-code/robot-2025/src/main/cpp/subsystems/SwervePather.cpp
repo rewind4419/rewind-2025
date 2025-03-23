@@ -120,11 +120,11 @@ frc2::CommandPtr SwervePather::DriveWaypointSimple(
     units::angle::radian_t rSlop, double accelVperTime, double decelVperDistance
 )
 {
-    // bool flipped = false;
+    bool flipped = false;
 
-    // std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+    std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
 
-    // frc::Pose2d potentiallyFlippedTarget = target;
+    frc::Pose2d potentiallyFlippedTarget = target;
 
     // double smartDashboardOverride = frc::SmartDashboard::GetNumber("TeamColorOverride (1 is red, 2 is blue)", 0.0);
 
@@ -141,26 +141,24 @@ frc2::CommandPtr SwervePather::DriveWaypointSimple(
     //     }
     // }
     // else
-    // {
-    //     if (!alliance.has_value()) {printf("Bruh the optional returned no field color\n");}
+    {
+        if (!alliance.has_value()) {printf("Bruh the optional returned no field color, defaulting to RED. :(\n");}
 
-    //     if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kBlue)
-    //     {
-    //         printf("Flipping field side for blue!\n");
-    //         potentiallyFlippedTarget = SwapFieldSide(target);
-    //     }
+        if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kBlue)
+        {
+            printf("Flipping field side for blue! :)\n");
+            potentiallyFlippedTarget = SwapFieldSide(target);
+        }
 
-    //     if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kRed)
-    //     {
-    //         printf("Keeping red side!\n");
-    //     }
-    // }
-
+        if (alliance.has_value() && alliance.value() == frc::DriverStation::Alliance::kRed)
+        {
+            printf("Keeping red side! :)\n");
+        }
+    }
     
-    
-    // return SwerveCmdDriveWaypointSimple(this, potentiallyFlippedTarget, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
+    return SwerveCmdDriveWaypointSimple(this, potentiallyFlippedTarget, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
 
-    return SwerveCmdDriveWaypointSimple(this, target, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
+    //return SwerveCmdDriveWaypointSimple(this, target, maxV, slop, rSlop, accelVperTime, decelVperDistance).ToPtr();
 }
 
 frc2::CommandPtr SwervePather::DriveBezier()

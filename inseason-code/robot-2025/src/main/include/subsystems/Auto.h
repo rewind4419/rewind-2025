@@ -18,8 +18,8 @@ public:
     std::optional<photon::EstimatedRobotPose> optional;
 
     
-    //photon::PhotonPoseEstimator estimator{this->aprilTagFieldLayout, photon::CLOSEST_TO_REFERENCE_POSE, this->robotToCam};
-    photon::PhotonPoseEstimator estimator {aprilTagFieldLayout, photon::PoseStrategy::MULTI_TAG_PNP_ON_COPROCESSOR, this->robotToCam};
+    photon::PhotonPoseEstimator estimator{this->aprilTagFieldLayout, photon::CLOSEST_TO_REFERENCE_POSE, this->robotToCam};
+    //photon::PhotonPoseEstimator estimator;
 };
 
 
