@@ -15,6 +15,9 @@ float lenSq(float x, float y);
 int clamp(int x, int min, int max);
 double clamp(double x, double min, double max);
 
+double deadzone(double x, double deadzoneMax);
+
+
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max);
 units::velocity::meters_per_second_t clamp(units::velocity::meters_per_second_t x, units::velocity::meters_per_second_t min, units::velocity::meters_per_second_t max);units::velocity::meters_per_second_t clamp(units::velocity::meters_per_second_t x, units::velocity::meters_per_second_t min, units::velocity::meters_per_second_t max);
 units::angular_velocity::radians_per_second_t clamp(units::angular_velocity::radians_per_second_t x, units::angular_velocity::radians_per_second_t min, units::angular_velocity::radians_per_second_t max);
@@ -81,6 +84,3 @@ public:
     }
 };
 
-RPose RPosefromFRCPose(frc::Pose2d pose);
-
-frc::Pose2d RPosetoFrcPose(RPose pose);

@@ -31,6 +31,16 @@ double clamp(double x, double min, double max)
     return x;
 }
 
+double deadzone(double x, double deadzoneMax)
+{
+  if (abs(x) < deadzoneMax)
+  {
+    return 0.0;
+  }
+
+  return clamp(abs(x)-deadzoneMax, 0.0, 1.0-deadzoneMax) / (1.0 - deadzoneMax) * (x > 0.0 ? 1.0 : -1.0);
+}
+
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max)
 {
     if (x < min) {return min;}
@@ -56,15 +66,11 @@ RPose RPosefromFRCPose(frc::Pose2d pose)
 {
     return RPose {
         V2 {
-            pose.X().value(),
-            pose.Y().value()
+            (float)pose.X().value(),
+            (float)pose.Y().value()
         },
-        pose.Rotation().Radians().value()
+        (float)pose.Rotation().Radians().value()
     };
 }
 
-frc::Pose2d RPosetoFrcPose(RPose pose)
-{
-    //Todo
-    //return frc::Pose2d {(pose.translation.x)_m, (pose.translation.y)_m, frc::Rotation2d{} }
-}
+

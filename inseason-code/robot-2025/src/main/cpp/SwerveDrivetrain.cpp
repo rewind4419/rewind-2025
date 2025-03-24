@@ -1,11 +1,9 @@
-#include "subsystems/SwerveDrivetrain.h"
-#include <frc/RobotController.h>
+#include "SwerveDrivetrain.h"
 
+#include <frc/RobotController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "subsystems/SwerveDrivetrain.h"
-
-void CommandSwerveDrivetrain::Periodic()
+void SwerveDrivetrain::Periodic()
 {
     /*
      * Periodically try to apply the operator perspective.
@@ -44,7 +42,7 @@ void CommandSwerveDrivetrain::Periodic()
     //frc::SmartDashboard::PutNumber("IMU Angle", this->GetPigeon2().GetAngle());
 }
 
-void CommandSwerveDrivetrain::StartSimThread()
+void SwerveDrivetrain::StartSimThread()
 {
     m_lastSimTime = utils::GetCurrentTime();
     m_simNotifier = std::make_unique<frc::Notifier>([this] {
