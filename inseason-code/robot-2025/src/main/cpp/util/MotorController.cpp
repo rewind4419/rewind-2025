@@ -7,7 +7,7 @@ using namespace ctre::phoenix6::controls;
 
 
 
-MotorController::MotorController(int id, TalonFXConfiguration config, std::string canbus = "") : motor(id,canbus)
+MotorController::MotorController(int id, TalonFXConfiguration config, std::string canbus) : motor(id,canbus)
 {
     motor.GetConfigurator().Apply(config);
 }
