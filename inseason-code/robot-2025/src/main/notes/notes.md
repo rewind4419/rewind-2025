@@ -1,5 +1,8 @@
 # Notes
 
+BRILLIANT WORK CODE TEAM! 2025 AVR auton had a fantastic record of 19 out of 24 coral placed on L4.
+Note: appears the resolution for PV might have been set to lower resolution on practice day causing all the autos to fail. All missed were on the LEFT side of the reef perhaps caused by differences in the field elements.
+
 ## Guide
 
 - "- " to make a bullet point
@@ -25,6 +28,9 @@
   to configure them, go to the place where the CommandPtr is created, and do
   .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   before returning it.
+
+## Bugs
+- Vision update only runs when disabled (i removed from auto for reasons), implement an updateVision function for auto
 
 ## TODO List
 
@@ -60,8 +66,8 @@
     - Set heights
 
 - ~~PhotonVision integration [Sam]~~
-    - Get new camera mount at 15 degrees
-        - Change rotation value in auto.h
+    - ~~Get new camera mount at 15 degrees~~
+        - ~~Change rotation value in auto.h~~
     - ~~Find out what is needed for pather~~
         - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
     - ~~Clean up autonomousperiodic()~~
