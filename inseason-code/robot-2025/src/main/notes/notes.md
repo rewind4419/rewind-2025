@@ -28,6 +28,14 @@
 
 ## TODO List
 
+- IMPORTANT (after SDR To-do List):
+    - Fix vision!
+        - Especially for Auto!
+    - Fix code to exit Recovery Mode
+        - Find new button to exit Recovery Mode or Modify Circle code to exit Recovery Mode properly
+    - WINCH
+        - Create code so that the robot stays still after it climbed while it is enable
+
 - Notes cleanup and maintainment [Everyone] ***(CONTINUOUS)***
     - ~~Create bindings.md for controller bindings~~
     - Update bindings.md whenever controls are changed [Everyone] ***(CONTINUOUS)***
