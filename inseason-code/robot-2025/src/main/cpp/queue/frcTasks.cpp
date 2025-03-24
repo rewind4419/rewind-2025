@@ -3,7 +3,7 @@
 #include "queue/frcTasks.hpp"
 
 
-MotorPositionTask::MotorPositionTask(MotorController *ctrlr,double targetPosition,bool wait = false, double epsilon = 0.05): targetPosition(targetPosition),wait(wait), epsilon(epsilon)
+MotorPositionTask::MotorPositionTask(MotorController *ctrlr,double targetPosition,bool wait, double epsilon): targetPosition(targetPosition),wait(wait), epsilon(epsilon)
 {
     controller = ctrlr;
 }

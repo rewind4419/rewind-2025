@@ -19,7 +19,7 @@ frc::FieldObject2d* m_object;
 
 TaskQueue queue {};
 
-SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
+// SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
 
 frc::PS4Controller driver {0};
 frc::PS4Controller mate {1};
@@ -66,9 +66,9 @@ void Robot::TeleopInit() {
   
 }
 
-swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-    //.WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
-    .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
+// swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
+//     //.WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
+//     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
   
 
 void Robot::TeleopPeriodic() {
@@ -78,12 +78,12 @@ void Robot::TeleopPeriodic() {
     // frc::SmartDashboard::PutNumber("BL Angle", this->bl.GetAbsolutePosition().GetValueAsDouble());
     // frc::SmartDashboard::PutNumber("BR Angle", this->br.GetAbsolutePosition().GetValueAsDouble());
 
-    drivetrain.SetControl(
-        drive
-        .WithVelocityX(deadzone(driver.GetLeftY(), 0.1) * 5.7_mps)
-        .WithVelocityY(deadzone(-driver.GetLeftX(), 0.1) * 5.7_mps)
-        .WithRotationalRate(deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s)
-    );
+    // drivetrain.SetControl(
+    //     drive
+    //     .WithVelocityX(deadzone(driver.GetLeftY(), 0.1) * 5.7_mps)
+    //     .WithVelocityY(deadzone(-driver.GetLeftX(), 0.1) * 5.7_mps)
+    //     .WithRotationalRate(deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s)
+    // );
 }
 
 void Robot::TeleopExit() {
