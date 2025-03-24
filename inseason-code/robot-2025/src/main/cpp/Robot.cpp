@@ -2,21 +2,27 @@
 
 #include "Config.h"
 
+#include "queue/taskQueue.hpp"
+
+#include "queue/standardTasks.hpp"
+
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 frc::Field2d m_field {};
 frc::FieldObject2d* m_object;
 
+TaskQueue queue {};
+
 Robot::Robot() {
     frc::SmartDashboard::PutData("Field", &m_field);
     m_object = m_field.GetObject("bob");
 
-    
+
 }
 
 void Robot::RobotPeriodic() {
-
+    queue.update();
 }
 
 void Robot::DisabledInit() {
@@ -32,7 +38,10 @@ void Robot::DisabledExit() {
 }
 
 void Robot::AutonomousInit() {
-
+    queue.addTask(new CustomTask([] {
+        printf("Starting auto\n");
+        return true;
+    }));
 }
 
 void Robot::AutonomousPeriodic() {

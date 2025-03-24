@@ -23,7 +23,6 @@ class CustomTask:public Task
         void dispose();
 };
 
-
 class TaskList: public Task
 {
     public:
