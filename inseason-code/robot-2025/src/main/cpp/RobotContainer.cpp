@@ -275,7 +275,7 @@ void RobotContainer::ConfigureBindings()
       std::pair{0, 
         robotState.SetCurrentState(STATE_FUNNEL)
           .AndThen(coralwrist.SetPosition(CORAL_WRIST_FUNNEL, true))
-          .AndThen(elevator.SetHeight(0.7_tr)) //1.3_tr
+          .AndThen(elevator.SetHeight(0.91_tr)) //1.3_tr then 0.7_tr
       }
     )
     .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
@@ -448,7 +448,7 @@ void RobotContainer::AddAutos()
         return robotState.GetDeliverHeight();
       }, false))
       // Drive up to score
-      .AndThen(pather.DriveFor(4_s, 1_mps))
+      .AndThen(pather.DriveFor(3.75_s, 1_mps)) //4_s
       .AndThen(pather.LockWheels())
       .AndThen(frc2::cmd::Wait(0.1_s))
       .AndThen(coralarm.SetPosition(0.4_tr, false))
