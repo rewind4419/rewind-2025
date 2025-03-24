@@ -64,9 +64,6 @@ double deadzone(double x, double deadzoneMax)
 
 void RobotContainer::ConfigureBindings()
 {
-  
-  
-
   // Drivetrain //
   drivetrain.SetDefaultCommand(
     drivetrain.ApplyRequest([this]() -> auto&& {

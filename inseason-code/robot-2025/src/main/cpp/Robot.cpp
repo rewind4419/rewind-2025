@@ -12,7 +12,7 @@
 #include <photon/PhotonUtils.h>
 #include <subsystems/Auto.h>
 #include <frc/smartdashboard/Field2d.h>
-#include <frc/SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "subsystems/SwervePather.h"
 
@@ -39,10 +39,9 @@ void Robot::RobotPeriodic() {
 
   // frc::Pose2d centerPose {m.aprilTagFieldLayout.GetFieldLength() * 0.5, m.aprilTagFieldLayout.GetFieldWidth() * 0.5, frc::Rotation2d {0_rad}};
 
-  // frc::Pose2d flippedRobotPose {centerPose.X() - (robotPose.X() - centerPose.X()), centerPose.Y() - (robotPose.Y() - centerPose.Y()), robotPose.Rotation() + frc::Rotation2d {M_PI * 1_rad}};
+  // frc::Pose2d flippedRobotPose {centerPose.X() - (r obotPose.X() - centerPose.X()), centerPose.Y() - (robotPose.Y() - centerPose.Y()), robotPose.Rotation() + frc::Rotation2d {M_PI * 1_rad}};
 
   m_field.SetRobotPose(robotPose);
-
   m_object->SetPose(SwapFieldSide(robotPose));
 }
 
