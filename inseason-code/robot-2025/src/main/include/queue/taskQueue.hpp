@@ -15,6 +15,7 @@ class Task
 class TaskQueue
 {
     public:
+        //List of the tasks
         Task** tasks;
         Task* activeTask;
         bool active = false;
