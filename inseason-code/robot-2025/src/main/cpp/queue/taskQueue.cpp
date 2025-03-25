@@ -1,42 +1,49 @@
 #include <cstdlib>
 #include "queue/taskQueue.hpp"
 
-
+int counter = 0;
 TaskQueue::TaskQueue()
 {
     tasks = (Task**)calloc(1024, sizeof(Task*));
     queueSize = 1024;
+    counter++;
 }
 
 void TaskQueue::addTask(Task* task)
 {
-    if(queueItemCount < queueSize){
-        tasks[(queueStart+queueItemCount)%queueSize] = task;
-        queueItemCount ++;
+    if (queueItemCount < queueSize) {
+        tasks[(queueStart + queueItemCount) % queueSize] = task;
+        queueItemCount++;
     }
     else {
-        throw("QUEUE OVERFLOW!!!!");
+        //throw("QUEUE OVERFLOW!!!!");
+        printf("Unable to add task, queue is full!\n");
     }
 }
 
-void TaskQueue::nextTask()
+void TaskQueue::nextTask(int recursionDepth)
 {
-    if(active)
+    if (active)
     {
-        activeTask->dispose();
+        activeTask->end();
+        delete activeTask;
     }
 
-    if(queueItemCount != 0)
+    if (queueItemCount != 0)
     {
         activeTask = dequeue();
+        printf("what: %i\n", queueItemCount);
         activeTask->start();
         active = true;
-        if(activeTask->loop())
+        if (recursionDepth > 0)
         {
-            nextTask();
+            if (activeTask->loop())
+            {
+                nextTask(recursionDepth - 1);
+            }
         }
     }
-    else 
+    else
     {
         active = false;
     }
@@ -44,13 +51,13 @@ void TaskQueue::nextTask()
 
 void TaskQueue::update()
 {
-    if(!active)
+    if (!active)
     {
         nextTask();
     }
-    if(active)
+    else if (active)
     {
-        if(activeTask->loop())
+        if (activeTask->loop())
         {
             nextTask();
         }
@@ -59,32 +66,35 @@ void TaskQueue::update()
 
 Task* TaskQueue::dequeue()
 {
-    Task* out;
-    if(queueItemCount != 0)
+    Task* out = nullptr;
+    if (queueItemCount != 0)
     {
         out = tasks[queueStart];
         queueItemCount--;
         queueStart++;
         queueStart %= queueSize;
     }
-    
     return out;
 }
 
 void TaskQueue::clear()
 {
-    if(active)
+    if (active)
     {
-        activeTask->dispose();
+        activeTask->end();
         active = false;
+        delete activeTask;
     }
-    for(int i = 0; i < queueItemCount; i++)
+    for (int i = 0; i < queueItemCount; i++)
     {
-        tasks[(queueStart + i) % queueSize]->dispose();
+        tasks[(queueStart + i) % queueSize]->end();
+        delete tasks[(queueStart + i) % queueSize];
     }
 }
 void TaskQueue::destroy()
 {
     clear();
     free(tasks);
+    counter--;
+    printf("count:%i\n", counter);
 }

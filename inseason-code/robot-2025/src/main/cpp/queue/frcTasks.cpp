@@ -17,7 +17,7 @@ bool MotorPositionTask::loop()
 
     return fabs(pos-targetPosition) < epsilon;
 }
-void MotorPositionTask::dispose()
+void MotorPositionTask::end()
 {
-    delete this;
+
 }
