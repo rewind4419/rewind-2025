@@ -31,6 +31,7 @@
 - IMPORTANT (after SDR To-do List):
     - Fix vision!
         - Especially for Auto!
+    - Make improved auto paths
     - Fix code to exit Recovery Mode
         - Find new button to exit Recovery Mode or Modify Circle code to exit Recovery Mode properly
     - WINCH
