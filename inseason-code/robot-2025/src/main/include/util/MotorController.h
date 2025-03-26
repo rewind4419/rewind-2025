@@ -20,8 +20,7 @@ public:
     double targetPosition = 0.0;
     double targetVoltage = 0.0;
 
-
-    MotorController(int id, TalonFXConfiguration config, std::string canbus = "");
+    MotorController(int id, TalonFXConfiguration config, double initPosition = 0.0, std::string canbus = "");
     void Enable();
     void Disable();
     bool GetEnabled();
@@ -30,5 +29,17 @@ public:
 
     void Update();
 
-    bool enabled = false;
+    bool enabled = true;
+};
+
+class MotorFollower
+{
+public:
+    TalonFX motor;
+
+    Follower follower;
+
+    MotorFollower(int id, int idToFollow, bool opposeDirection, std::string canbus = "");
+
+    void Update();
 };

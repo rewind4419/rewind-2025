@@ -7,9 +7,11 @@ using namespace ctre::phoenix6::controls;
 
 
 
-MotorController::MotorController(int id, TalonFXConfiguration config, std::string canbus) : motor(id,canbus)
+MotorController::MotorController(int id, TalonFXConfiguration config, double initPosition, std::string canbus) : motor(id,canbus)
 {
     motor.GetConfigurator().Apply(config);
+    motor.SetPosition(initPosition * 1_tr);
+    this->targetPosition = initPosition;
 }
 
 void MotorController::Enable()
@@ -41,6 +43,7 @@ void MotorController::Update()
         if(!useMotionMagic)
         {
             motor.SetControl(positionRequest.WithPosition(units::angle::turn_t(targetPosition)));
+            printf("%f gerber\n", targetPosition);
         }
         else
         {
@@ -51,4 +54,14 @@ void MotorController::Update()
     {
         motor.SetControl(voltageRequest.WithOutput(units::voltage::volt_t(targetVoltage)));
     }
+}
+
+MotorFollower::MotorFollower(int id, int idToFollow, bool opposeDirection, std::string canbus) : motor(id, canbus), follower(idToFollow, opposeDirection)
+{
+
+}
+
+void MotorFollower::Update()
+{
+    motor.SetControl(follower);
 }

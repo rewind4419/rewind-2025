@@ -13,6 +13,7 @@ void MotorPositionTask::Start()
 }
 bool MotorPositionTask::Loop()
 {
+    if (wait == false) { return true; }
     double pos = controller->motor.GetPosition().GetValueAsDouble();
 
     return fabs(pos-targetPosition) < epsilon;

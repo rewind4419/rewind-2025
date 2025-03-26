@@ -88,3 +88,12 @@ bool Queue::IsBusy()
 		return true;
 	}
 }
+
+void Queue::Clear()
+{
+	for (int i = currentTask; (i % MAX_TASKS) != int(endTask); i = (i + 1) % MAX_TASKS)
+	{
+		delete tasks[i];
+	}
+	currentTask = endTask;
+}

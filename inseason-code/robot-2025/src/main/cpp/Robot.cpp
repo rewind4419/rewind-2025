@@ -2,55 +2,29 @@
 
 #include "Config.h"
 
-#include "queue/Queue.h"
-#include "queue/StandardTasks.h"
-#include "queue/FrcTasks.h"
 
-#include "SwerveConstants.h"
-#include "SwerveDrivetrain.h"
-
-#include <frc/smartdashboard/Field2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/PS4Controller.h>
 
 #include "util/maths.h"
-#include "util/MotorController.h"
 
-#include "ctre/phoenix6/configs/Configs.hpp"
-
-using namespace ctre::phoenix6::configs;
-
-frc::Field2d m_field {};
-frc::FieldObject2d* m_object;
-
-Queue queue;
-
-// SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
-
-frc::PS4Controller driver {0};
-frc::PS4Controller mate {1};
-
-// TalonFXConfiguration elevatorConfig;
-
-// MotorController elevator {ELEVATOR_MOTOR_1_ID, elevatorConfig};
+#include "Hardware.h"
 
 Robot::Robot() {
+    
     frc::SmartDashboard::PutData("Field", &m_field);
     m_object = m_field.GetObject("bob");
 
-
+    frc::SmartDashboard::PutNumber("Elevator SetPos", 0.0);
 }
 
 void Robot::RobotPeriodic() {
-    queue.Update();
+    
 }
 
 void Robot::TeleopInit() {
-  
+    queue.Clear();
 }
 
 // swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-//     //.WithDeadband(MaxSpeed * 0.05).WithRotationalDeadband(MaxAngularRate * 0.04) // Add a 10% deadband
 //     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
 
 void Robot::TeleopPeriodic() {
@@ -60,11 +34,38 @@ void Robot::TeleopPeriodic() {
     //     .WithVelocityY(deadzone(-driver.GetLeftX(), 0.1) * 5.7_mps)
     //     .WithRotationalRate(deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s)
     // );
+
+    if (driver.GetCrossButtonPressed())
+    {
+        printf("Cross\n");
+        // queue.AddTask(new MotorPositionTask(hardware.elevator, 1.0, true, 0.15));
+        queue.AddTask(new MotorPositionTask(hardware.elevator, 0.0));
+    }
+
+    if (driver.GetTriangleButtonPressed())
+    {
+        printf("Triangle\n");
+        queue.AddTask(new MotorPositionTask(hardware.elevator, 1.0));
+    }
+
+    if (driver.GetSquareButtonPressed())
+    {
+        printf("Square\n");
+        hardware.elevator->targetPosition = frc::SmartDashboard::GetNumber("Elevator SetPos", 0.0);
+        printf("Setting elevator to %f\n", hardware.elevator->targetPosition);
+    }
+
+    frc::SmartDashboard::PutNumber("Elevator GetPos", hardware.elevator->motor.GetPosition().GetValueAsDouble());
+
+    queue.Update();
+    hardware.Update();
 }
 
 void Robot::TeleopExit() {}
 
 void Robot::AutonomousInit() {
+    queue.Clear();
+
     queue.AddTask(new CustomTask([] {
         printf("Starting auto\n");
         return true;
@@ -73,6 +74,10 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {
 
+
+
+    queue.Update();
+    hardware.Update();
 }
 
 void Robot::AutonomousExit() {}
