@@ -1,7 +1,7 @@
 #include "util/MotorController.h"
-#include "queue/taskQueue.hpp"
+#include "queue/Queue.h"
 
-class MotorPositionTask: public Task
+class MotorPositionTask : public Task
 {
     MotorController *controller;
 
@@ -9,8 +9,9 @@ class MotorPositionTask: public Task
     bool wait;
     double epsilon;
 
+public:
     MotorPositionTask(MotorController *ctrlr,double targetPosition,bool wait = false, double epsilon = 0.05);
-    void start();
-    bool loop();
-    void end();
+    void Start() override;
+    bool Loop() override;
+    void End() override;
 };

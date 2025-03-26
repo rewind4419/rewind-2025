@@ -1,23 +1,23 @@
 #include "util/MotorController.h"
-#include "queue/taskQueue.hpp"
-#include "queue/frcTasks.hpp"
+#include "queue/Queue.h"
+#include "queue/FrcTasks.h"
 
 
 MotorPositionTask::MotorPositionTask(MotorController *ctrlr,double targetPosition,bool wait, double epsilon): targetPosition(targetPosition),wait(wait), epsilon(epsilon)
 {
     controller = ctrlr;
 }
-void MotorPositionTask::start()
+void MotorPositionTask::Start()
 {
-    controller->setTargetPosition(targetPosition);
+    controller->SetTargetPosition(targetPosition);
 }
-bool MotorPositionTask::loop()
+bool MotorPositionTask::Loop()
 {
     double pos = controller->motor.GetPosition().GetValueAsDouble();
 
     return fabs(pos-targetPosition) < epsilon;
 }
-void MotorPositionTask::end()
+void MotorPositionTask::End()
 {
 
 }

@@ -12,29 +12,29 @@ MotorController::MotorController(int id, TalonFXConfiguration config, std::strin
     motor.GetConfigurator().Apply(config);
 }
 
-void MotorController::enable()
+void MotorController::Enable()
 {
     enabled = true;
 }
-void MotorController::disable()
+void MotorController::Disable()
 {
     targetVoltage = 0.0;
     enabled = false;
 }
-bool MotorController::getEnabled()
+bool MotorController::GetEnabled()
 {
     return enabled;
 }
-void MotorController::setTargetPosition(double position)
+void MotorController::SetTargetPosition(double position)
 {
     targetPosition = position;
 }
-void MotorController::setVoltage(double voltage)
+void MotorController::SetVoltage(double voltage)
 {
     targetVoltage = voltage;
 }
 
-void MotorController::update()
+void MotorController::Update()
 {
     if(enabled)
     {

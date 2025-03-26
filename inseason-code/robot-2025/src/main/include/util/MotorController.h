@@ -8,28 +8,27 @@ using namespace ctre::phoenix6::controls;
 
 class MotorController
 {
-    public:
-        TalonFX motor;
+public:
+    TalonFX motor;
 
-        PositionVoltage positionRequest  {0_tr};
-        MotionMagicVoltage motionMagicRequest  {0_tr};
-        VoltageOut voltageRequest{0_V};
+    PositionVoltage positionRequest  {0_tr};
+    MotionMagicVoltage motionMagicRequest  {0_tr};
+    VoltageOut voltageRequest{0_V};
 
-        bool useMotionMagic = false;
+    bool useMotionMagic = false;
 
-        double targetPosition = 0.0;
-        double targetVoltage = 0.0;
+    double targetPosition = 0.0;
+    double targetVoltage = 0.0;
 
 
-        MotorController(int id, TalonFXConfiguration config, std::string canbus = "");
-        void enable();
-        void disable();
-        bool getEnabled();
-        void setTargetPosition(double position);
-        void setVoltage(double voltage);
+    MotorController(int id, TalonFXConfiguration config, std::string canbus = "");
+    void Enable();
+    void Disable();
+    bool GetEnabled();
+    void SetTargetPosition(double position);
+    void SetVoltage(double voltage);
 
-        void update();
+    void Update();
 
-    private:
-        bool enabled = false;
+    bool enabled = false;
 };

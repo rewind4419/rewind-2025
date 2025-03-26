@@ -1,17 +1,17 @@
 #pragma once
-#include "taskQueue.hpp"
+#include "Queue.h"
 #include <functional>
 
 class DelayTask :public Task
 {
 public:
     int duration;
-    long startTime;
+    long long startTime;
     DelayTask(int duration_ms);
 
-    void start() override;
-    bool loop() override;
-    void end() override;
+    void Start() override;
+    bool Loop() override;
+    void End() override;
 };
 
 class CustomTask :public Task
@@ -19,18 +19,18 @@ class CustomTask :public Task
 public:
     std::function<bool()> loopFunc;
     CustomTask(std::function<bool()> func);
-    bool loop() override;
-    void end() override;
+    bool Loop() override;
+    void End() override;
 };
 
 class TaskList : public Task
 {
 public:
-    TaskQueue queue;
+    Queue queue;
     TaskList();
-    void addTask(Task* task);
-    bool loop() override;
-    void end() override;
+    void AddTask(Task* task);
+    bool Loop() override;
+    void End() override;
 };
 
 class ForkTask : public Task
@@ -43,7 +43,7 @@ public:
     bool task1Done = false;
 
     ForkTask(Task* task0, Task* task1);
-    void start() override;
-    bool loop() override;
-    void end() override;
+    void Start() override;
+    bool Loop() override;
+    void End() override;
 };
