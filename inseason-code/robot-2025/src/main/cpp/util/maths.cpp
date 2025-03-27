@@ -33,12 +33,12 @@ double clamp(double x, double min, double max)
 
 double deadzone(double x, double deadzoneMax)
 {
-  if (abs(x) < deadzoneMax)
+  if (fabsf(x) < deadzoneMax)
   {
     return 0.0;
   }
 
-  return clamp(abs(x)-deadzoneMax, 0.0, 1.0-deadzoneMax) / (1.0 - deadzoneMax) * (x > 0.0 ? 1.0 : -1.0);
+  return clamp(fabsf(x) * (1 + deadzoneMax) - deadzoneMax, 0.0, 1.0) * (x >= 0 ? 1.0 : -1.0);
 }
 
 units::angle::turn_t clamp(units::angle::turn_t x, units::angle::turn_t min, units::angle::turn_t max)

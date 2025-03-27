@@ -14,24 +14,25 @@
 #include "queue/FrcTasks.h"
 
 #include "Hardware.h"
+#include "State.h"
 
 class Robot : public frc::TimedRobot {
 public:
     Queue queue;
 
-    // SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
+    StateManager stateManager;
+
+    SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
     Hardware hardware;
 
     frc::PS4Controller driver {0};
     frc::PS4Controller mate {1};
 
-
-
+    swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
+    .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
 
     frc::Field2d m_field {};
     frc::FieldObject2d* m_object;
-
-    
 
     Robot();
     void RobotPeriodic() override;

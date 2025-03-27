@@ -14,48 +14,92 @@ Robot::Robot() {
     m_object = m_field.GetObject("bob");
 
     frc::SmartDashboard::PutNumber("Elevator SetPos", 0.0);
+    
+    
 }
 
 void Robot::RobotPeriodic() {
-    
+    frc::SmartDashboard::PutNumber("Wrist Pos", hardware.wrist->motor.GetPosition().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("Elevator Pos", hardware.elevator->motor.GetPosition().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("Arm Pos", hardware.arm->motor.GetPosition().GetValueAsDouble());
+
+    frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
+    frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
 }
 
 void Robot::TeleopInit() {
     queue.Clear();
+    hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
 }
 
-// swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-//     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
-
 void Robot::TeleopPeriodic() {
-    // drivetrain.SetControl(
-    //     drive
-    //     .WithVelocityX(deadzone(driver.GetLeftY(), 0.1) * 5.7_mps)
-    //     .WithVelocityY(deadzone(-driver.GetLeftX(), 0.1) * 5.7_mps)
-    //     .WithRotationalRate(deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s)
-    // );
-
-    if (driver.GetCrossButtonPressed())
+    if (!driver.GetR1Button())
     {
-        printf("Cross\n");
-        // queue.AddTask(new MotorPositionTask(hardware.elevator, 1.0, true, 0.15));
-        queue.AddTask(new MotorPositionTask(hardware.elevator, 0.0));
+        drivetrain.SetControl(
+            drive
+            .WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * 5.7_mps * 2)
+            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * 5.7_mps * 2)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 2)
+        );
+    }
+    else
+    {
+        // Slow mode
+        drivetrain.SetControl(
+            drive
+            .WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * 5.7_mps * 0.35 * 2)
+            .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * 5.7_mps * 0.35 * 2)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 0.25 * 2)
+        );
     }
 
     if (driver.GetTriangleButtonPressed())
     {
-        printf("Triangle\n");
-        queue.AddTask(new MotorPositionTask(hardware.elevator, 1.0));
+        drivetrain.SeedFieldCentric();
     }
 
-    if (driver.GetSquareButtonPressed())
+    
+
+    if (mate.GetR1Button())
     {
-        printf("Square\n");
-        hardware.elevator->targetPosition = frc::SmartDashboard::GetNumber("Elevator SetPos", 0.0);
-        printf("Setting elevator to %f\n", hardware.elevator->targetPosition);
+        hardware.winch->SetMode(CTRL_VOLTAGE);
+        hardware.winch->targetVoltage = -6;
+        hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
+    }
+    else if (mate.GetL1Button())
+    {
+        hardware.winch->SetMode(CTRL_VOLTAGE);
+        hardware.winch->targetVoltage = 6;
+        hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
+    }
+    else
+    {
+        hardware.winch->SetMode(CTRL_PID_POSITION);
     }
 
-    frc::SmartDashboard::PutNumber("Elevator GetPos", hardware.elevator->motor.GetPosition().GetValueAsDouble());
+    hardware.intake->SetTargetVelocity(CORAL_ARM_INTAKE_SPEED * deadzone(mate.GetR2Axis() * 0.5 + 0.5, 0.1) + CORAL_ARM_OUTTAKE_SPEED * deadzone(mate.GetL2Axis() * 0.5 + 0.5, 0.1));
+
+    if (mate.GetCircleButtonPressed())
+    {
+        if (stateManager.targetState == STATE_DELIVER)
+        {
+            queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_SAFE, true, hardware.armDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
+            queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+        }
+        else if (stateManager.targetState == STATE_FUNNEL)
+        {
+
+        }
+    }
+
+    if (mate.GetTouchpadButtonPressed())
+    {
+        hardware.flipper->SetTargetPosition(0.3);
+    }
 
     queue.Update();
     hardware.Update();
