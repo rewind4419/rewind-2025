@@ -1,9 +1,6 @@
 #pragma once
 
-// #define CORAL_INTAKE_MOTOR_1_ID 1
-// #define CORAL_INTAKE_MOTOR_2_ID 2
 #define CORAL_INTAKE_MOTOR_ID 1
-//#define CORAL_INTAKE_MOTOR_ID_2 2
 
 #define CORAL_ARM_MOTOR_ID 5
 #define CORAL_WRIST_MOTOR_ID 10 // Needs to be set, placeholder
@@ -23,7 +20,7 @@
 // TODO: implement all the safeties! only basic ones exist now
 #define ELEVATOR_MIN 0
 //#define ELEVATOR_FUNNEL 1.5_tr // Position to grab from funnel
-#define ELEVATOR_FUNNEL 1.0 // Position to grab from funnel
+#define ELEVATOR_FUNNEL 0.91 // Position to grab from funnel
 #define ELEVATOR_IN_MAX 4.0 // Highest elevator can go when coral arm at 0
 #define ELEVATOR_SAFE_MAX 18 // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 
@@ -42,7 +39,6 @@
 #define CORAL_WRIST_DELIVER 0.25
 #define CORAL_WRIST_CLIMB 0.2
 
-// #define CORAL_WRIST_FUNNEL 0.05_tr
 #define CORAL_WRIST_FUNNEL 0.02
 
 #define CORAL_ARM_MIN 0.04444444444 // The angle of the arm when its resting on the hard stop
@@ -56,3 +52,6 @@
 #define CORAL_ARM_INTAKE_SPEED 10
 #define CORAL_ARM_OUTTAKE_SPEED -12 //-10_tps then -15_tps !NEED TO DEPLOY TO CLOYSTER!
 #define CORAL_ARM_IDLE_SPEED 5
+
+#define FLIPPER_RETRACTED 0
+#define FLIPPER_EXTENDED 0.3

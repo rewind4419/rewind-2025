@@ -13,6 +13,8 @@
 #include "queue/StandardTasks.h"
 #include "queue/FrcTasks.h"
 
+#include "util/Controller.h"
+
 #include "Hardware.h"
 #include "State.h"
 
@@ -25,8 +27,8 @@ public:
     SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
     Hardware hardware;
 
-    frc::PS4Controller driver {0};
-    frc::PS4Controller mate {1};
+    Controller driver {0};
+    Controller mate {1};
 
     swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors

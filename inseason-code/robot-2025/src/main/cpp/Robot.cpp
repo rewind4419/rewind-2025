@@ -2,11 +2,10 @@
 
 #include "Config.h"
 
-
-
 #include "util/maths.h"
 
 #include "Hardware.h"
+#include "State.h"
 
 Robot::Robot() {
     
@@ -88,21 +87,78 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
-            queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+            queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
         }
         else if (stateManager.targetState == STATE_FUNNEL)
         {
+            queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
+        }
+        else if (stateManager.targetState == STATE_CLIMB)
+        {
+            queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.flipper, FLIPPER_RETRACTED));
+            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL));
+            queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
+        }
+    }
 
+    if (mate.GetTriangleButtonPressed())
+    {
+        if (stateManager.targetState == STATE_NEUTRAL)
+        {
+            queue.AddTask(new TargetStateTask(STATE_DELIVER, &stateManager));
+            queue.AddTask(new CustomTask([this] {stateManager.height = HEIGHT_ZERO; return true;}));
+            queue.AddTask(new ForkTask(
+                new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
+                new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
+            ));
+            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
+            queue.AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
+        }
+    }
+
+    if (stateManager.targetState == STATE_DELIVER && mate.GetDPadUpPressed())
+    {
+
+    }
+
+    if (stateManager.targetState == STATE_DELIVER && mate.GetDPadDownPressed())
+    {
+        
+    }
+
+    if (mate.GetSquareButtonPressed())
+    {
+        if (stateManager.targetState == STATE_NEUTRAL)
+        {
+            queue.AddTask(new TargetStateTask(STATE_FUNNEL, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_FUNNEL, true, hardware.elevatorDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            queue.AddTask(new CurrentStateTask(STATE_FUNNEL, &stateManager));
         }
     }
 
     if (mate.GetTouchpadButtonPressed())
     {
-        hardware.flipper->SetTargetPosition(0.3);
+        if (stateManager.targetState == STATE_NEUTRAL)
+        {
+            queue.AddTask(new TargetStateTask(STATE_CLIMB, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.flipper, FLIPPER_EXTENDED));
+            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_CLIMB));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_CLIMB));
+            queue.AddTask(new CurrentStateTask(STATE_CLIMB, &stateManager));
+        }
     }
 
     queue.Update();
     hardware.Update();
+    driver.Update();
+    mate.Update();
 }
 
 void Robot::TeleopExit() {}

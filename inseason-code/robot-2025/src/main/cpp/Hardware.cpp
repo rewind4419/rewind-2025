@@ -74,6 +74,7 @@ Hardware::Hardware()
     wristConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
 
     wrist = new MotorController(CORAL_WRIST_MOTOR_ID, wristConfig, CORAL_WRIST_MIN, CTRL_PID_POSITION_MOTION_MAGIC);
+    wrist->SetTargetPosition(CORAL_WRIST_FUNNEL);
 
     TalonFXConfiguration winchConfig;
 

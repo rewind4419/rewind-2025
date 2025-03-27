@@ -10,11 +10,26 @@ enum RobotState
     STATE_CLIMB
 };
 
+enum DeliverHeight
+{
+    HEIGHT_ZERO,
+    HEIGHT_L1,
+    HEIGHT_L2,
+    HEIGHT_L3,
+    HEIGHT_L4
+};
+
+#define POV_UP 0
+#define POV_RIGHT 90
+#define POV_DOWN 180
+#define POV_LEFT 270
+
 class StateManager
 {
 public:
     RobotState currentState = STATE_NEUTRAL;
     RobotState targetState = STATE_NEUTRAL;
+    DeliverHeight height = HEIGHT_ZERO;
 };
 
 class TargetStateTask : public Task
