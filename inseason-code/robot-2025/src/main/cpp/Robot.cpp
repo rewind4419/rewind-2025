@@ -83,8 +83,10 @@ void Robot::TeleopPeriodic() {
         if (stateManager.targetState == STATE_DELIVER)
         {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
-            queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_SAFE, true, hardware.armDefaultEpsilon));
-            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            queue.AddTask(new ForkTask(
+                new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon),
+                new MotorPositionTask(hardware.arm, CORAL_ARM_SAFE, true, hardware.armDefaultEpsilon)
+            ));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
             queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
@@ -117,19 +119,26 @@ void Robot::TeleopPeriodic() {
                 new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
                 new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
             ));
-            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, false, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
         }
     }
 
     if (stateManager.targetState == STATE_DELIVER && mate.GetDPadUpPressed())
     {
-
+        stateManager.IncrementDeliverHeight();
+        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist);
     }
 
     if (stateManager.targetState == STATE_DELIVER && mate.GetDPadDownPressed())
     {
-        
+        stateManager.DecrementDeliverHeight();
+        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist);
+    }
+
+    if (stateManager.currentState == STATE_DELIVER && stateManager.targetState == STATE_DELIVER)
+    {
+        hardware.wrist->SetTargetPosition(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.1);
     }
 
     if (mate.GetSquareButtonPressed())

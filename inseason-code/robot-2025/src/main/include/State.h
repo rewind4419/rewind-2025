@@ -1,6 +1,7 @@
 #pragma once
 
 #include "queue/Queue.h"
+#include "util/MotorController.h"
 
 enum RobotState
 {
@@ -13,7 +14,6 @@ enum RobotState
 enum DeliverHeight
 {
     HEIGHT_ZERO,
-    HEIGHT_L1,
     HEIGHT_L2,
     HEIGHT_L3,
     HEIGHT_L4
@@ -30,6 +30,11 @@ public:
     RobotState currentState = STATE_NEUTRAL;
     RobotState targetState = STATE_NEUTRAL;
     DeliverHeight height = HEIGHT_ZERO;
+
+    void IncrementDeliverHeight();
+    void DecrementDeliverHeight();
+
+    void GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist);
 };
 
 class TargetStateTask : public Task
