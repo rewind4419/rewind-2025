@@ -59,8 +59,8 @@
     - Set heights
 
 - ~~PhotonVision integration [Sam]~~
-    - Get new camera mount at 15 degrees
-        - Change rotation value in auto.h
+    - ~~Get new camera mount at 15 degrees~~
+        - ~~Change rotation value in auto.h~~
     - ~~Find out what is needed for pather~~
         - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
     - ~~Clean up autonomousperiodic()~~

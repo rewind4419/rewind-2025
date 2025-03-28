@@ -7,10 +7,13 @@
 #include "Hardware.h"
 #include "State.h"
 
+// :pink_bow:
+
 enum Autos
 {
     AUTO_NONE,
-    AUTO_DRIVE_FORWARD_1S
+    AUTO_DRIVE_FORWARD_1S,
+    AUTO_SCORE_TAG11
 };
 
 Robot::Robot() {
@@ -24,6 +27,7 @@ Robot::Robot() {
 
     autoChooser.SetDefaultOption("No Auto", AUTO_NONE);
     autoChooser.AddOption("Drive Forward 1 Second Auto", AUTO_DRIVE_FORWARD_1S);
+    autoChooser.AddOption("Tag11", AUTO_SCORE_TAG11);
 
     frc::SmartDashboard::PutData(&autoChooser);
 
@@ -47,6 +51,12 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
+
+    m.updRoutine();
+    if (m.optional.has_value()){
+        printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+        drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+    }
 
     if (!driver.GetR1Button())
     {
@@ -202,6 +212,8 @@ void Robot::AutonomousInit() {
     visionEnabled = false;
     queue.Clear();
 
+    
+
     switch (autoChooser.GetSelected())
     {
     case AUTO_NONE:
@@ -236,6 +248,26 @@ void Robot::AutonomousInit() {
         queue.AddTask(new ForkTask(list, list2));
 
         break;
+    // case AUTO_SCORE_TAG11:
+    //     TaskList* tag11List1 = new TaskList();
+
+    //     tag11List1->AddTask(new SwerveWaypointTask(&pather, frc::Pose2d{11.27293_m, 2.46467_m, frc::Rotation2d{1_rad}}, 2, 0.05, 0.1, 2.0, 2.0));
+    //     tag11List1->AddTask(new SwerveLockWheelsTask(&pather));
+
+    //     TaskList* tag11List2 = new TaskList();
+
+    //     tag11List2->AddTask(new ForkTask(
+    //         new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
+    //         new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
+    //     ));
+    //     tag11List2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_DELIVER_LOW, true, hardware.elevatorDefaultEpsilon));
+
+    //     queue.AddTask(new ForkTask(tag11List1, tag11List2));
+
+    //     queue.AddTask(new SwerveWaypointTask(&pather, frc::Pose2d{11.77293_m, 3.3307_m, frc::Rotation2d{1_rad}}, 0.5, 0.05, 0.1, 1.0, 1.0));
+    //     queue.AddTask(new SwerveLockWheelsTask(&pather));
+
+    //     break;
     }
 }
 
@@ -243,12 +275,15 @@ void Robot::AutonomousPeriodic() {
     if (visionEnabled)
     {
         m.updRoutine();
+        if (m.optional.has_value()){
+            //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+            drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+        }
     }
 
     drivetrain.Periodic(true);
     queue.Update();
     hardware.Update();
-    
 }
 
 void Robot::AutonomousExit() {}
@@ -258,7 +293,11 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {
     m.updRoutine();
 
-    
+    if (m.optional.has_value()){
+        //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+        drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+    }
+    drivetrain.Periodic();
 }
 
 void Robot::DisabledExit() {}
