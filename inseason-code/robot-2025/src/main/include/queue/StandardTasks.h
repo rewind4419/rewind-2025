@@ -5,9 +5,9 @@
 class DelayTask :public Task
 {
 public:
-    int duration;
-    long long startTime;
-    DelayTask(int duration_ms);
+    double duration;
+    double startTime;
+    DelayTask(double durationSeconds);
 
     void Start() override;
     bool Loop() override;

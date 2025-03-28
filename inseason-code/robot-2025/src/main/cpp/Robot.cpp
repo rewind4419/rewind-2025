@@ -7,6 +7,12 @@
 #include "Hardware.h"
 #include "State.h"
 
+enum Autos
+{
+    AUTO_NONE,
+    AUTO_DRIVE_FORWARD_1S
+};
+
 Robot::Robot() {
     
     frc::SmartDashboard::PutData("Field", &m_field);
@@ -14,7 +20,15 @@ Robot::Robot() {
 
     frc::SmartDashboard::PutNumber("Elevator SetPos", 0.0);
     
-    
+    m.Init();
+
+    autoChooser.SetDefaultOption("No Auto", AUTO_NONE);
+    autoChooser.AddOption("Drive Forward 1 Second Auto", AUTO_DRIVE_FORWARD_1S);
+
+    frc::SmartDashboard::PutData(&autoChooser);
+
+    frc::SmartDashboard::PutNumber("Test Arm", 0.35);
+    frc::SmartDashboard::PutNumber("Test Wrist", 0.3);
 }
 
 void Robot::RobotPeriodic() {
@@ -29,16 +43,18 @@ void Robot::RobotPeriodic() {
 void Robot::TeleopInit() {
     queue.Clear();
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
+    hardware.intake->SetTargetVelocity(0.0);
 }
 
 void Robot::TeleopPeriodic() {
+
     if (!driver.GetR1Button())
     {
         drivetrain.SetControl(
             drive
             .WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * 5.7_mps * 2)
             .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * 5.7_mps * 2)
-            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 2)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 4)
         );
     }
     else
@@ -48,7 +64,7 @@ void Robot::TeleopPeriodic() {
             drive
             .WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * 5.7_mps * 0.35 * 2)
             .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * 5.7_mps * 0.35 * 2)
-            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 0.25 * 2)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 4 * 0.45)
         );
     }
 
@@ -136,6 +152,12 @@ void Robot::TeleopPeriodic() {
         stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist);
     }
 
+    // if (stateManager.targetState == STATE_DELIVER && mate.GetDPadRightPressed())
+    // {
+    //     //queue.AddTask(new MotorPositionTask(hardware.arm, frc::SmartDashboard::GetNumber("Test Arm", 0.35)));
+    //     //queue.AddTask(new MotorPositionTask(hardware.wrist, frc::SmartDashboard::GetNumber("Test Wrist", 0.3)));
+    // }
+
     if (stateManager.currentState == STATE_DELIVER && stateManager.targetState == STATE_DELIVER)
     {
         hardware.wrist->SetTargetPosition(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.1);
@@ -164,8 +186,11 @@ void Robot::TeleopPeriodic() {
         }
     }
 
+    drivetrain.Periodic(false);
+
     queue.Update();
     hardware.Update();
+
     driver.Update();
     mate.Update();
 }
@@ -173,27 +198,68 @@ void Robot::TeleopPeriodic() {
 void Robot::TeleopExit() {}
 
 void Robot::AutonomousInit() {
+    hardware.intake->SetTargetVelocity(0.0);
+    visionEnabled = false;
     queue.Clear();
 
-    queue.AddTask(new CustomTask([] {
-        printf("Starting auto\n");
-        return true;
-    }));
+    switch (autoChooser.GetSelected())
+    {
+    case AUTO_NONE:
+        queue.AddTask(new CustomTask([] {
+            printf("No task\n");
+            return true;
+        }));
+        break;
+    case AUTO_DRIVE_FORWARD_1S:
+        TaskList* list = new TaskList();
+
+        list->AddTask(new SwerveDriveForTask(&pather, 1.0, 0.5, 0));
+        list->AddTask(new SwerveLockWheelsTask(&pather));
+        list->AddTask(new DelayTask(1));
+        list->AddTask(new SwerveDriveForTask(&pather, 1.0, -0.5, 0));
+        list->AddTask(new SwerveLockWheelsTask(&pather));
+
+        TaskList* list2 = new TaskList();
+
+        list2->AddTask(new ForkTask(
+            new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
+            new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
+        ));
+        list2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_DELIVER_LOW, true, hardware.elevatorDefaultEpsilon));
+        list2->AddTask(new DelayTask(1));
+        list2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
+        list2->AddTask(new ForkTask(
+            new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon),
+            new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon)
+        ));
+
+        queue.AddTask(new ForkTask(list, list2));
+
+        break;
+    }
 }
 
 void Robot::AutonomousPeriodic() {
+    if (visionEnabled)
+    {
+        m.updRoutine();
+    }
 
-
-
+    drivetrain.Periodic(true);
     queue.Update();
     hardware.Update();
+    
 }
 
 void Robot::AutonomousExit() {}
 
 void Robot::DisabledInit() {}
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+    m.updRoutine();
+
+    
+}
 
 void Robot::DisabledExit() {}
 

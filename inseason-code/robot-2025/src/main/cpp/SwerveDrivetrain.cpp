@@ -3,7 +3,7 @@
 #include <frc/RobotController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-void SwerveDrivetrain::Periodic()
+void SwerveDrivetrain::Periodic(bool autonomous)
 {
     /*
      * Periodically try to apply the operator perspective.
@@ -12,22 +12,24 @@ void SwerveDrivetrain::Periodic()
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
-
-   
-    // if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
-    //     auto const allianceColor = frc::DriverStation::GetAlliance();
-    //     if (allianceColor) {
-    //         SetOperatorPerspectiveForward(
-    //             *allianceColor == frc::DriverStation::Alliance::kRed
-    //                 ? kRedAlliancePerspectiveRotation
-    //                 : kBlueAlliancePerspectiveRotation
-    //         );
-    //         m_hasAppliedOperatorPerspective = true;
-    //     }
-    // }
-
-    SetOperatorPerspectiveForward(
+    if (autonomous)
+    {
+        SetOperatorPerspectiveForward(
                 kRedAlliancePerspectiveRotation);
+    }
+    else if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
+        auto const allianceColor = frc::DriverStation::GetAlliance();
+        if (allianceColor) {
+            SetOperatorPerspectiveForward(
+                *allianceColor == frc::DriverStation::Alliance::kRed
+                    ? kRedAlliancePerspectiveRotation
+                    : kBlueAlliancePerspectiveRotation
+            );
+            m_hasAppliedOperatorPerspective = true;
+        }
+    }
+
+    
 
     frc::Pose2d pose = this->GetState().Pose;
     

@@ -259,7 +259,7 @@ public:
         });
     }
 
-    void Periodic();
+    void Periodic(bool autonomous = false);
 
     // /**
     //  * \brief Runs the SysId Quasistatic test in the given direction for the routine

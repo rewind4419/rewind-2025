@@ -1,22 +1,18 @@
 #include "queue/StandardTasks.h"
 #include <chrono>
+#include <frc/Timer.h>
 
-DelayTask::DelayTask(int duration_ms) {
-    duration = duration_ms;
+DelayTask::DelayTask(double durationSeconds)
+{
+    this->duration = durationSeconds;
 }
 
 void DelayTask::Start() {
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-    startTime = currentTime;
+    this->startTime = frc::Timer::GetFPGATimestamp().value();
 }
 
 bool DelayTask::Loop() {
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-    return currentTime >= startTime + duration;
+    return (frc::Timer::GetFPGATimestamp().value()) >= startTime + duration;
 }
 
 void DelayTask::End() {

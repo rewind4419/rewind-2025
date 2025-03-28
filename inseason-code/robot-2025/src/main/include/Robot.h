@@ -7,6 +7,7 @@
 
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/PS4Controller.h>
 
 #include "queue/Queue.h"
@@ -17,6 +18,8 @@
 
 #include "Hardware.h"
 #include "State.h"
+#include "SwervePather.h"
+#include "Auto.h"
 
 class Robot : public frc::TimedRobot {
 public:
@@ -30,11 +33,17 @@ public:
     Controller driver {0};
     Controller mate {1};
 
+    SwervePather pather {&drivetrain};
+
+    AutoManager m;
+
     swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
     .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
 
     frc::Field2d m_field {};
     frc::FieldObject2d* m_object;
+
+    bool visionEnabled = false;
 
     Robot();
     void RobotPeriodic() override;
@@ -51,6 +60,7 @@ public:
     void TestPeriodic() override;
     void TestExit() override;
 
+    frc::SendableChooser<int> autoChooser;
 
     // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
     // ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
