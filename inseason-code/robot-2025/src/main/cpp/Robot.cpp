@@ -7,13 +7,16 @@
 #include "Hardware.h"
 #include "State.h"
 
+#include "autos/testAuto.h"
+
 // :pink_bow:
 
 enum Autos
 {
     AUTO_NONE,
     AUTO_DRIVE_FORWARD_1S,
-    AUTO_SCORE_TAG11
+    AUTO_SCORE_TAG11,
+    AUTO_YEETAGE
 };
 
 Robot::Robot() {
@@ -28,6 +31,7 @@ Robot::Robot() {
     autoChooser.SetDefaultOption("No Auto", AUTO_NONE);
     autoChooser.AddOption("Drive Forward 1 Second Auto", AUTO_DRIVE_FORWARD_1S);
     autoChooser.AddOption("Tag11", AUTO_SCORE_TAG11);
+    autoChooser.AddOption("testAuto", AUTO_YEETAGE);
 
     frc::SmartDashboard::PutData(&autoChooser);
 
@@ -42,21 +46,24 @@ void Robot::RobotPeriodic() {
 
     frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
+
+    
 }
 
 void Robot::TeleopInit() {
     queue.Clear();
+    hardware.elevator->SetTargetPosition(ELEVATOR_MIN);
+    hardware.arm->SetTargetPosition(CORAL_ARM_MIN);
+    hardware.wrist->SetTargetPosition(CORAL_WRIST_MIN);
+
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
     hardware.intake->SetTargetVelocity(0.0);
+    drivetrain.GetPigeon2().SetYaw(0_deg,1_s);
 }
 
 void Robot::TeleopPeriodic() {
 
     m.updRoutine();
-    if (m.optional.has_value()){
-        printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-        drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
-    }
 
     if (!driver.GetR1Button())
     {
@@ -78,9 +85,21 @@ void Robot::TeleopPeriodic() {
         );
     }
 
-    if (driver.GetTriangleButtonPressed())
-    {
-        drivetrain.SeedFieldCentric();
+    if (driver.GetCrossButtonPressed()){
+        // drivetrain.ResetRotation(0_rad);
+        drivetrain.GetPigeon2().SetYaw(0_deg,1_s);
+    }
+    if (driver.GetTriangleButtonPressed()){
+        // drivetrain.ResetRotation(M_PI * 1.0_rad);
+        drivetrain.GetPigeon2().SetYaw(180_deg,1_s);
+    }
+    if (driver.GetSquareButtonPressed()){
+        // drivetrain.ResetRotation(-0.5*M_PI * 1.0_rad);
+        drivetrain.GetPigeon2().SetYaw(-90_deg,1_s);
+    }
+    if (driver.GetCircleButtonPressed()){
+        // drivetrain.ResetRotation(0.5*M_PI * 1.0_rad); 
+        drivetrain.GetPigeon2().SetYaw(90_deg,1_s);
     }
 
     
@@ -222,6 +241,10 @@ void Robot::AutonomousInit() {
             return true;
         }));
         break;
+    case AUTO_YEETAGE:
+        yeetAuto();
+        break;
+
     case AUTO_DRIVE_FORWARD_1S:
         TaskList* list = new TaskList();
 
@@ -248,6 +271,9 @@ void Robot::AutonomousInit() {
         queue.AddTask(new ForkTask(list, list2));
 
         break;
+        //12.795321
+        //2.859783
+        //0.824
     // case AUTO_SCORE_TAG11:
     //     TaskList* tag11List1 = new TaskList();
 
@@ -275,10 +301,10 @@ void Robot::AutonomousPeriodic() {
     if (visionEnabled)
     {
         m.updRoutine();
-        if (m.optional.has_value()){
-            //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-            drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
-        }
+        // if (m.optional.has_value()){
+        //     //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+        //     drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), m.optional.value().timestamp);
+        // }
     }
 
     drivetrain.Periodic(true);
@@ -292,11 +318,20 @@ void Robot::DisabledInit() {}
 
 void Robot::DisabledPeriodic() {
     m.updRoutine();
-
+    
     if (m.optional.has_value()){
-        //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
-        drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+        auto autoPose = m.optional.value().estimatedPose.ToPose2d();
+        //drivetrain.SamplePoseAt(m.optional.value().timestamp).value().Rotation()
+        auto visionPose = frc::Pose2d(autoPose.X(),autoPose.Y(),0.0_rad);
+        printf("Yes, going to %f, %f, %f\n",visionPose.X().value(), visionPose.Y().value(),visionPose.Rotation().Radians().value());
+        drivetrain.ResetPose(visionPose);
+        // drivetrain.AddVisionMeasurement(visionPose, m.optional.value().timestamp);
     }
+
+    // if (m.optional.has_value()){
+    //     //printf("Yes, going to %f, %f\n", m.optional.value().estimatedPose.X().value(), m.optional.value().estimatedPose.Y().value());
+    //     drivetrain.AddVisionMeasurement(m.optional.value().estimatedPose.ToPose2d(), utils::GetCurrentTime());
+    // }
     drivetrain.Periodic();
 }
 

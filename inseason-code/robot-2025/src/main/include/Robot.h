@@ -60,6 +60,8 @@ public:
     void TestPeriodic() override;
     void TestExit() override;
 
+    void yeetAuto();
+
     frc::SendableChooser<int> autoChooser;
 
     // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};

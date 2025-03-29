@@ -26,6 +26,9 @@
   .WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelIncoming)
   before returning it.
 
+## Bugs
+- Vision update only runs when disabled (i removed from auto for reasons), implement an updateVision function for auto
+
 ## TODO List
 
 - IMPORTANT (after SDR To-do List):
