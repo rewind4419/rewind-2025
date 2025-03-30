@@ -59,7 +59,7 @@ Hardware::Hardware()
 
     wristConfig.Slot0.kP = 16;
 
-    wristConfig.MotionMagic.MotionMagicCruiseVelocity = 100_tps;
+    wristConfig.MotionMagic.MotionMagicCruiseVelocity = 100_tps; //Changed motor polarity to accomadate new wrist gearbox 3-29-2025
     wristConfig.MotionMagic.MotionMagicAcceleration = 1600_tr_per_s_sq;
     wristConfig.MotionMagic.MotionMagicJerk = 6400_tr_per_s_cu;
 

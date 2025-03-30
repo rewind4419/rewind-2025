@@ -36,7 +36,7 @@
 #define CORAL_WRIST_INTAKING_MAX 0.025 // All 3 of these are arbitrary at the moment 
 
 #define CORAL_WRIST_EXTENDED 0.3
-#define CORAL_WRIST_DELIVER 0.25
+#define CORAL_WRIST_DELIVER 0.25 // motor polarity reversed in Tuner due to new wrist motor orientation 3-29-25
 #define CORAL_WRIST_CLIMB 0.2
 
 #define CORAL_WRIST_FUNNEL 0.02
