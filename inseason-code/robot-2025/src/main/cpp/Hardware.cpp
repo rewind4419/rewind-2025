@@ -35,7 +35,7 @@ Hardware::Hardware()
 
     TalonFXConfiguration armConfig;
 
-    armConfig.Slot0.kP = 40;
+    armConfig.Slot0.kP = 42.0;
     armConfig.Slot0.kG = 0.7;
     armConfig.Slot0.GravityType = GravityTypeValue::Arm_Cosine;
 
@@ -60,8 +60,8 @@ Hardware::Hardware()
     wristConfig.Slot0.kP = 16;
 
     wristConfig.MotionMagic.MotionMagicCruiseVelocity = 100_tps; //Changed motor polarity to accomadate new wrist gearbox 3-29-2025
-    wristConfig.MotionMagic.MotionMagicAcceleration = 1600_tr_per_s_sq;
-    wristConfig.MotionMagic.MotionMagicJerk = 6400_tr_per_s_cu;
+    wristConfig.MotionMagic.MotionMagicAcceleration = 400_tr_per_s_sq;
+    wristConfig.MotionMagic.MotionMagicJerk = 4800_tr_per_s_cu;
 
     wristConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     wristConfig.CurrentLimits.StatorCurrentLimit = 120_A;
@@ -69,9 +69,10 @@ Hardware::Hardware()
     wristConfig.CurrentLimits.SupplyCurrentLimit = 40_A;
     wristConfig.CurrentLimits.SupplyCurrentLowerLimit = 40_A;
 
-    wristConfig.Feedback.SensorToMechanismRatio = 4.0;
+    wristConfig.Feedback.SensorToMechanismRatio = 37.5;
 
     wristConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
+    wristConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
 
     wrist = new MotorController(CORAL_WRIST_MOTOR_ID, wristConfig, CORAL_WRIST_MIN, CTRL_PID_POSITION_MOTION_MAGIC);
     wrist->SetTargetPosition(CORAL_WRIST_FUNNEL);

@@ -27,25 +27,27 @@
 #define ELEVATOR_DELIVER_LOW 3
 #define ELEVATOR_DELIVER_MID 8.6
 //#define ELEVATOR_DELIVER_HIGH 18
-#define ELEVATOR_DELIVER_HIGH 17.5
+#define ELEVATOR_DELIVER_HIGH 17.7 //was 17.5
 
 // just for HIGH, mamke the wrist 0.26 and the arm 0.32
 
 #define CORAL_WRIST_MIN 0
-#define CORAL_WRIST_MAX 0.5
+#define CORAL_WRIST_MAX 0.45
 #define CORAL_WRIST_INTAKING_MAX 0.025 // All 3 of these are arbitrary at the moment 
 
-#define CORAL_WRIST_EXTENDED 0.3
-#define CORAL_WRIST_DELIVER 0.25 // motor polarity reversed in Tuner due to new wrist motor orientation 3-29-25
+#define CORAL_WRIST_EXTENDED 0.32 // was .25 3/30 mh
+#define CORAL_WRIST_DELIVER 0.25
 #define CORAL_WRIST_CLIMB 0.2
 
 #define CORAL_WRIST_FUNNEL 0.02
 
+#define CORAL_ARM_TRANSIT 0.43
 #define CORAL_ARM_MIN 0.04444444444 // The angle of the arm when its resting on the hard stop
 #define CORAL_ARM_INTAKING_MAX 0.025
 #define CORAL_ARM_SAFE 0.3 // Any less than this, and can't extend elevator all the way
 #define CORAL_ARM_EXTENDED 0.35
-#define CORAL_ARM_MAX 0.40 // Arbitrary
+#define CORAL_ARM_MAX 0.44
+ // Arbitrary
 #define CORAL_ARM_CLIMB 0.20
 
 // Measured in turns per second

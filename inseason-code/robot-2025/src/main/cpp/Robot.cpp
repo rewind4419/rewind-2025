@@ -129,8 +129,8 @@ void Robot::TeleopPeriodic() {
         {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
             queue.AddTask(new ForkTask(
-                new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon),
-                new MotorPositionTask(hardware.arm, CORAL_ARM_SAFE, true, hardware.armDefaultEpsilon)
+                new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon),
+                new MotorPositionTask(hardware.arm, CORAL_ARM_TRANSIT, true, hardware.armDefaultEpsilon)
             ));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
@@ -141,7 +141,7 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
-            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon));
             queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
         }
         else if (stateManager.targetState == STATE_CLIMB)
@@ -149,7 +149,7 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
             queue.AddTask(new MotorPositionTask(hardware.flipper, FLIPPER_RETRACTED));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN));
-            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL));
+            queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN));
             queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
         }
     }
@@ -172,14 +172,21 @@ void Robot::TeleopPeriodic() {
     if (stateManager.targetState == STATE_DELIVER && mate.GetDPadUpPressed())
     {
         stateManager.IncrementDeliverHeight();
-        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist);
+        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist, hardware.arm);
+        stateManager.SetArmToDeliver(&queue, hardware.arm);
     }
 
     if (stateManager.targetState == STATE_DELIVER && mate.GetDPadDownPressed())
     {
         stateManager.DecrementDeliverHeight();
-        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist);
+        stateManager.GoToDeliverHeight(&queue, hardware.elevator, hardware.wrist, hardware.arm);
+        stateManager.SetArmToDeliver(&queue, hardware.arm);
     }
+
+    // if (stateManager.targetState == STATE_DELIVER && mate.GetDPadRightPressed())
+    // {
+    //     // stateManager.SetArmToDeliver(&queue, hardware.arm);
+    // }
 
     // if (stateManager.targetState == STATE_DELIVER && mate.GetDPadRightPressed())
     // {
@@ -189,7 +196,7 @@ void Robot::TeleopPeriodic() {
 
     if (stateManager.currentState == STATE_DELIVER && stateManager.targetState == STATE_DELIVER)
     {
-        hardware.wrist->SetTargetPosition(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.1);
+        hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.45, 0.0, 0.4));
     }
 
     if (mate.GetSquareButtonPressed())

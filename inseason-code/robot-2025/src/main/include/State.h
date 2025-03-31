@@ -30,11 +30,13 @@ public:
     RobotState currentState = STATE_NEUTRAL;
     RobotState targetState = STATE_NEUTRAL;
     DeliverHeight height = HEIGHT_ZERO;
+    DeliverHeight heightPrev = HEIGHT_ZERO;
 
     void IncrementDeliverHeight();
     void DecrementDeliverHeight();
 
-    void GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist);
+    void GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist, MotorController* arm);
+    void SetArmToDeliver(Queue* queue, MotorController* arm);
 };
 
 class TargetStateTask : public Task

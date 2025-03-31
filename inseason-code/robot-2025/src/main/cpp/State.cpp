@@ -14,27 +14,33 @@ void StateManager::DecrementDeliverHeight()
     this->height = (DeliverHeight)clamp(this->height - 1, HEIGHT_ZERO, HEIGHT_L4);
 }
 
-void StateManager::GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist)
+void StateManager::GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist, MotorController* arm)
 {
     switch (this->height)
     {
     case HEIGHT_ZERO:
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_MIN));
+        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_MIN, true));
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED));
         break;
     case HEIGHT_L2:
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_LOW));
+        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_LOW, true, 0.25));
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED));
         break;
     case HEIGHT_L3:
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_MID));
+        queue->AddTask(new MotorPositionTask(arm, CORAL_ARM_TRANSIT, true, 0.025));
+        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_MID, true, 0.25));
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED));
         break;
     case HEIGHT_L4:
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_HIGH));
+        queue->AddTask(new MotorPositionTask(arm, CORAL_ARM_TRANSIT, true, 0.025));
+        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_HIGH, true, 0.25));
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED));
         break;
     };
+}
+
+void StateManager::SetArmToDeliver(Queue* queue, MotorController* arm){
+    queue->AddTask(new MotorPositionTask(arm, CORAL_ARM_EXTENDED));
 }
 
 TargetStateTask::TargetStateTask(RobotState state, StateManager* manager)
