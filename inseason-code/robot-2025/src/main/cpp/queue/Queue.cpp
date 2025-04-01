@@ -88,6 +88,17 @@ bool Queue::IsBusy()
 		return true;
 	}
 }
+int Queue::TaskCount()
+{
+	if(endTask<currentTask)
+	{
+		return endTask - currentTask + MAX_TASKS;
+	}
+	else
+	{
+		return endTask - currentTask;
+	}
+}
 
 void Queue::Clear()
 {
@@ -96,4 +107,5 @@ void Queue::Clear()
 		delete tasks[i];
 	}
 	currentTask = endTask;
+	hasCurrentTaskStarted = false;
 }

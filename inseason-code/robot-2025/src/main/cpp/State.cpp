@@ -66,6 +66,7 @@ TargetStateTask::TargetStateTask(RobotState state, StateManager* manager)
 void TargetStateTask::Start()
 {
     manager->targetState = this->newState;
+    printf("SettingTargetState: %i, newState: %i (these should be the same)\n",manager->targetState, this->newState);
 }
 
 bool TargetStateTask::Loop()

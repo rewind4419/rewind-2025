@@ -31,6 +31,29 @@ void Robot::InitializeAutos()
 
 void Robot::RunAuto()
 {
+    std::optional<frc::DriverStation::Alliance> allianceOptional = frc::DriverStation::GetAlliance();
+
+
+
+    if (allianceOptional.has_value())
+    {
+        if (allianceOptional.value() == frc::DriverStation::Alliance::kRed)
+        {
+            visionManager.tagsAllowed = RED_REEF;
+            printf("Running red\n");
+        }
+        else
+        {
+            visionManager.tagsAllowed = BLUE_REEF;
+            printf("Running blue\n");
+        }
+    }
+    else
+    {
+        printf("Warning, frc driver station returned no team, aborting auto!!\n");
+        return;
+    }
+
     switch (autoChooser.GetSelected())
     {
     case AUTO_NONE:
@@ -43,8 +66,6 @@ void Robot::RunAuto()
         break;
     case AUTO_YEETAGE:
     {
-        visionManager.tagsAllowed = RED_REEF;
-
         printf("hello is the auto??\n");
 
         TaskList* deploy4 = new TaskList();
@@ -62,17 +83,17 @@ void Robot::RunAuto()
 
         queue.AddTask(new ForkTask{
             new SwerveWaypointTask(&pather, 
-                visionManager.TagToWorld(frc::Pose2d(1.558_m, 0.156_m,0.0_rad),11)
+                visionManager.TagToWorld(frc::Pose2d(1.558_m, 0.156_m,0.0_rad),19)
             ,2.0,0.05,0.03,3.5,3.5),
             deploy4
         });
 
         queue.AddTask(new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(0.528_m, 0.156_m,0.0_rad),11)
+            visionManager.TagToWorld(frc::Pose2d(0.528_m, 0.156_m,0.0_rad),19)
         ,1.5,0.05,0.03,3.5,3.0));
         queue.AddTask(new SwerveLockWheelsTask(&pather));
 
-        queue.AddTask(new DelayTask(0.5));
+        queue.AddTask(new DelayTask(0.2));
 
         queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_DELIVER_AUTO_L4, true, hardware.wristDefaultEpsilon));
         queue.AddTask(new DelayTask(0.3));
@@ -83,7 +104,7 @@ void Robot::RunAuto()
         queue.AddTask(new MotorVelocityTask(hardware.intake, 0));
         
         queue.AddTask(new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(1.558_m, 0.156_m,0.0_rad), 11)
+            visionManager.TagToWorld(frc::Pose2d(1.558_m, 0.156_m,0.0_rad), 19)
         ,2.0,0.05,0.03,3.5,3.5));
 
         queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));

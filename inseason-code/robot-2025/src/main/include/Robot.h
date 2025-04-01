@@ -64,6 +64,8 @@ public:
     void InitializeAutos();
     void RunAuto();
 
+    
+
     frc::SendableChooser<int> autoChooser;
 
     // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};

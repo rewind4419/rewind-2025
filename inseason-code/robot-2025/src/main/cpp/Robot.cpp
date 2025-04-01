@@ -32,7 +32,7 @@ void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
 
-    
+    frc::SmartDashboard::PutNumber("Queue Tasks", queue.TaskCount());
 }
 
 void Robot::TeleopInit() {
@@ -131,6 +131,7 @@ void Robot::TeleopPeriodic() {
     {
         if (stateManager.targetState == STATE_DELIVER || stateManager.targetState == STATE_ALGAE)
         {
+            printf("Pressing circle, going to deliver\n");
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
             queue.AddTask(new ForkTask(
                 new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon),
@@ -309,6 +310,11 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_CLIMB));
             queue.AddTask(new CurrentStateTask(STATE_CLIMB, &stateManager));
         }
+    }
+
+    if (mate.GetOptionsButtonPressed())
+    {
+        queue.Clear();
     }
 
     if (driver.GetDPadUpPressed())

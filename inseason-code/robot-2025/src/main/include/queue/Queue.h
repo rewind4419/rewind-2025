@@ -31,5 +31,6 @@ public:
 	void AddTask(Task* task);
 	void Update();
 	bool IsBusy();
+	int TaskCount();
 	void Clear();
 };
