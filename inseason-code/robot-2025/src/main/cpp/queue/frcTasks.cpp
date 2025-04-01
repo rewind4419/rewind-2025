@@ -22,3 +22,24 @@ void MotorPositionTask::End()
 {
 
 }
+
+MotorVelocityTask::MotorVelocityTask(MotorController *ctrlr, double targetVelocity)
+{
+    controller = ctrlr;
+    this->targetVelocity = targetVelocity;
+}
+
+void MotorVelocityTask::Start()
+{
+    controller->SetTargetVelocity(targetVelocity);
+}
+
+bool MotorVelocityTask::Loop()
+{
+    return true;
+}
+
+void MotorVelocityTask::End()
+{
+
+}

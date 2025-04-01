@@ -57,11 +57,11 @@ Hardware::Hardware()
 
     TalonFXConfiguration wristConfig;
 
-    wristConfig.Slot0.kP = 16;
+    wristConfig.Slot0.kP = 30;
 
-    wristConfig.MotionMagic.MotionMagicCruiseVelocity = 100_tps; //Changed motor polarity to accomadate new wrist gearbox 3-29-2025
-    wristConfig.MotionMagic.MotionMagicAcceleration = 400_tr_per_s_sq;
-    wristConfig.MotionMagic.MotionMagicJerk = 4800_tr_per_s_cu;
+    wristConfig.MotionMagic.MotionMagicCruiseVelocity = 400_tps; //Changed motor polarity to accomadate new wrist gearbox 3-29-2025
+    wristConfig.MotionMagic.MotionMagicAcceleration = 800_tr_per_s_sq;
+    wristConfig.MotionMagic.MotionMagicJerk = 4000_tr_per_s_cu;
 
     wristConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     wristConfig.CurrentLimits.StatorCurrentLimit = 120_A;

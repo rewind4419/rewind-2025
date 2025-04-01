@@ -104,9 +104,14 @@ bool SwerveWaypointTask::Loop()
 
     velocityTarget = clamp(velocityTarget, -elapsedTime * acceleration, elapsedTime * acceleration);
 
-    float rotationDistanceToGoal = abs(targetRot.Radians().value() - currentRot.Radians().value());
+    float rotationDistanceToGoal = (targetRot.Radians().value() - currentRot.Radians().value());
 
-    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 12.0f, -2.0f, 2.0f);
+    rotationDistanceToGoal = fmod(rotationDistanceToGoal + M_PI, 2 * M_PI) - M_PI;
+
+    // This is not ideal, but modulo wouldn't work with negative numbers without more stuff so idk
+
+
+    double rotationVelocityTarget = clamp(rotationDistanceToGoal * 9.0f, -2.0f, 2.0f);
 
     rotationVelocityTarget = clamp(rotationVelocityTarget, -elapsedTime, elapsedTime);
 
@@ -122,7 +127,7 @@ bool SwerveWaypointTask::Loop()
         //.WithVelocityX(0.5* 1_mps)
         .WithVelocityY(-(diffTranslation.Y().value() / distanceToGoal * velocityTarget) * 1_mps)
         //.WithVelocityY(0.5 * 1_mps)
-        .WithRotationalRate((diffRot.Radians().value() * rotationVelocityTarget) * 1_rad_per_s)
+        .WithRotationalRate((rotationVelocityTarget) * 1_rad_per_s)
         //.WithRotationalRate(1.0 * 1_rad_per_s)
     );
 

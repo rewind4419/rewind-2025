@@ -12,22 +12,22 @@ void SwerveDrivetrain::Periodic(bool autonomous)
      * Otherwise, only check and apply the operator perspective if the DS is disabled.
      * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
      */
-    if (autonomous)
+    //if (autonomous)
     {
         SetOperatorPerspectiveForward(
                 kRedAlliancePerspectiveRotation);
     }
-    else if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
-        auto const allianceColor = frc::DriverStation::GetAlliance();
-        if (allianceColor) {
-            SetOperatorPerspectiveForward(
-                *allianceColor == frc::DriverStation::Alliance::kRed
-                    ? kRedAlliancePerspectiveRotation
-                    : kBlueAlliancePerspectiveRotation
-            );
-            m_hasAppliedOperatorPerspective = true;
-        }
-    }
+    // else if (!m_hasAppliedOperatorPerspective || frc::DriverStation::IsDisabled()) {
+    //     auto const allianceColor = frc::DriverStation::GetAlliance();
+    //     if (allianceColor) {
+    //         SetOperatorPerspectiveForward(
+    //             *allianceColor == frc::DriverStation::Alliance::kRed
+    //                 ? kRedAlliancePerspectiveRotation
+    //                 : kBlueAlliancePerspectiveRotation
+    //         );
+    //         m_hasAppliedOperatorPerspective = true;
+    //     }
+    // }
 
     
 

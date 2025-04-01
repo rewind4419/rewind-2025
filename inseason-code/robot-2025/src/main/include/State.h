@@ -8,7 +8,8 @@ enum RobotState
     STATE_NEUTRAL,
     STATE_DELIVER,
     STATE_FUNNEL,
-    STATE_CLIMB
+    STATE_CLIMB,
+    STATE_ALGAE
 };
 
 enum DeliverHeight
@@ -17,6 +18,12 @@ enum DeliverHeight
     HEIGHT_L2,
     HEIGHT_L3,
     HEIGHT_L4
+};
+
+enum AlgaeHeight
+{
+    ALGAE_LOW,
+    ALGAE_HIGH
 };
 
 #define POV_UP 0
@@ -30,12 +37,12 @@ public:
     RobotState currentState = STATE_NEUTRAL;
     RobotState targetState = STATE_NEUTRAL;
     DeliverHeight height = HEIGHT_ZERO;
-    DeliverHeight heightPrev = HEIGHT_ZERO;
+    AlgaeHeight algaeHeight = ALGAE_LOW;
 
-    void IncrementDeliverHeight();
-    void DecrementDeliverHeight();
+    DeliverHeight GetNextHeight();
+    DeliverHeight GetPreviousHeight();
 
-    void GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist, MotorController* arm);
+    void GoToDeliverHeight(Queue* queue, MotorController* elevator, MotorController* wrist, MotorController* arm, DeliverHeight newHeight);
     void SetArmToDeliver(Queue* queue, MotorController* arm);
 };
 

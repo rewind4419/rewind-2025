@@ -15,3 +15,16 @@ public:
     bool Loop() override;
     void End() override;
 };
+
+class MotorVelocityTask : public Task
+{
+    MotorController *controller;
+
+    double targetVelocity;
+
+public:
+    MotorVelocityTask(MotorController *ctrlr, double targetVelocity);
+    void Start() override;
+    bool Loop() override;
+    void End() override;
+};
