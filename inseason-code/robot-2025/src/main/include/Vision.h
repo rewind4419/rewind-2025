@@ -12,6 +12,7 @@ enum TagSet
   RED_REEF,
   BLUE_REEF,
   ALL,
+  NONE
 };
 
 class VisionManager

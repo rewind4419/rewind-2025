@@ -7,14 +7,6 @@
 #include "Hardware.h"
 #include "State.h"
 
-enum Autos
-{
-    AUTO_NONE,
-    AUTO_DRIVE_FORWARD_1S,
-    AUTO_SCORE_TAG11,
-    AUTO_YEETAGE
-};
-
 // :pink_bow:
 
 Robot::Robot() {
@@ -24,14 +16,9 @@ Robot::Robot() {
 
     frc::SmartDashboard::PutNumber("Elevator SetPos", 0.0);
     
+    InitializeAutos();
+
     visionManager.Init();
-
-    autoChooser.SetDefaultOption("No Auto", AUTO_NONE);
-    autoChooser.AddOption("Drive Forward 1 Second Auto", AUTO_DRIVE_FORWARD_1S);
-    autoChooser.AddOption("Tag11", AUTO_SCORE_TAG11);
-    autoChooser.AddOption("testAuto", AUTO_YEETAGE);
-
-    frc::SmartDashboard::PutData(&autoChooser);
 
     frc::SmartDashboard::PutNumber("Test Arm", 0.35);
     frc::SmartDashboard::PutNumber("Test Wrist", 0.3);
@@ -354,71 +341,7 @@ void Robot::AutonomousInit() {
     hardware.intake->SetTargetVelocity(0.0);
     visionEnabled = false;
     queue.Clear();
-
-    
-
-    switch (autoChooser.GetSelected())
-    {
-    case AUTO_NONE:
-        queue.AddTask(new CustomTask([] {
-            printf("No task\n");
-            return true;
-        }));
-        break;
-    case AUTO_YEETAGE:
-        yeetAuto(&visionManager);
-        break;
-
-    case AUTO_DRIVE_FORWARD_1S:
-        TaskList* list = new TaskList();
-
-        list->AddTask(new SwerveDriveForTask(&pather, 1.0, 0.5, 0));
-        list->AddTask(new SwerveLockWheelsTask(&pather));
-        list->AddTask(new DelayTask(1));
-        list->AddTask(new SwerveDriveForTask(&pather, 1.0, -0.5, 0));
-        list->AddTask(new SwerveLockWheelsTask(&pather));
-
-        TaskList* list2 = new TaskList();
-
-        list2->AddTask(new ForkTask(
-            new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
-            new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
-        ));
-        list2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_DELIVER_LOW, true, hardware.elevatorDefaultEpsilon));
-        list2->AddTask(new DelayTask(1));
-        list2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
-        list2->AddTask(new ForkTask(
-            new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon),
-            new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon)
-        ));
-
-        queue.AddTask(new ForkTask(list, list2));
-
-        break;
-        //12.795321
-        //2.859783
-        //0.824
-    // case AUTO_SCORE_TAG11:
-    //     TaskList* tag11List1 = new TaskList();
-
-    //     tag11List1->AddTask(new SwerveWaypointTask(&pather, frc::Pose2d{11.27293_m, 2.46467_m, frc::Rotation2d{1_rad}}, 2, 0.05, 0.1, 2.0, 2.0));
-    //     tag11List1->AddTask(new SwerveLockWheelsTask(&pather));
-
-    //     TaskList* tag11List2 = new TaskList();
-
-    //     tag11List2->AddTask(new ForkTask(
-    //         new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
-    //         new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
-    //     ));
-    //     tag11List2->AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_DELIVER_LOW, true, hardware.elevatorDefaultEpsilon));
-
-    //     queue.AddTask(new ForkTask(tag11List1, tag11List2));
-
-    //     queue.AddTask(new SwerveWaypointTask(&pather, frc::Pose2d{11.77293_m, 3.3307_m, frc::Rotation2d{1_rad}}, 0.5, 0.05, 0.1, 1.0, 1.0));
-    //     queue.AddTask(new SwerveLockWheelsTask(&pather));
-
-    //     break;
-    }
+    RunAuto();
 }
 
 void Robot::AutonomousPeriodic() {

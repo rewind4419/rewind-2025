@@ -60,9 +60,9 @@ public:
     void TestPeriodic() override;
     void TestExit() override;
 
+    // These two functions are in AutoManager.cpp
     void InitializeAutos();
-
-    void yeetAuto(VisionManager* vision);
+    void RunAuto();
 
     frc::SendableChooser<int> autoChooser;
 
