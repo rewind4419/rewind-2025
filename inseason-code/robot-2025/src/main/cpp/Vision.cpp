@@ -93,9 +93,12 @@ void VisionManager::updRoutine(){
   {
     int id = result.GetTargets()[i].fiducialId ;
     if(
-      (id >= 6 && id <= 11 && tagsAllowed == RED_REEF) ||
-      (id >= 17 && id <= 22 && tagsAllowed == BLUE_REEF) ||
-      tagsAllowed == ALL
+      (
+        (id >= 6 && id <= 11 && tagsAllowed == RED_REEF) ||
+        (id >= 17 && id <= 22 && tagsAllowed == BLUE_REEF) ||
+        tagsAllowed == ALL
+      ) &&
+      result.GetTargets()[i].poseAmbiguity < 0.1
     )
     {
       filteredResults.targets.push_back(result.GetTargets()[i]);
@@ -121,17 +124,17 @@ void VisionManager::updRoutine(){
 
         frc::Pose2d robotPose = this->optionalVisionEstimate.value().estimatedPose.ToPose2d();
 
-        frc::Pose2d tag7Pose = WorldToTag(robotPose, 6);
+        frc::Pose2d tag7Pose = WorldToTag(robotPose, 13);
 
-        frc::Pose2d tag7BackToWorld = TagToWorld(tag7Pose, 6);
+        frc::Pose2d tag7BackToWorld = TagToWorld(tag7Pose, 13);
 
-        frc::SmartDashboard::PutNumber("Tag 11 Relative X", tag7Pose.X().value());
-        frc::SmartDashboard::PutNumber("Tag 11 Relative Y", tag7Pose.Y().value());
-        frc::SmartDashboard::PutNumber("Tag 11 Relative Rot", tag7Pose.Rotation().Radians().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Relative X", tag7Pose.X().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Relative Y", tag7Pose.Y().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Relative Rot", tag7Pose.Rotation().Radians().value());
 
-        frc::SmartDashboard::PutNumber("Tag 7 Back to world X", tag7BackToWorld.X().value());
-        frc::SmartDashboard::PutNumber("Tag 7 Back to world Y", tag7BackToWorld.Y().value());
-        frc::SmartDashboard::PutNumber("Tag 7 Back to world Rot", tag7BackToWorld.Rotation().Radians().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Back to world X", tag7BackToWorld.X().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Back to world Y", tag7BackToWorld.Y().value());
+        frc::SmartDashboard::PutNumber("Tag 12 Back to world Rot", tag7BackToWorld.Rotation().Radians().value());
     } else {
       // printf("No value here.   ");
     }

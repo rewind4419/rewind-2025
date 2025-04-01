@@ -140,18 +140,18 @@ bool SwerveWaypointTask::Loop()
     frc::SmartDashboard::PutNumber("Distance to goal", lastDistance);
 
     bool done = lastDistance < this->slop && fabsf(lastRDistance) < this->rSlop;
-    if(done)
-    {
-        this->pather->drivetrain->SetControl(
-            this->pather->drive_closedloop
-            .WithVelocityX(0.0 * 1_mps)
-            //.WithVelocityX(0.5* 1_mps)
-            .WithVelocityY(0.0 * 1_mps)
-            //.WithVelocityY(0.5 * 1_mps)
-            .WithRotationalRate(0.0 * 1_rad_per_s)
-            //.WithRotationalRate(1.0 * 1_rad_per_s)
-        );
-    }
+    // if(done)
+    // {
+    //     this->pather->drivetrain->SetControl(
+    //         this->pather->drive_closedloop
+    //         .WithVelocityX(0.0 * 1_mps)
+    //         //.WithVelocityX(0.5* 1_mps)
+    //         .WithVelocityY(0.0 * 1_mps)
+    //         //.WithVelocityY(0.5 * 1_mps)
+    //         .WithRotationalRate(0.0 * 1_rad_per_s)
+    //         //.WithRotationalRate(1.0 * 1_rad_per_s)
+    //     );
+    // }
     return (lastDistance < this->slop && fabsf(lastRDistance) < this->rSlop);
 }
 

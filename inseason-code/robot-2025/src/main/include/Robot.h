@@ -64,7 +64,9 @@ public:
     void InitializeAutos();
     void RunAuto();
 
-    
+    void ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftTree = false, bool retractDuringDriveaway = false);
+    void HumanPlayerPickup(int tagId);
+    TaskList* RetractFromDeliver();
 
     frc::SendableChooser<int> autoChooser;
 

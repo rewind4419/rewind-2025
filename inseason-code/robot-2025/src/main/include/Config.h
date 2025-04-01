@@ -41,7 +41,7 @@
 #define CORAL_WRIST_EXTENDED 0.32 // was .25 3/30 mh
 #define CORAL_WRIST_EXTENDED_L4 0.32 // coral wrist extended, but just for L4
 #define CORAL_WRIST_DELIVER_AUTO 0.26 //0.15
-#define CORAL_WRIST_DELIVER_AUTO_L4 0.26
+#define CORAL_WRIST_DELIVER_AUTO_L4 0.20
 #define CORAL_WRIST_CLIMB 0.2
 #define CORAL_WRIST_TROUGH 0.075
 
@@ -57,6 +57,7 @@
 #define CORAL_ARM_EXTENDED 0.35
 #define CORAL_ARM_MAX 0.44
 #define CORAL_ARM_ALGAE 0.43
+#define CORAL_ARM_PLACE 0.4
  // Arbitrary
 #define CORAL_ARM_CLIMB 0.20
 

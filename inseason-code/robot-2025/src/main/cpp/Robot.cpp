@@ -33,6 +33,8 @@ void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
 
     frc::SmartDashboard::PutNumber("Queue Tasks", queue.TaskCount());
+
+    m_field.SetRobotPose(drivetrain.GetState().Pose);
 }
 
 void Robot::TeleopInit() {
@@ -40,6 +42,15 @@ void Robot::TeleopInit() {
     // hardware.elevator->SetTargetPosition(ELEVATOR_MIN);
     // hardware.arm->SetTargetPosition(CORAL_ARM_MIN);
     // hardware.wrist->SetTargetPosition(CORAL_WRIST_MIN);
+
+    if (stateManager.currentState == STATE_DELIVER || stateManager.targetState == STATE_DELIVER)
+    {
+        if (hardware.elevator->targetPosition > 1)
+        {
+            hardware.elevator->SetTargetPosition(ELEVATOR_DELIVER_LOW);
+            stateManager.height = DeliverHeight::HEIGHT_L2;
+        }
+    }
 
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
     hardware.intake->SetTargetVelocity(0.0);
@@ -259,16 +270,6 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    // if (stateManager.targetState == STATE_DELIVER && mate.GetDPadRightPressed())
-    // {
-    //     // stateManager.SetArmToDeliver(&queue, hardware.arm);
-    // }
-
-    // if (stateManager.targetState == STATE_DELIVER && mate.GetDPadRightPressed())
-    // {
-    //     //queue.AddTask(new MotorPositionTask(hardware.arm, frc::SmartDashboard::GetNumber("Test Arm", 0.35)));
-    //     //queue.AddTask(new MotorPositionTask(hardware.wrist, frc::SmartDashboard::GetNumber("Test Wrist", 0.3)));
-    // }
 
     if (stateManager.currentState == STATE_DELIVER && stateManager.targetState == STATE_DELIVER)
     {
@@ -282,12 +283,17 @@ void Robot::TeleopPeriodic() {
         }
     }
 
-    // if (stateManager.targetState == STATE_DELIVER && mate.GetShareButtonPressed())
-    // {
-    //     queue.AddTask(new MotorPositionTask(hardware.elevator, frc::SmartDashboard::GetNumber("Manual Height", ELEVATOR_MIN)));
-    //     queue.AddTask(new MotorPositionTask(hardware.arm, frc::SmartDashboard::GetNumber("Manual Arm", CORAL_ARM_MIN)));
-    //     queue.AddTask(new MotorPositionTask(hardware.wrist, frc::SmartDashboard::GetNumber("Manual Wrist", CORAL_WRIST_MIN)));
-    // }
+    if (stateManager.targetState == STATE_DELIVER && mate.GetShareButtonPressed())
+    {
+        queue.AddTask(new MotorPositionTask(hardware.elevator, frc::SmartDashboard::GetNumber("Manual Height", ELEVATOR_MIN)));
+        queue.AddTask(new MotorPositionTask(hardware.arm, frc::SmartDashboard::GetNumber("Manual Arm", CORAL_ARM_MIN)));
+        queue.AddTask(new MotorPositionTask(hardware.wrist, frc::SmartDashboard::GetNumber("Manual Wrist", CORAL_WRIST_MIN)));
+    }
+
+    if (stateManager.targetState == STATE_DELIVER && mate.GetCrossButtonPressed())
+    {
+        queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_PLACE, true, hardware.armDefaultEpsilon));
+    }
 
     if (mate.GetSquareButtonPressed())
     {
