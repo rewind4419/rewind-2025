@@ -5,30 +5,78 @@
 enum Autos
 {
     AUTO_NONE,
+    AUTO_CONFIGURABLE,
     AUTO_DRIVE_FORWARD_3S,
-    AUTO_CENTER_L2,
-    AUTO_LEFT_L2,
-    AUTO_RIGHT_L2,
-    AUTO_SCORE_TAG11,
-    AUTO_YEETAGE,
-    AUTO_DRIVE_FORWARD_TROUGH,
-    AUTO_2_PIECE_LEFT_L2
+    AUTO_DRIVE_FORWARD_TROUGH
+};
+
+
+enum Piece1Position
+{
+    TAG_LEFT,
+    TAG_CENTER,
+    TAG_RIGHT
+};
+enum Piece2Position
+{
+    TAG_FRONT,
+    TAG_MIDDLE,
+    TAG_FAR
+};
+
+enum PiecePlacements
+{
+    L2_LEFT,
+    L2_RIGHT,
+    L4_LEFT,
+    L4_RIGHT,
+    NONE
+};
+
+enum EndBehavior
+{
+    GO_TO_CORAL_STATION,
+    BACK_UP,
+    NONE
 };
 
 void Robot::InitializeAutos()
 {
     autoChooser.SetDefaultOption("No Auto", AUTO_NONE);
+    autoChooser.AddOption("ConfigurableAuto", AUTO_CONFIGURABLE);
+
     autoChooser.AddOption("Auto Drive Forward 3 Seconds", AUTO_DRIVE_FORWARD_3S);
-    // autoChooser.AddOption("Tag11", AUTO_SCORE_TAG11);
-    autoChooser.AddOption("testAuto", AUTO_YEETAGE);
-
-    autoChooser.AddOption("Auto Left L2 (left from driver perspective)", AUTO_LEFT_L2);
-    autoChooser.AddOption("Auto Center L2 (center from driver perspective)", AUTO_CENTER_L2);
-    autoChooser.AddOption("Auto Right L2 (right from driver perspective)", AUTO_RIGHT_L2);
-
     autoChooser.AddOption("Auto Drive Forward, Trough", AUTO_DRIVE_FORWARD_TROUGH);
 
     frc::SmartDashboard::PutData(&autoChooser);
+
+    piece1Chooser.SetDefaultOption("Piece 1: L2 Right"      , L2_RIGHT );
+    piece1Chooser.AddOption("Piece 1: L2 Left"       , L2_LEFT);
+    piece1Chooser.AddOption("Piece 1: L4 Left"       , L4_LEFT);
+    piece1Chooser.AddOption("Piece 1: L4 Right"      , L4_RIGHT );
+    frc::SmartDashboard::PutData(&piece1Chooser);
+
+    piece2Chooser.SetDefaultOption("Piece 2: L2 Right"      , L2_RIGHT );
+    piece2Chooser.AddOption("Piece 2: L2 Left"       , L2_LEFT);
+    piece2Chooser.AddOption("Piece 2: L4 Left"       , L4_LEFT);
+    piece2Chooser.AddOption("Piece 2: L4 Right"      , L4_RIGHT );
+    piece2Chooser.AddOption("Piece 2: None"          , NONE );
+    frc::SmartDashboard::PutData(&piece2Chooser);
+
+    endChooser.SetDefaultOption("End: Return to coral station", GO_TO_CORAL_STATION);
+    endChooser.AddOption("End: Back up for 1.5 seconds", BACK_UP);
+    endChooser.AddOption("End: None", NONE);
+    frc::SmartDashboard::PutData(&endChooser);
+
+    piece1PositionChooser.SetDefaultOption("Piece 1 Side: Center", TAG_CENTER);
+    piece1PositionChooser.AddOption("Piece 1 Side: Left", TAG_LEFT);
+    piece1PositionChooser.AddOption("Piece 1 Side: Right", TAG_RIGHT);
+    frc::SmartDashboard::PutData(&piece1PositionChooser);
+
+    piece2PositionChooser.SetDefaultOption("Piece 2 Side: Middle", TAG_MIDDLE);
+    piece2PositionChooser.AddOption("Piece 2 Side: Front", TAG_FRONT);
+    piece2PositionChooser.AddOption("Piece 2 Side: Far", TAG_FAR);
+    frc::SmartDashboard::PutData(&piece2PositionChooser);
 }
 
 TaskList* Robot::RetractFromDeliver()
@@ -221,63 +269,196 @@ void Robot::RunAuto()
         }));
     }
         break;
-    case AUTO_YEETAGE:
-    {
-        ScoreOnPole(20, HEIGHT_L4);
-        HumanPlayerPickup(13);
-        ScoreOnPole(18, HEIGHT_L4, true);
-        HumanPlayerPickup(13);
-    }
-        break;
-    case AUTO_LEFT_L2:
-    {
-        if (isRed)
-        {
-            ScoreOnPole(11,HEIGHT_L2);
-        }
-        else
-        {
-            ScoreOnPole(20,HEIGHT_L2);
-        }
-        queue.AddTask(RetractFromDeliver());
-        queue.AddTask(new SwerveLockWheelsTask(&pather));
-    }
-        break;
-    case AUTO_RIGHT_L2:
-    {
-        if (isRed)
-        {
-            ScoreOnPole(9,HEIGHT_L4);
-        }
-        else
-        {
-            ScoreOnPole(22,HEIGHT_L4);
-        }
-        queue.AddTask(RetractFromDeliver());
-        queue.AddTask(new SwerveLockWheelsTask(&pather));
-    }
-        break;
-    case AUTO_CENTER_L2:
-    {
-        if (isRed)
-        {
-            ScoreOnPole(10,HEIGHT_L2);
-        }
-        else
-        {
-            ScoreOnPole(21,HEIGHT_L2);
-        }
-        queue.AddTask(RetractFromDeliver());
-        queue.AddTask(new SwerveLockWheelsTask(&pather));
-    }
-        break;
 
+    case AUTO_CONFIGURABLE:
+    {
+        DeliverHeight piece1Height = HEIGHT_L2;
+        DeliverHeight piece2Height = HEIGHT_L2;
+
+        if(piece1Chooser.GetSelected() ==  L4_LEFT || piece1Chooser.GetSelected() ==  L4_RIGHT)
+        {
+            piece1Height  = HEIGHT_L4;
+        }
+        if(piece2Chooser.GetSelected() ==  L4_LEFT || piece2Chooser.GetSelected() ==  L4_RIGHT)
+        {
+            piece2Height  = HEIGHT_L4;
+        }
+        
+        bool piece1Left = piece1Chooser.GetSelected() ==  L2_LEFT || piece1Chooser.GetSelected() ==  L4_LEFT;
+        bool piece2Left = piece2Chooser.GetSelected() ==  L2_LEFT || piece2Chooser.GetSelected() ==  L4_LEFT;
+
+        bool doPiece2 = piece2Chooser.GetSelected() != NONE && piece1PositionChooser.GetSelected() != TAG_CENTER;
+
+        int tag1;
+        int tag2;
+
+        //Select tag 1
+        if(isRed){
+            switch(piece1PositionChooser.GetSelected())
+            {
+            case TAG_LEFT:
+                    tag1 = 11;
+            break;
+            
+            case TAG_CENTER:
+                    tag1 = 10;
+            break;
+            
+            case TAG_RIGHT:
+                    tag1 = 9;
+            break;
+
+            default: 
+                printf("wacky? Piece 1 tag selection is not valid\n");
+                return;
+            }
+        }
+        else{
+            switch(piece1PositionChooser.GetSelected())
+            {
+            case TAG_LEFT:
+                    tag1 = 20;
+            break;
+            
+            case TAG_CENTER:
+                    tag1 = 21;
+            break;
+            
+            case TAG_RIGHT:
+                    tag1 = 22;
+            break;
+
+            default: 
+                printf("wacky? Piece 1 tag selection is not valid\n");
+                return;
+            }
+        }
+
+
+        //Select tag 2
+        if(isRed){
+            switch(piece2PositionChooser.GetSelected())
+            {
+            case TAG_FRONT:
+                tag2 = 7;
+            break;
+            
+            case TAG_MIDDLE:
+                if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                    tag2 = 6;
+                }
+                else{
+                    tag2 = 8;
+                }
+            break;
+            
+            case TAG_FAR:
+                if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                    tag2 = 11;
+                }
+                else{
+                    tag2 = 9;
+                }
+            break;
+
+            default: 
+                printf("wacky? Piece 2 tag selection is not valid\n");
+                return;
+            }
+        }
+        else{
+            switch(piece2PositionChooser.GetSelected())
+            {
+            case TAG_FRONT:
+                tag2 = 18;
+            break;
+            
+            case TAG_MIDDLE:
+                if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                    tag2 = 19;
+                }
+                else{
+                    tag2 = 17;
+                }
+            break;
+            
+            case TAG_FAR:
+                if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                    tag2 = 20;
+                }
+                else{
+                    tag2 = 22;
+                }
+            break;
+
+            default: 
+                printf("wacky? Piece 2 tag selection is not valid\n");
+                return;
+            }
+        }
+
+        int humanPlayerTag;
+
+        if(isRed){
+            if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                humanPlayerTag = 1;
+            }
+            else{
+                humanPlayerTag = 2;
+            }
+        }
+        else{
+            if(piece1PositionChooser.GetSelected() == TAG_LEFT){
+                humanPlayerTag = 13;
+            }
+            else{
+                humanPlayerTag = 12;
+            }
+        }
+
+        ScoreOnPole(tag1, piece1Height, piece1Left);
+        if(doPiece2)
+        {
+            HumanPlayerPickup(humanPlayerTag);
+            ScoreOnPole(tag2, piece2Height, piece2Left);
+        }
+
+        int endType = endChooser.GetSelected();
+        if(piece1PositionChooser.GetSelected() == TAG_CENTER)
+        {
+            endType = NONE;
+        }
+
+        switch (endType)
+        {
+        case GO_TO_CORAL_STATION:
+            HumanPlayerPickup(humanPlayerTag);
+            break;
+        case BACK_UP:
+            queue.AddTask(new ForkTask(
+                new SwerveDriveForTask(&pather,1.5,-1.0,0.0),
+                RetractFromDeliver()
+            ));
+            break;
+        case NONE:
+            queue.AddTask(RetractFromDeliver());
+            break;
+        default:
+            break;
+        }
+    }
+
+
+
+    //Emergencies only, no vision
     case AUTO_DRIVE_FORWARD_3S:
     {
         queue.AddTask(new SwerveDriveForTask(&pather, 3.0, 0.5, 0));
         queue.AddTask(new SwerveLockWheelsTask(&pather));
     }
         break;
+
+    //Emergencies only, no vision
     case AUTO_DRIVE_FORWARD_TROUGH:
     {
         TaskList* deploy3 = new TaskList();
