@@ -279,7 +279,7 @@ void Robot::TeleopPeriodic() {
         }
         else
         {
-            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.2, 0.2, 0.4));
+            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.2, 0.15, 0.4));
         }
     }
 
