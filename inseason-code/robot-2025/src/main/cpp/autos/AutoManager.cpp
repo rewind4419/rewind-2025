@@ -30,14 +30,14 @@ enum PiecePlacements
     L2_RIGHT,
     L4_LEFT,
     L4_RIGHT,
-    NONE
+    PLACEMENT_NONE
 };
 
 enum EndBehavior
 {
     GO_TO_CORAL_STATION,
     BACK_UP,
-    NONE
+    END_BEHAVIOR_NONE
 };
 
 void Robot::InitializeAutos()
@@ -60,12 +60,12 @@ void Robot::InitializeAutos()
     piece2Chooser.AddOption("Piece 2: L2 Left"       , L2_LEFT);
     piece2Chooser.AddOption("Piece 2: L4 Left"       , L4_LEFT);
     piece2Chooser.AddOption("Piece 2: L4 Right"      , L4_RIGHT );
-    piece2Chooser.AddOption("Piece 2: None"          , NONE );
+    piece2Chooser.AddOption("Piece 2: None"          , PLACEMENT_NONE );
     frc::SmartDashboard::PutData(&piece2Chooser);
 
     endChooser.SetDefaultOption("End: Return to coral station", GO_TO_CORAL_STATION);
     endChooser.AddOption("End: Back up for 1.5 seconds", BACK_UP);
-    endChooser.AddOption("End: None", NONE);
+    endChooser.AddOption("End: None", END_BEHAVIOR_NONE);
     frc::SmartDashboard::PutData(&endChooser);
 
     piece1PositionChooser.SetDefaultOption("Piece 1 Side: Center", TAG_CENTER);
@@ -287,7 +287,7 @@ void Robot::RunAuto()
         bool piece1Left = piece1Chooser.GetSelected() ==  L2_LEFT || piece1Chooser.GetSelected() ==  L4_LEFT;
         bool piece2Left = piece2Chooser.GetSelected() ==  L2_LEFT || piece2Chooser.GetSelected() ==  L4_LEFT;
 
-        bool doPiece2 = piece2Chooser.GetSelected() != NONE && piece1PositionChooser.GetSelected() != TAG_CENTER;
+        bool doPiece2 = piece2Chooser.GetSelected() != PLACEMENT_NONE && piece1PositionChooser.GetSelected() != TAG_CENTER;
 
         int tag1;
         int tag2;
@@ -426,13 +426,14 @@ void Robot::RunAuto()
         int endType = endChooser.GetSelected();
         if(piece1PositionChooser.GetSelected() == TAG_CENTER)
         {
-            endType = NONE;
+            endType = END_BEHAVIOR_NONE;
         }
 
         switch (endType)
         {
         case GO_TO_CORAL_STATION:
             HumanPlayerPickup(humanPlayerTag);
+            queue.AddTask(new SwerveLockWheelsTask(&pather));
             break;
         case BACK_UP:
             queue.AddTask(new ForkTask(
@@ -440,14 +441,15 @@ void Robot::RunAuto()
                 RetractFromDeliver()
             ));
             break;
-        case NONE:
+        case END_BEHAVIOR_NONE:
+            queue.AddTask(new SwerveLockWheelsTask(&pather));
             queue.AddTask(RetractFromDeliver());
             break;
         default:
             break;
         }
     }
-
+    break;
 
 
     //Emergencies only, no vision
