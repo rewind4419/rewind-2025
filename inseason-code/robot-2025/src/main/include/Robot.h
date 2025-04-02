@@ -69,6 +69,13 @@ public:
     TaskList* RetractFromDeliver();
 
     frc::SendableChooser<int> autoChooser;
+    frc::SendableChooser<int> piece1PositionChooser;
+    frc::SendableChooser<int> piece2PositionChooser;
+
+    frc::SendableChooser<int> piece1Chooser;
+    frc::SendableChooser<int> piece2Chooser;
+
+    frc::SendableChooser<int> endChooser;
 
     // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
     // ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
