@@ -141,7 +141,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     if (yourHighness == HEIGHT_L4) {L4offset = -0.04;}
 
     queue.AddTask(new SwerveWaypointTask(&pather, 
-        visionManager.TagToWorld(frc::Pose2d(0.528_m + L4offset * 1_m, leftTreeMul*0.156_m,0.0_rad),tagId)
+        visionManager.TagToWorld(frc::Pose2d(0.540_m + L4offset * 1_m, leftTreeMul*0.162_m,0.0_rad),tagId) //0.528 and 0.156
     ,1.5,0.05,0.03,3.5,3.0));
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
