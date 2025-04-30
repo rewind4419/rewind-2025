@@ -1,5 +1,8 @@
 # Notes
 
+BRILLIANT WORK CODE TEAM! 2025 AVR auton had a fantastic record of 19 out of 24 coral placed on L4.
+Note: appears the resolution for PV might have been set to lower resolution on practice day causing all the autos to fail. All missed were on the LEFT side of the reef perhaps caused by differences in the field elements.
+
 ## Guide
 
 - "- " to make a bullet point
