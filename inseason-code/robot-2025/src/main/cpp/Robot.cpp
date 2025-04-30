@@ -79,7 +79,7 @@ void Robot::TeleopPeriodic() {
             drive
             .WithVelocityX(-deadzone(driver.GetLeftY(), 0.1) * 5.7_mps * 2)
             .WithVelocityY(-deadzone(driver.GetLeftX(), 0.1) * 5.7_mps * 2)
-            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 0.75_rad_per_s * 4)
+            .WithRotationalRate(-deadzone(driver.GetRightX(), 0.1) * 1.00_rad_per_s * 4) //(was 0.75_rad_per_s)
         );
     }
     else

@@ -14,7 +14,7 @@
 
 //Elevator [TODO: implement all the safeties! only basic ones exist now]
 #define ELEVATOR_MIN 0
-#define ELEVATOR_FUNNEL 0.91 // Position to grab from funnel (was 1.5_tr)
+#define ELEVATOR_FUNNEL 0.80 // Position to grab from funnel (was 0.91_tr)
 #define ELEVATOR_IN_MAX 4.0 // Highest elevator can go when coral arm at 0
 #define ELEVATOR_SAFE_MAX 18 // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 
@@ -57,7 +57,7 @@
 #define CORAL_ARM_CLIMB 0.20
 
 // Measured in turns per second
-#define CORAL_ARM_INTAKE_SPEED 10
+#define CORAL_ARM_INTAKE_SPEED 14 //was 10
 #define CORAL_ARM_OUTTAKE_SPEED -12 //-10_tps then -15_tps
 #define CORAL_ARM_INTAKE_SPEED_ALGAE 20
 #define CORAL_ARM_OUTTAKE_SPEED_ALGAE -24 //-10_tps then -15_tps
