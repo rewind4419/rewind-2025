@@ -12,6 +12,10 @@
 
 ### Buttons
 
+- L2: Rotates climber wheels inwards
+    - Rotates left wheel clockwise, right wheel counterclockwise.
+      Hold to rotate
+
 - R1: Puts driving into "surgery mode"
     - In surgery mode, the bot moves and turns slower, allowing
       for finer adjustment and positioning via joysticks

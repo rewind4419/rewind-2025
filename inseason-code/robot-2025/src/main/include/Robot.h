@@ -2,7 +2,6 @@
 
 #include <frc/TimedRobot.h>
 
-#include "SwerveConstants.h"
 #include "SwerveDrivetrain.h"
 
 #include <frc/smartdashboard/Field2d.h>
@@ -37,8 +36,7 @@ public:
 
     VisionManager visionManager;
 
-    swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}
-    .WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
+    swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}.WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
 
     frc::Field2d m_field {};
     frc::FieldObject2d* m_object;
