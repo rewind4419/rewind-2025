@@ -299,6 +299,7 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new TargetStateTask(STATE_FUNNEL, &stateManager));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_FUNNEL, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
+            //queue.AddTask(new MotorPositionTask(hardware.flipper, FLIPPER_RETRACTED)); //Nethra: will potentially retract the funnel
             queue.AddTask(new CurrentStateTask(STATE_FUNNEL, &stateManager));
         }
     }
@@ -334,6 +335,18 @@ void Robot::TeleopPeriodic() {
     {
         visionManager.tagsAllowed = BLUE_REEF;
     }
+    // if (driver.GetL2Button()) //Nethra (for new climber wheels but does not work)
+    // {
+    //     hardware.wheels->SetMode(CTRL_VOLTAGE);
+    //     hardware.wheels->targetVoltage = 6;
+    //     hardware.wheels->targetPosition = hardware.wheels->motor.GetPosition().GetValueAsDouble();
+    // }
+    // if (driver.GetR2Button()) //Nethra (for new climber wheels but does not work)
+    // {
+    //     hardware.wheels->SetMode(CTRL_VOLTAGE);
+    //     hardware.wheels->targetVoltage = -6;
+    //     hardware.wheels->targetPosition = hardware.wheels->motor.GetPosition().GetValueAsDouble();
+    // }
 
     drivetrain.Periodic(false);
 

@@ -15,10 +15,11 @@ public:
     double elevatorDefaultEpsilon = 0.2;
 
     MotorController* arm;
-    double armDefaultEpsilon = 0.05;
+    double armDefaultEpsilon = 0.04;
     MotorController* wrist;
     double wristDefaultEpsilon = 0.06;
     MotorController* winch;
     MotorController* intake;
     MotorController* flipper;
+    // MotorController* wheels; //(Nethra)
 };

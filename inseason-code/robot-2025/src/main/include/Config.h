@@ -6,11 +6,12 @@
 #define CORAL_WRIST_MOTOR_ID 10 // Needs to be set, placeholder
 #define ELEVATOR_MOTOR_1_ID 3
 #define ELEVATOR_MOTOR_2_ID 4
-#define WINCH_MOTOR_ID 6
+#define WINCH_MOTOR_ID 6 //Nethra (new climber pivot)
 #define ALGAE_HANDLER_MOTOR_ID1 7
 #define ALGAE_HANDLER_MOTOR_ID2 8
 #define INTAKE_MOTOR_ID 9
-#define FUNNEL_FLIPPER_ID 12
+#define FUNNEL_FLIPPER_ID 12 //Nethra (new funnel)
+#define WINCH_WHEELS_ID 11 //(Nethra: new climber wheels)
 
 //Elevator [TODO: implement all the safeties! only basic ones exist now]
 #define ELEVATOR_MIN 0
@@ -33,8 +34,8 @@
 #define CORAL_WRIST_MAX 0.45
 #define CORAL_WRIST_INTAKING_MAX 0.025 // All 3 of these are arbitrary at the moment 
 
-#define CORAL_WRIST_EXTENDED 0.32 // was .25 3/30 mh
-#define CORAL_WRIST_EXTENDED_L4 0.32 // coral wrist extended, but just for L4
+#define CORAL_WRIST_EXTENDED 0.32 //was .25 3/30 mh
+#define CORAL_WRIST_EXTENDED_L4 0.32
 #define CORAL_WRIST_DELIVER_AUTO 0.26 //0.15
 #define CORAL_WRIST_DELIVER_AUTO_L4 0.18 //0.20
 #define CORAL_WRIST_CLIMB 0.2
@@ -65,4 +66,4 @@
 
 // Flipper
 #define FLIPPER_RETRACTED 0
-#define FLIPPER_EXTENDED 0.3
+#define FLIPPER_EXTENDED 0.3 //Need to make larger? (Nethra)

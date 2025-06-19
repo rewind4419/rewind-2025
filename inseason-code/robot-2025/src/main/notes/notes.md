@@ -34,56 +34,12 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 
 ## TODO List
 
-- IMPORTANT (after SDR To-do List):
-    - Fix vision!
-        - Especially for Auto!
-    - Fix code to exit Recovery Mode
-        - Find new button to exit Recovery Mode or Modify Circle code to exit Recovery Mode properly
-    - WINCH
-        - Create code so that the robot stays still after it climbed while it is enable
-
-- Notes cleanup and maintainment [Everyone] ***(CONTINUOUS)***
-    - ~~Create bindings.md for controller bindings~~
-    - Update bindings.md whenever controls are changed [Everyone] ***(CONTINUOUS)***
-        
-
-- Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
-    - ~~ Tune closed loop task to go at the target velocity, especially at low velocities~~
-    - ~~ Add point following with tasks that end after reaching goal or stalling~~
-    - ~~ Test navigation between multiple points with tasks~~
-    - Test larger scale waypoint nav, esp once camera is good angle
-    - Further tune PIDs
-    - Integrate vision
-
-- Wrist code
-    - ~~Switch wrist to use a position PID for everything~~
-    - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
-
-- Full driver code [Sherwin] ***(IN PROGRESS)***
-    - ~~Fix chassis control sensitivity~~
-    - Find out what controls we need
-    - Set heights
-
-- ~~PhotonVision integration [Sam]~~
-    - ~~Get new camera mount at 15 degrees~~
-        - ~~Change rotation value in auto.h~~
-    - ~~Find out what is needed for pather~~
-        - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
-    - ~~Clean up autonomousperiodic()~~
-        1. ~~Make all of it a function~~
-        2. ~~Make auto a subsystem~~
-    - ~~Measure camera rotation in rads~~
-    - ~~Tell the odometry whats its new pose is~~
-    
-
-- Wrist [Nethra]
-    - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
-    - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
-        - ~~(look at how its done in the CoralArm and Elevator and do the same for the coralwrist)~~
-    - ~~Joystick control using SetPositionProvider()~~
-
-Robot Efficiency [Nethra]
-    - controller up/down button does not move elevator/arm after pressing triangle
+- Fairbotics To-Do [Everyone] ***(IN PROGRESS)*** (wrote "Nethra" for places in code that need to be tested)
+    - Test code for coral delivery and adjust for new funnel [changing delivery height]
+    - Write code for button to run the climber wheels and test
+    - Test code for climber pivot (winch)
+    - Test code for funnel folding when we climb (flipper)
+        - Write code for funnel unfolding during auto
 
 ## Subsystems
 

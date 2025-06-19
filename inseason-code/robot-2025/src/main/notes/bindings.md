@@ -16,6 +16,10 @@
     - Rotates left wheel clockwise, right wheel counterclockwise.
       Hold to rotate
 
+- R2: Rotates climber wheels outwards?
+    - Rotates left wheel counterclockwise, right wheel clockwise.
+      Hold to rotate
+
 - R1: Puts driving into "surgery mode"
     - In surgery mode, the bot moves and turns slower, allowing
       for finer adjustment and positioning via joysticks
@@ -62,8 +66,12 @@
 
 - Square:
     - Moves the arm out to intaking position.
+    - Retracts funnel?
 
 - Share:
     - Cancels current running command.
+
+- Touchpad:
+    - Climbing Position: Pulls folder back, moves arm and wrist vertical
 
 --- 
