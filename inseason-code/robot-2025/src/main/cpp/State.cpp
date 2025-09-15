@@ -43,9 +43,9 @@ void StateManager::GoToDeliverHeight(Queue* queue, MotorController* elevator, Mo
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED));
         break;
     case HEIGHT_L4:
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_MID, true, 0.25));
-        queue->AddTask(new MotorPositionTask(arm, CORAL_ARM_TRANSIT, true, 0.025));
-        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_HIGH, true, 0.25));
+        // queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_MID, true, 0.25));
+        // queue->AddTask(new MotorPositionTask(arm, CORAL_ARM_TRANSIT, true, 0.025));
+        queue->AddTask(new MotorPositionTask(elevator, ELEVATOR_DELIVER_HIGH, false, 0.25));
         queue->AddTask(new MotorPositionTask(wrist, CORAL_WRIST_EXTENDED_L4));
         break;
     };
