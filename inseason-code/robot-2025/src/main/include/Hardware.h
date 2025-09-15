@@ -15,7 +15,7 @@ public:
     double elevatorDefaultEpsilon = 0.2;
 
     MotorController* arm;
-    double armDefaultEpsilon = 0.04;
+    double armDefaultEpsilon = 0.05;
     MotorController* wrist;
     double wristDefaultEpsilon = 0.06;
     MotorController* winch;
