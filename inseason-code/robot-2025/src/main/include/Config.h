@@ -3,14 +3,14 @@
 //Motor IDs
 #define CORAL_INTAKE_MOTOR_ID 1
 #define CORAL_ARM_MOTOR_ID 5
-#define CORAL_WRIST_MOTOR_ID 10 // Needs to be set, placeholder
+#define CORAL_WRIST_MOTOR_ID 10
 #define ELEVATOR_MOTOR_1_ID 3
 #define ELEVATOR_MOTOR_2_ID 4
 #define WINCH_MOTOR_ID 6 //Nethra (new climber pivot)
 #define ALGAE_HANDLER_MOTOR_ID1 7
 #define ALGAE_HANDLER_MOTOR_ID2 8
 #define INTAKE_MOTOR_ID 9
-#define FUNNEL_FLIPPER_ID 12 //Nethra (new funnel)
+#define FUNNEL_PULLEY_ID 12 //Nethra (new funnel)
 #define WINCH_WHEELS_ID 11 //(Nethra: new climber wheels)
 
 //Elevator [TODO: implement all the safeties! only basic ones exist now]

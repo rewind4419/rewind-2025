@@ -69,10 +69,10 @@ Hardware::Hardware()
     wristConfig.CurrentLimits.SupplyCurrentLimit = 40_A;
     wristConfig.CurrentLimits.SupplyCurrentLowerLimit = 40_A;
 
-    wristConfig.Feedback.SensorToMechanismRatio = 57.143; //37.5
+    wristConfig.Feedback.SensorToMechanismRatio = 37.5;
 
     wristConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
-    wristConfig.MotorOutput.Inverted = InvertedValue::CounterClockwise_Positive;
+    wristConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
 
 
     wrist = new MotorController(CORAL_WRIST_MOTOR_ID, wristConfig, CORAL_WRIST_MIN, CTRL_PID_POSITION_MOTION_MAGIC);
@@ -104,29 +104,29 @@ Hardware::Hardware()
 
     intake = new MotorController(CORAL_INTAKE_MOTOR_ID, intakeConfig, 0.0, CTRL_PID_VELOCITY);
 
-    // TalonFXConfiguration wheelConfig; //(Nethra: climber wheels config)
+    TalonFXConfiguration pulleyConfig;
 
-    // wheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    // wheelConfig.CurrentLimits.StatorCurrentLimit = 80_A;
-    // wheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    // wheelConfig.CurrentLimits.SupplyCurrentLimit = 20_A;
-    // wheelConfig.CurrentLimits.SupplyCurrentLowerLimit = 20_A;
+    pulleyConfig.Slot0.kP = 3.5;
 
-    // wheelConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
-    // wheelConfig.Slot0.kP = 0.3;
+    pulleyConfig.Feedback.SensorToMechanismRatio = 5.0;
 
-    // wheels = new MotorController(WINCH_WHEELS_ID, wheelConfig, 0.0, CTRL_PID_VELOCITY);
+    pulleyConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
+    pulleyConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
 
-    TalonFXConfiguration flipperConfig;
+    pulley = new MotorController(FUNNEL_PULLEY_ID, pulleyConfig, 0.0, CTRL_PID_POSITION);
 
-    flipperConfig.Slot0.kP = 3.5;
+    TalonFXConfiguration wheelsConfig;
 
-    flipperConfig.Feedback.SensorToMechanismRatio = 5.0;
+    wheelsConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    wheelsConfig.CurrentLimits.StatorCurrentLimit = 80_A;
+    wheelsConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    wheelsConfig.CurrentLimits.SupplyCurrentLimit = 20_A;
+    wheelsConfig.CurrentLimits.SupplyCurrentLowerLimit = 20_A;
 
-    flipperConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
-    flipperConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
+    wheelsConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
+    wheelsConfig.Slot0.kP = 0.3;
 
-    flipper = new MotorController(FUNNEL_FLIPPER_ID, flipperConfig, 0.0, CTRL_PID_POSITION);
+    wheels = new MotorController(WINCH_WHEELS_ID, wheelsConfig, 0.0, CTRL_PID_VELOCITY);
 }
 
 void Hardware::Update()
@@ -142,9 +142,9 @@ void Hardware::Update()
 
     intake->Update();
 
-    flipper->Update();
+    pulley->Update();
 
-    // wheels->Update(); //(Nethra)
+    wheels->Update();
 }
 
 Hardware::~Hardware()
@@ -160,7 +160,7 @@ Hardware::~Hardware()
 
     delete intake;
 
-    delete flipper;
+    delete pulley;
 
-    // delete wheels; //(Nethra)
+    delete wheels;
 }

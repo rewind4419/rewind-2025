@@ -20,6 +20,6 @@ public:
     double wristDefaultEpsilon = 0.06;
     MotorController* winch;
     MotorController* intake;
-    MotorController* flipper;
-    // MotorController* wheels; //(Nethra)
+    MotorController* pulley;
+    MotorController* wheels;
 };

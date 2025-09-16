@@ -34,12 +34,11 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 
 ## TODO List
 
-- Fairbotics To-Do [Everyone] ***(IN PROGRESS)*** (wrote "Nethra" for places in code that need to be tested)
-    - Test code for coral delivery and adjust for new funnel [changing delivery height]
-    - Write code for button to run the climber wheels and test
-    - Test code for climber pivot (winch)
-    - Test code for funnel folding when we climb (flipper)
-        - Write code for funnel unfolding during auto
+- Climber wheels
+    - Create controls
+- Funnel pulley
+    - Create controls
+- Vision
 
 ## Subsystems
 
@@ -48,6 +47,7 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 - Arm
 - Climber
 - Algae Handler
+- Funnel
 
 ## Notes during SDR
 
