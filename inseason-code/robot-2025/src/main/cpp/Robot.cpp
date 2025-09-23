@@ -29,6 +29,7 @@ void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("Wrist Pos", hardware.wrist->motor.GetPosition().GetValueAsDouble());
     frc::SmartDashboard::PutNumber("Elevator Pos", hardware.elevator->motor.GetPosition().GetValueAsDouble());
     frc::SmartDashboard::PutNumber("Arm Pos", hardware.arm->motor.GetPosition().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("Pulley Pos", hardware.pulley->motor.GetPosition().GetValueAsDouble());
 
     frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
@@ -127,7 +128,7 @@ void Robot::TeleopPeriodic() {
     }
     else
     {
-        hardware.winch->SetMode(CTRL_PID_POSITION);
+        hardware.pulley->SetMode(CTRL_PID_POSITION);
     }
 
     if (stateManager.currentState != STATE_ALGAE)
@@ -153,6 +154,7 @@ void Robot::TeleopPeriodic() {
         else if (stateManager.targetState == STATE_FUNNEL)
         {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED))
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon));
@@ -161,7 +163,7 @@ void Robot::TeleopPeriodic() {
         else if (stateManager.targetState == STATE_CLIMB)
         {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
-            // queue.AddTask(new MotorPositionTask(hardware.funnel, FLIPPER_RETRACTED));
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN));
             queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
@@ -179,6 +181,7 @@ void Robot::TeleopPeriodic() {
                 new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
             ));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, false, hardware.elevatorDefaultEpsilon));
+            // queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_INTAKE, false));
             queue.AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
         }
     }
@@ -300,7 +303,7 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new TargetStateTask(STATE_FUNNEL, &stateManager));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_FUNNEL, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_FUNNEL, true, hardware.wristDefaultEpsilon));
-            //queue.AddTask(new MotorPositionTask(hardware.funnel, FLIPPER_RETRACTED)); //Nethra: will potentially retract the funnel
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED)); //Nethra: will potentially retract the funnel
             queue.AddTask(new CurrentStateTask(STATE_FUNNEL, &stateManager));
         }
     }
@@ -310,7 +313,7 @@ void Robot::TeleopPeriodic() {
         if (stateManager.targetState == STATE_NEUTRAL)
         {
             queue.AddTask(new TargetStateTask(STATE_CLIMB, &stateManager));
-            // queue.AddTask(new MotorPositionTask(hardware.funnel, FLIPPER_EXTENDED));
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_RETRACTED));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_CLIMB));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_CLIMB));
             queue.AddTask(new CurrentStateTask(STATE_CLIMB, &stateManager));

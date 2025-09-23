@@ -6,5 +6,3 @@
 
 #include "Hardware.h"
 #include "State.h"
-
-

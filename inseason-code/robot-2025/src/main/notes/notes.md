@@ -34,11 +34,11 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 
 ## TODO List
 
-- Climber wheels
-    - Create controls
 - Funnel pulley
-    - Create controls
+    - Create controls, find positions, set position at start of round/auto period, lower funnel during auto (IN PROGRESS - Sam)
 - Vision
+    - Find new camera position
+    - Adjust settings
 
 ## Subsystems
 
