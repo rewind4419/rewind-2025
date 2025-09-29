@@ -54,8 +54,10 @@ void Robot::TeleopInit() {
         }
     }
 
+    hardware.pulley->SetTargetPosition(FLIPPER_STARTPOS);
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
     hardware.intake->SetTargetVelocity(0.0);
+
     // drivetrain.GetPigeon2().SetYaw(0_deg,1_s);
 
     frc::SmartDashboard::PutNumber("Manual Height", ELEVATOR_MIN);
@@ -128,7 +130,7 @@ void Robot::TeleopPeriodic() {
     }
     else
     {
-        hardware.pulley->SetMode(CTRL_PID_POSITION);
+        hardware.winch->SetMode(CTRL_PID_POSITION);
     }
 
     if (stateManager.currentState != STATE_ALGAE)
@@ -149,12 +151,13 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED));
             queue.AddTask(new CurrentStateTask(STATE_NEUTRAL, &stateManager));
         }
         else if (stateManager.targetState == STATE_FUNNEL)
         {
             queue.AddTask(new TargetStateTask(STATE_NEUTRAL, &stateManager));
-            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED))
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED));
             queue.AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_MIN, true, hardware.armDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, true, hardware.elevatorDefaultEpsilon));
             queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_MIN, true, hardware.wristDefaultEpsilon));
@@ -178,10 +181,10 @@ void Robot::TeleopPeriodic() {
             queue.AddTask(new CustomTask([this] {stateManager.height = HEIGHT_ZERO; return true;}));
             queue.AddTask(new ForkTask(
                 new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon),
-                new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, true, hardware.wristDefaultEpsilon)
+                new MotorPositionTask(hardware.wrist, CORAL_WRIST_EXTENDED, false, hardware.wristDefaultEpsilon) // Change false back to true later
             ));
             queue.AddTask(new MotorPositionTask(hardware.elevator, ELEVATOR_MIN, false, hardware.elevatorDefaultEpsilon));
-            // queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_INTAKE, false));
+            queue.AddTask(new MotorPositionTask(hardware.pulley, FLIPPER_EXTENDED, false));
             queue.AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
         }
     }
@@ -344,11 +347,9 @@ void Robot::TeleopPeriodic() {
         hardware.wheels->SetMode(CTRL_VOLTAGE);
         hardware.wheels->targetVoltage = 6;
         hardware.wheels->targetPosition = hardware.wheels->motor.GetPosition().GetValueAsDouble();
-    }
-    if (driver.GetR2Button()) //Nethra (for new climber wheels but does not work)
+    } else 
     {
-        hardware.wheels->SetMode(CTRL_VOLTAGE);
-        hardware.wheels->targetVoltage = -6;
+        hardware.wheels->SetMode(CTRL_PID_POSITION);
         hardware.wheels->targetPosition = hardware.wheels->motor.GetPosition().GetValueAsDouble();
     }
 

@@ -72,7 +72,7 @@ Hardware::Hardware()
     wristConfig.Feedback.SensorToMechanismRatio = 37.5;
 
     wristConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
-    wristConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
+    wristConfig.MotorOutput.Inverted = InvertedValue::CounterClockwise_Positive;
 
 
     wrist = new MotorController(CORAL_WRIST_MOTOR_ID, wristConfig, CORAL_WRIST_MIN, CTRL_PID_POSITION_MOTION_MAGIC);
@@ -113,7 +113,7 @@ Hardware::Hardware()
     pulleyConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
     pulleyConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
 
-    pulley = new MotorController(FUNNEL_PULLEY_ID, pulleyConfig, 0.0, CTRL_PID_POSITION);
+    pulley = new MotorController(FUNNEL_PULLEY_ID, pulleyConfig, FLIPPER_STARTPOS, CTRL_PID_POSITION);
 
     TalonFXConfiguration wheelsConfig;
 

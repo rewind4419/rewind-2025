@@ -35,12 +35,7 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 ## TODO List
 
 - Funnel pulley
-    - Create a reset button (IN PROGRESS - Nethra)
-    - find positions (IN PROGRESS - Sam)
-    - set position at start of round/auto period
-        - Positioning for the beginning of the match
-        - lower funnel during auto to receive coral
-        - raise funnel during endgame to climb
+    - Create a reset button (IN PROGRESS - Nethra) (Please use FLIPPER_STARTPOS as the position to go to when resetting -Sam)
 - Vision
     - Find new camera position
     - Adjust settings
