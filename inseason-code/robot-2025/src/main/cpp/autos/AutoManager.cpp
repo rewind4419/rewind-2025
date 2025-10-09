@@ -122,6 +122,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     break;
     }
     deploy4->AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon));
+    deploy4->AddTask(new MotorPositionTask(hardware.wrist, 0.436, true));
     deploy4->AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
 
     double leftTreeMul = 1.0;
@@ -201,7 +202,7 @@ void Robot::HumanPlayerPickup(int tagId)
         new ForkTask(
             new SwerveWaypointTask(&pather, 
                 visionManager.TagToWorld(frc::Pose2d(0.5_m, 0_m, M_PI * 1_rad), tagId)
-            ,4.0,0.08,0.05,4.0,2.0),
+            ,4.0,0.18,0.05,4.0,2.0),
             humanPlayerDeploy
         )
     );

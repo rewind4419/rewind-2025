@@ -113,7 +113,7 @@ Hardware::Hardware()
     pulleyConfig.MotorOutput.Inverted = InvertedValue::Clockwise_Positive;
     pulleyConfig.MotorOutput.NeutralMode = NeutralModeValue::Brake;
 
-    pulley = new MotorController(FUNNEL_PULLEY_ID, pulleyConfig, FLIPPER_STARTPOS, CTRL_PID_POSITION);
+    pulley = new MotorController(FUNNEL_PULLEY_ID, pulleyConfig, FLIPPER_EXTENDED, CTRL_PID_POSITION);
 
     TalonFXConfiguration wheelsConfig;
 

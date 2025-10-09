@@ -54,7 +54,7 @@ void Robot::TeleopInit() {
         }
     }
 
-    hardware.pulley->SetTargetPosition(FLIPPER_STARTPOS);
+    hardware.pulley->SetTargetPosition(FLIPPER_EXTENDED);
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
     hardware.intake->SetTargetVelocity(0.0);
 
@@ -279,11 +279,11 @@ void Robot::TeleopPeriodic() {
     {
         if (stateManager.height != HEIGHT_L4)
         {
-            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.3, CORAL_WRIST_TROUGH, 0.4));
+            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.3, CORAL_WRIST_TROUGH, 0.5));
         }
         else
         {
-            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.2, 0.15, 0.4));
+            hardware.wrist->SetTargetPosition(clamp(CORAL_WRIST_EXTENDED - mate.GetRightY() * 0.2, 0.15, 0.5));
         }
     }
 

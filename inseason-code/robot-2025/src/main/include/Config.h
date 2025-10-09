@@ -65,6 +65,5 @@
 #define CORAL_ARM_IDLE_SPEED 5
 
 // Flipper
-#define FLIPPER_STARTPOS 0
-#define FLIPPER_EXTENDED -1.4 //Need to make larger? (Nethra)
-#define FLIPPER_RETRACTED 1.0
+#define FLIPPER_EXTENDED 0 //Need to make larger? (Nethra)
+#define FLIPPER_RETRACTED -2.3
