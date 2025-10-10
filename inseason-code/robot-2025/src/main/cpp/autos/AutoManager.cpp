@@ -202,7 +202,7 @@ void Robot::HumanPlayerPickup(int tagId)
         new ForkTask(
             new SwerveWaypointTask(&pather, 
                 visionManager.TagToWorld(frc::Pose2d(0.5_m, 0_m, M_PI * 1_rad), tagId)
-            ,4.0,0.18,0.05,4.0,2.0),
+            ,4.0,0.08,0.05,4.0,2.0),
             humanPlayerDeploy
         )
     );
