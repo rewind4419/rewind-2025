@@ -119,13 +119,13 @@ void Robot::TeleopPeriodic() {
     if (mate.GetR1Button())
     {
         hardware.winch->SetMode(CTRL_VOLTAGE);
-        hardware.winch->targetVoltage = -12;
+        hardware.winch->targetVoltage = -6;
         hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
     }
     else if (mate.GetL1Button())
     {
         hardware.winch->SetMode(CTRL_VOLTAGE);
-        hardware.winch->targetVoltage = 12;
+        hardware.winch->targetVoltage = 6;
         hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
     }
     else

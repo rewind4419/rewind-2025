@@ -15,7 +15,7 @@
 
 //Elevator [TODO: implement all the safeties! only basic ones exist now]
 #define ELEVATOR_MIN 0
-#define ELEVATOR_FUNNEL 0.80 // Position to grab from funnel (was 0.91_tr)
+#define ELEVATOR_FUNNEL 0.78 // Position to grab from funnel (was 0.91_tr)
 #define ELEVATOR_IN_MAX 4.0 // Highest elevator can go when coral arm at 0
 #define ELEVATOR_SAFE_MAX 18 // Highest elevator can go when we are at CORAL_ARM_MIN_SAFE or higher
 

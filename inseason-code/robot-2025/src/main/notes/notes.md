@@ -3,6 +3,9 @@
 BRILLIANT WORK CODE TEAM! 2025 AVR auton had a fantastic record of 19 out of 24 coral placed on L4.
 Note: appears the resolution for PV might have been set to lower resolution on practice day causing all the autos to fail. All missed were on the LEFT side of the reef perhaps caused by differences in the field elements.
 
+BRILLIANT WORK CODE TEAM! 2025 AVR auton had a fantastic record of 19 out of 24 coral placed on L4.
+Note: appears the resolution for PV might have been set to lower resolution on practice day causing all the autos to fail. All missed were on the LEFT side of the reef perhaps caused by differences in the field elements.
+
 ## Guide
 
 - "- " to make a bullet point
@@ -32,13 +35,62 @@ Note: appears the resolution for PV might have been set to lower resolution on p
 ## Bugs
 - Vision update only runs when disabled (i removed from auto for reasons), implement an updateVision function for auto
 
+## Bugs
+- Vision update only runs when disabled (i removed from auto for reasons), implement an updateVision function for auto
+
 ## TODO List
 
-- Funnel pulley
-    - Create a reset button (IN PROGRESS - Nethra) (Please use FLIPPER_STARTPOS as the position to go to when resetting -Sam)
-- Vision
-    - Find new camera position
-    - Adjust settings
+- IMPORTANT (after SDR To-do List):
+    - Fix vision!
+        - Especially for Auto!
+    - Make improved auto paths
+    - Fix code to exit Recovery Mode
+        - Find new button to exit Recovery Mode or Modify Circle code to exit Recovery Mode properly
+    - WINCH
+        - Create code so that the robot stays still after it climbed while it is enable
+
+- Notes cleanup and maintainment [Everyone] ***(CONTINUOUS)***
+    - ~~Create bindings.md for controller bindings~~
+    - Update bindings.md whenever controls are changed [Everyone] ***(CONTINUOUS)***
+        
+
+- Make swervepather not absolutely garbage [Sherwin] ***(IN PROGRESS)***
+    - ~~ Tune closed loop task to go at the target velocity, especially at low velocities~~
+    - ~~ Add point following with tasks that end after reaching goal or stalling~~
+    - ~~ Test navigation between multiple points with tasks~~
+    - Test larger scale waypoint nav, esp once camera is good angle
+    - Further tune PIDs
+    - Integrate vision
+
+- Wrist code
+    - ~~Switch wrist to use a position PID for everything~~
+    - Set zero on init using the rev encoder (Waiting for the REV encoder to get wired)
+
+- Full driver code [Sherwin] ***(IN PROGRESS)***
+    - ~~Fix chassis control sensitivity~~
+    - Find out what controls we need
+    - Set heights
+
+- ~~PhotonVision integration [Sam]~~
+    - ~~Get new camera mount at 15 degrees~~
+        - ~~Change rotation value in auto.h~~
+    - ~~Find out what is needed for pather~~
+        - ~~Figure out how to access the Pose3d from the returned EstimatedRobotPose~~
+    - ~~Clean up autonomousperiodic()~~
+        1. ~~Make all of it a function~~
+        2. ~~Make auto a subsystem~~
+    - ~~Measure camera rotation in rads~~
+    - ~~Tell the odometry whats its new pose is~~
+    
+
+- Wrist [Nethra]
+    - Find positions for wrist (not enough time since the robot was preoccupied most of the time for changing the winch)
+    - Add positions to the buttons (not enough time since the robot was preoccupied most of the time for changing the winch)
+        - ~~(look at how its done in the CoralArm and Elevator and do the same for the coralwrist)~~
+    - ~~Joystick control using SetPositionProvider()~~
+
+Robot Efficiency [Nethra]
+    - controller up/down button does not move elevator/arm after pressing triangle
 
 ## Subsystems
 

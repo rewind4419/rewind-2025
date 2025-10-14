@@ -142,8 +142,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     if (yourHighness == HEIGHT_L4) {L4offset = -0.04;}
 
     queue.AddTask(new SwerveWaypointTask(&pather, 
-        visionManager.TagToWorld(frc::Pose2d(0.600_m + L4offset * 1_m, leftTreeMul*0.162_m,0.0_rad),tagId) // WAS 0.518 instead of 0.6
-
+        visionManager.TagToWorld(frc::Pose2d(0.540_m + L4offset * 1_m, leftTreeMul*0.162_m,0.0_rad),tagId) //0.528 and 0.156
     ,1.5,0.05,0.03,3.5,3.0));
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
@@ -167,7 +166,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     //     new SwerveDriveForTask(&pather, 0.3, -1.0, 0.0)
     // ));
     queue.AddTask(
-        new MotorVelocityTask(hardware.intake, CORAL_ARM_INTAKE_SPEED)
+        new MotorVelocityTask(hardware.intake, CORAL_ARM_OUTTAKE_SPEED)
     );
 
     TaskList* stopIntaking = new TaskList();
