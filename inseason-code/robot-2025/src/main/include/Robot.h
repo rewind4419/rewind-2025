@@ -1,40 +1,82 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #pragma once
 
-#include <optional>
-
 #include <frc/TimedRobot.h>
-#include <frc2/command/CommandPtr.h>
 
-#include "RobotContainer.h"
+#include "SwerveDrivetrain.h"
+
+#include <frc/smartdashboard/Field2d.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
+#include <frc/PS4Controller.h>
+
+#include "queue/Queue.h"
+#include "queue/StandardTasks.h"
+#include "queue/FrcTasks.h"
+
+#include "util/Controller.h"
+
+#include "Hardware.h"
+#include "State.h"
+#include "SwervePather.h"
+#include "Vision.h"
 
 class Robot : public frc::TimedRobot {
- public:
-  Robot();
-  void RobotPeriodic() override;
-  void DisabledInit() override;
-  void DisabledPeriodic() override;
-  void DisabledExit() override;
-  void AutonomousInit() override;
-  void AutonomousPeriodic() override;
-  void AutonomousExit() override;
-  void TeleopInit() override;
-  void TeleopPeriodic() override;
-  void TeleopExit() override;
-  void TestInit() override;
-  void TestPeriodic() override;
-  void TestExit() override;
+public:
+    Queue queue;
 
- private:
-  std::optional<frc2::CommandPtr> m_autonomousCommand;
+    StateManager stateManager;
 
-  RobotContainer m_container;
+    SwerveDrivetrain drivetrain {TunerConstants::CreateDrivetrain()};
+    Hardware hardware;
 
-  // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
-  // ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
-  // ctre::phoenix6::hardware::CANcoder bl {10, "Default Name"};
-  // ctre::phoenix6::hardware::CANcoder br {11, "Default Name"};
+    Controller driver {0};
+    Controller mate {1};
+
+    SwervePather pather {&drivetrain};
+
+    VisionManager visionManager;
+
+    swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}.WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
+
+    frc::Field2d m_field {};
+    frc::FieldObject2d* m_object;
+
+    bool visionEnabled = false;
+
+    Robot();
+    void RobotPeriodic() override;
+    void DisabledInit() override;
+    void DisabledPeriodic() override;
+    void DisabledExit() override;
+    void AutonomousInit() override;
+    void AutonomousPeriodic() override;
+    void AutonomousExit() override;
+    void TeleopInit() override;
+    void TeleopPeriodic() override;
+    void TeleopExit() override;
+    void TestInit() override;
+    void TestPeriodic() override;
+    void TestExit() override;
+
+    // These two functions are in AutoManager.cpp
+    void InitializeAutos();
+    void RunAuto();
+
+    void ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftTree = false, bool retractDuringDriveaway = false);
+    void HumanPlayerPickup(int tagId);
+    TaskList* RetractFromDeliver();
+
+    frc::SendableChooser<int> autoChooser;
+    frc::SendableChooser<int> piece1PositionChooser;
+    frc::SendableChooser<int> piece2PositionChooser;
+
+    frc::SendableChooser<int> piece1Chooser;
+    frc::SendableChooser<int> piece2Chooser;
+
+    frc::SendableChooser<int> endChooser;
+
+    // ctre::phoenix6::hardware::CANcoder fl {8, "Default Name"};
+    // ctre::phoenix6::hardware::CANcoder fr {9, "Default Name"};
+    // ctre::phoenix6::hardware::CANcoder bl {10, "Default Name"};
+    // ctre::phoenix6::hardware::CANcoder br {11, "Default Name"};
 };
