@@ -20,6 +20,12 @@ Robot::Robot() {
     InitializeAutos();
 
     visionManager.Init();
+    
+    // Initialize tunable auto parameters
+    autoParams.InitializeParameters();
+    
+    // Add button to reset auto parameters to defaults
+    frc::SmartDashboard::PutBoolean("Auto/ResetToDefaults", false);
 
     frc::SmartDashboard::PutNumber("Test Arm", 0.35);
     frc::SmartDashboard::PutNumber("Test Wrist", 0.3);
@@ -397,13 +403,22 @@ void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {
     visionManager.updRoutine();
     
+    // Update auto parameters from NetworkTables for real-time tuning
+    autoParams.UpdateFromNetworkTables();
+    
+    // Check if user wants to reset parameters to defaults
+    if (frc::SmartDashboard::GetBoolean("Auto/ResetToDefaults", false)) {
+        autoParams.ResetToDefaults();
+        frc::SmartDashboard::PutBoolean("Auto/ResetToDefaults", false);  // Reset the button
+    }
+    
     if (visionManager.optionalVisionEstimate.has_value()){
         auto autoPose = visionManager.optionalVisionEstimate.value().estimatedPose.ToPose2d();
         //drivetrain.SamplePoseAt(visionManager.optional.value().timestamp).value().Rotation()
         auto visionPose = frc::Pose2d(autoPose.X(),autoPose.Y(),0.0_rad);
         // printf("Yes, going to %f, %f, %f\n",visionPose.X().value(), visionPose.Y().value(),visionPose.Rotation().Radians().value());
         drivetrain.ResetPose(autoPose);
-        // drivetrain.AddVisionMeasurement(visionPose, visionManager.optional.value().timestamp);
+        // drivetrain.AddVisionMeasurement(visionPose, visionManager.optional.value.timestamp);
     }
 
     drivetrain.Periodic();
