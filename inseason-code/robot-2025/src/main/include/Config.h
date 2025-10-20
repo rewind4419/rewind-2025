@@ -38,7 +38,7 @@
 #define CORAL_WRIST_EXTENDED_L4 0.32
 #define CORAL_WRIST_DELIVER_AUTO 0.26 //0.15
 #define CORAL_WRIST_DELIVER_AUTO_L4 0.18 //0.20
-#define CORAL_WRIST_CLIMB 0.2
+#define CORAL_WRIST_CLIMB 0.55
 #define CORAL_WRIST_TROUGH 0.075
 
 #define CORAL_WRIST_ALGAE 0.17
@@ -55,7 +55,7 @@
 #define CORAL_ARM_ALGAE 0.43
 #define CORAL_ARM_PLACE 0.4
  // Arbitrary
-#define CORAL_ARM_CLIMB 0.20
+#define CORAL_ARM_CLIMB 0.35
 
 // Measured in turns per second
 #define CORAL_ARM_INTAKE_SPEED 14 //was 10

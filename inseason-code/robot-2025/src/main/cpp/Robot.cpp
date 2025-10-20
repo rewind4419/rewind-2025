@@ -119,13 +119,13 @@ void Robot::TeleopPeriodic() {
     if (mate.GetR1Button())
     {
         hardware.winch->SetMode(CTRL_VOLTAGE);
-        hardware.winch->targetVoltage = -6;
+        hardware.winch->targetVoltage = -12;
         hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
     }
     else if (mate.GetL1Button())
     {
         hardware.winch->SetMode(CTRL_VOLTAGE);
-        hardware.winch->targetVoltage = 6;
+        hardware.winch->targetVoltage = 12;
         hardware.winch->targetPosition = hardware.winch->motor.GetPosition().GetValueAsDouble();
     }
     else
@@ -345,7 +345,7 @@ void Robot::TeleopPeriodic() {
     if (driver.GetL2Button()) //Nethra (for new climber wheels but does not work)
     {
         hardware.wheels->SetMode(CTRL_VOLTAGE);
-        hardware.wheels->targetVoltage = 6;
+        hardware.wheels->targetVoltage = 3;
         hardware.wheels->targetPosition = hardware.wheels->motor.GetPosition().GetValueAsDouble();
     } else 
     {

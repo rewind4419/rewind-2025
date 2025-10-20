@@ -138,7 +138,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
         deploy4
     });
 
-    double L4offset = 0.0;
+    double L4offset = 0.0; // FIXME+
     if (yourHighness == HEIGHT_L4) {L4offset = -0.04;}
 
     queue.AddTask(new SwerveWaypointTask(&pather, 
@@ -302,7 +302,7 @@ void Robot::RunAuto()
             break;
             
             case TAG_CENTER:
-                    tag1 = 10;
+                    tag1 = 10; // FIXME hack to tidal tag on reef practice field, change back to 10
             break;
             
             case TAG_RIGHT:
