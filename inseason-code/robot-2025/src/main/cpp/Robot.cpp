@@ -54,7 +54,7 @@ void Robot::TeleopInit() {
         }
     }
 
-    hardware.pulley->SetTargetPosition(FLIPPER_EXTENDED);
+    hardware.pulley->SetTargetPosition(FLIPPER_EXTENDED); // FIXME CHECK THIS LATER!!
     hardware.winch->SetTargetPosition(hardware.winch->motor.GetPosition().GetValueAsDouble());
     hardware.intake->SetTargetVelocity(0.0);
 

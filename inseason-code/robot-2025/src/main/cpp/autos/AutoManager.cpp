@@ -133,8 +133,8 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
 
     queue.AddTask(new ForkTask{
         new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(1.558_m, leftTreeMul * 0.156_m,0.0_rad),tagId)
-        ,3.0,0.15,0.03,3.5,2.0),
+            visionManager.TagToWorld(frc::Pose2d(0.9_m, leftTreeMul * 0.156_m,0.0_rad),tagId)
+        ,2.5,0.15,0.03,3.5,2.0),
         deploy4
     });
 
@@ -143,7 +143,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
 
     queue.AddTask(new SwerveWaypointTask(&pather, 
         visionManager.TagToWorld(frc::Pose2d(0.540_m + L4offset * 1_m, leftTreeMul*0.162_m,0.0_rad),tagId) //0.528 and 0.156
-    ,1.5,0.05,0.03,3.5,3.0));
+    ,0.5,0.05,0.03,1.0,3.0));
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
 
