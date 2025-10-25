@@ -1,5 +1,8 @@
 #include "Robot.h"
 #include "queue/SensorTasks.h"
+#include "queue/TimedTask.h"
+#include "queue/ConditionalTask.h"
+#include "util/AutoDebug.h"
 
 #include "Config.h"
 #include "AutoConstants.h"
@@ -143,7 +146,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
                 ), tagId)
             , autoParams.approach_max_velocity
             , autoParams.approach_position_tolerance
-            , autoParams.approach_velocity_tolerance
+            , 0.05
             , autoParams.approach_max_acceleration
             , autoParams.approach_max_velocity),
             autoParams.GetScaledWaypointTimeout(3.0)
@@ -165,7 +168,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
             ), tagId)
         , autoParams.scoring_max_velocity
         , autoParams.scoring_position_tolerance
-        , autoParams.scoring_velocity_tolerance
+        , 0.05
         , autoParams.scoring_max_acceleration
         , autoParams.scoring_max_velocity),
         autoParams.GetScaledWaypointTimeout(2.5)
@@ -272,17 +275,20 @@ void Robot::HumanPlayerPickup(int tagId)
 
     queue.AddTask(
         new ForkTask(
-            new SwerveWaypointTask(&pather, 
-                visionManager.TagToWorld(frc::Pose2d(
-                    AutoConstants::HUMAN_PLAYER_DISTANCE * 1_m, 
-                    0_m, 
-                    M_PI * 1_rad
-                ), tagId)
-            , autoParams.GetScaledWaypointTimeout(autoParams.human_player_speed)
-            , autoParams.human_player_position_tolerance
-            , autoParams.human_player_velocity_tolerance
-            , autoParams.human_player_max_velocity
-            , autoParams.human_player_max_acceleration),
+            new TimedTask(
+                new SwerveWaypointTask(&pather, 
+                    visionManager.TagToWorld(frc::Pose2d(
+                        AutoConstants::HUMAN_PLAYER_DISTANCE * 1_m, 
+                        0_m, 
+                        M_PI * 1_rad
+                    ), tagId)
+                , autoParams.human_player_max_velocity
+                , autoParams.human_player_position_tolerance
+                , 0.10
+                , autoParams.human_player_max_acceleration
+                , autoParams.human_player_max_velocity),
+                autoParams.GetScaledWaypointTimeout(3.0)
+            ),
             humanPlayerDeploy
         )
     );
