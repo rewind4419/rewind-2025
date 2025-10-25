@@ -1,6 +1,8 @@
 #include "Robot.h"
 
 #include "Config.h"
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 #include "util/maths.h"
 
@@ -29,6 +31,10 @@ Robot::Robot() {
 
     frc::SmartDashboard::PutNumber("Test Arm", 0.35);
     frc::SmartDashboard::PutNumber("Test Wrist", 0.3);
+
+    // Start WPILib datalog (creates .wpilog and mirrors to DS log)
+    frc::DataLogManager::Start();
+    frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 }
 
 void Robot::RobotPeriodic() {
