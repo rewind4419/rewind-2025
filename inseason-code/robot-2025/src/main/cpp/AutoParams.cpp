@@ -56,6 +56,14 @@ void AutoParams::UpdateFromNetworkTables() {
     enable_vision_correction = GetParam("EnableVisionCorrection", false);
     enable_backup_strategies = GetParam("EnableBackupStrategies", true);
     max_retry_attempts = GetParam("MaxRetryAttempts", 2.0);
+
+    // Sensor thresholds
+    acquire_current_threshold = GetParam("AcquireCurrentA", 22.0);
+    acquire_hold_time = GetParam("AcquireHoldS", 0.06);
+    acquire_timeout = GetParam("AcquireTimeoutS", 1.2);
+    release_current_drop = GetParam("ReleaseDropA", 8.0);
+    release_hold_time = GetParam("ReleaseHoldS", 0.05);
+    release_timeout = GetParam("ReleaseTimeoutS", 0.6);
 }
 
 void AutoParams::PublishToNetworkTables() const {
@@ -98,6 +106,14 @@ void AutoParams::PublishToNetworkTables() const {
     SetParam("EnableVisionCorrection", enable_vision_correction);
     SetParam("EnableBackupStrategies", enable_backup_strategies);
     SetParam("MaxRetryAttempts", max_retry_attempts);
+
+    // Sensor thresholds
+    SetParam("AcquireCurrentA", acquire_current_threshold);
+    SetParam("AcquireHoldS", acquire_hold_time);
+    SetParam("AcquireTimeoutS", acquire_timeout);
+    SetParam("ReleaseDropA", release_current_drop);
+    SetParam("ReleaseHoldS", release_hold_time);
+    SetParam("ReleaseTimeoutS", release_timeout);
 }
 
 void AutoParams::ResetToDefaults() {
@@ -209,6 +225,14 @@ void AutoParams::ValidateAndClampParameters() {
     
     // Clamp retry attempts
     max_retry_attempts = std::clamp(max_retry_attempts, 0.0, 5.0);
+
+    // Clamp sensor thresholds
+    acquire_current_threshold = std::clamp(acquire_current_threshold, 0.0, 80.0);
+    acquire_hold_time = std::clamp(acquire_hold_time, 0.0, 2.0);
+    acquire_timeout = std::clamp(acquire_timeout, 0.0, 3.0);
+    release_current_drop = std::clamp(release_current_drop, 0.0, 40.0);
+    release_hold_time = std::clamp(release_hold_time, 0.0, 2.0);
+    release_timeout = std::clamp(release_timeout, 0.0, 3.0);
 }
 
 void AutoParams::LogCurrentParameters() const {

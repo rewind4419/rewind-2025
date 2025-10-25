@@ -88,6 +88,15 @@ public:
     bool enable_backup_strategies = true;       // Fall back to simpler autos if vision fails
     double max_retry_attempts = 2.0;           // Number of times to retry failed actions
     
+    // Sensor-based acquire/release thresholds
+    double acquire_current_threshold = 22.0;   // Amps at intake indicating coral captured
+    double acquire_hold_time = 0.06;           // Seconds current must exceed threshold
+    double acquire_timeout = 1.2;              // Seconds to give up waiting for acquire
+
+    double release_current_drop = 8.0;         // Amps drop from baseline indicating release
+    double release_hold_time = 0.05;           // Seconds drop must persist
+    double release_timeout = 0.6;              // Seconds to give up waiting for release
+
     // =============================================================================
     // PUBLIC INTERFACE
     // =============================================================================
