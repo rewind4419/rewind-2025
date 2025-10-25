@@ -134,17 +134,20 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     }
 
     queue.AddTask(new ForkTask{
-        new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(
-                autoParams.GetAdjustedApproachDistance() * 1_m, 
-                leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m, 
-                0.0_rad
-            ), tagId)
-        , autoParams.GetScaledWaypointTimeout(AutoConstants::DEFAULT_APPROACH_SPEED)
-        , autoParams.approach_position_tolerance
-        , autoParams.approach_velocity_tolerance
-        , autoParams.approach_max_velocity
-        , autoParams.approach_max_acceleration),
+        new TimedTask(
+            new SwerveWaypointTask(&pather, 
+                visionManager.TagToWorld(frc::Pose2d(
+                    autoParams.GetAdjustedApproachDistance() * 1_m, 
+                    leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m, 
+                    0.0_rad
+                ), tagId)
+            , autoParams.approach_max_velocity
+            , autoParams.approach_position_tolerance
+            , autoParams.approach_velocity_tolerance
+            , autoParams.approach_max_acceleration
+            , autoParams.approach_max_velocity),
+            autoParams.GetScaledWaypointTimeout(3.0)
+        ),
         deploy4
     });
 
@@ -153,17 +156,20 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
         L4offset = autoParams.GetAdjustedL4Offset();
     }
 
-    queue.AddTask(new SwerveWaypointTask(&pather, 
-        visionManager.TagToWorld(frc::Pose2d(
-            (autoParams.GetAdjustedScoringDistance() + L4offset) * 1_m, 
-            leftTreeMul * AutoConstants::SCORING_SIDE_OFFSET * 1_m,  // Use scoring-specific side offset
-            0.0_rad
-        ), tagId)
-    , autoParams.GetScaledWaypointTimeout(autoParams.scoring_speed)
-    , autoParams.scoring_position_tolerance
-    , autoParams.scoring_velocity_tolerance
-    , autoParams.scoring_max_velocity
-    , autoParams.scoring_max_acceleration));
+    queue.AddTask(new TimedTask(
+        new SwerveWaypointTask(&pather, 
+            visionManager.TagToWorld(frc::Pose2d(
+                (autoParams.GetAdjustedScoringDistance() + L4offset) * 1_m, 
+                leftTreeMul * AutoConstants::SCORING_SIDE_OFFSET * 1_m,
+                0.0_rad
+            ), tagId)
+        , autoParams.scoring_max_velocity
+        , autoParams.scoring_position_tolerance
+        , autoParams.scoring_velocity_tolerance
+        , autoParams.scoring_max_acceleration
+        , autoParams.scoring_max_velocity),
+        autoParams.GetScaledWaypointTimeout(2.5)
+    ));
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
 
@@ -213,17 +219,20 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     }
     queue.AddTask(new ForkTask(
         releaseThenRetract,
-        new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(
-                AutoConstants::RETREAT_DISTANCE * 1_m, 
-                leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m,
-                0.0_rad
-            ), tagId)
-        , autoParams.GetScaledWaypointTimeout(AutoConstants::RETREAT_VELOCITY)
-        , AutoConstants::APPROACH_POSITION_TOLERANCE  // Use approach tolerances for retreat
-        , 0.1  // Slightly relaxed velocity tolerance for retreat
-        , AutoConstants::RETREAT_VELOCITY
-        , AutoConstants::RETREAT_ACCELERATION)
+        new TimedTask(
+            new SwerveWaypointTask(&pather, 
+                visionManager.TagToWorld(frc::Pose2d(
+                    AutoConstants::RETREAT_DISTANCE * 1_m, 
+                    leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m,
+                    0.0_rad
+                ), tagId)
+            , AutoConstants::RETREAT_VELOCITY
+            , AutoConstants::APPROACH_POSITION_TOLERANCE
+            , 0.1
+            , AutoConstants::RETREAT_ACCELERATION
+            , AutoConstants::RETREAT_VELOCITY),
+            autoParams.GetScaledWaypointTimeout(2.5)
+        )
     ));
     
 }
