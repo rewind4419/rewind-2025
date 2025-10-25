@@ -80,13 +80,8 @@ public:
     // =============================================================================
     
     // Performance vs reliability tradeoffs
-    bool enable_parallel_retraction = false;    // Retract mechanism during drive-away
     bool enable_adaptive_timing = false;        // Use mechanism feedback instead of fixed delays
-    bool enable_vision_correction = false;      // Use vision feedback for position correction
-    
-    // Fallback behavior
-    bool enable_backup_strategies = true;       // Fall back to simpler autos if vision fails
-    double max_retry_attempts = 2.0;           // Number of times to retry failed actions
+    double max_retry_attempts = 1.0;            // Number of times to retry failed actions (e.g., jiggle)
     
     // Sensor-based acquire/release thresholds
     double acquire_current_threshold = 22.0;   // Amps at intake indicating coral captured
@@ -96,6 +91,10 @@ public:
     double release_current_drop = 8.0;         // Amps drop from baseline indicating release
     double release_hold_time = 0.05;           // Seconds drop must persist
     double release_timeout = 0.6;              // Seconds to give up waiting for release
+
+    // Additional timing refinements
+    double release_presample_time = 0.10;      // Seconds to sample outtake current before detection
+    double l4_settle_time = 0.10;              // Seconds to settle at L4 before outtake
 
     // =============================================================================
     // PUBLIC INTERFACE

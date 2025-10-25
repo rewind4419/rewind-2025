@@ -51,11 +51,8 @@ void AutoParams::UpdateFromNetworkTables() {
     waypoint_timeout_multiplier = GetParam("WaypointTimeoutMultiplier", 1.0);
     
     // Strategy parameters
-    enable_parallel_retraction = GetParam("EnableParallelRetraction", false);
     enable_adaptive_timing = GetParam("EnableAdaptiveTiming", false);
-    enable_vision_correction = GetParam("EnableVisionCorrection", false);
-    enable_backup_strategies = GetParam("EnableBackupStrategies", true);
-    max_retry_attempts = GetParam("MaxRetryAttempts", 2.0);
+    max_retry_attempts = GetParam("MaxRetryAttempts", 1.0);
 
     // Sensor thresholds
     acquire_current_threshold = GetParam("AcquireCurrentA", 22.0);
@@ -64,6 +61,9 @@ void AutoParams::UpdateFromNetworkTables() {
     release_current_drop = GetParam("ReleaseDropA", 8.0);
     release_hold_time = GetParam("ReleaseHoldS", 0.05);
     release_timeout = GetParam("ReleaseTimeoutS", 0.6);
+    // Additional timing refinements
+    release_presample_time = GetParam("ReleasePresampleS", 0.10);
+    l4_settle_time = GetParam("L4SettleS", 0.10);
 }
 
 void AutoParams::PublishToNetworkTables() const {
@@ -101,10 +101,7 @@ void AutoParams::PublishToNetworkTables() const {
     SetParam("WaypointTimeoutMultiplier", waypoint_timeout_multiplier);
     
     // Strategy parameters
-    SetParam("EnableParallelRetraction", enable_parallel_retraction);
     SetParam("EnableAdaptiveTiming", enable_adaptive_timing);
-    SetParam("EnableVisionCorrection", enable_vision_correction);
-    SetParam("EnableBackupStrategies", enable_backup_strategies);
     SetParam("MaxRetryAttempts", max_retry_attempts);
 
     // Sensor thresholds
@@ -114,6 +111,8 @@ void AutoParams::PublishToNetworkTables() const {
     SetParam("ReleaseDropA", release_current_drop);
     SetParam("ReleaseHoldS", release_hold_time);
     SetParam("ReleaseTimeoutS", release_timeout);
+    SetParam("ReleasePresampleS", release_presample_time);
+    SetParam("L4SettleS", l4_settle_time);
 }
 
 void AutoParams::ResetToDefaults() {
@@ -151,11 +150,8 @@ void AutoParams::ResetToDefaults() {
     waypoint_timeout_multiplier = 1.0;
     
     // Reset strategy flags
-    enable_parallel_retraction = false;
     enable_adaptive_timing = false;
-    enable_vision_correction = false;
-    enable_backup_strategies = true;
-    max_retry_attempts = 2.0;
+    max_retry_attempts = 1.0;
     
     // Publish the defaults
     PublishToNetworkTables();
@@ -224,7 +220,7 @@ void AutoParams::ValidateAndClampParameters() {
     waypoint_timeout_multiplier = std::clamp(waypoint_timeout_multiplier, 0.1, 5.0);
     
     // Clamp retry attempts
-    max_retry_attempts = std::clamp(max_retry_attempts, 0.0, 5.0);
+    max_retry_attempts = std::clamp(max_retry_attempts, 0.0, 2.0);
 
     // Clamp sensor thresholds
     acquire_current_threshold = std::clamp(acquire_current_threshold, 0.0, 80.0);
@@ -233,6 +229,8 @@ void AutoParams::ValidateAndClampParameters() {
     release_current_drop = std::clamp(release_current_drop, 0.0, 40.0);
     release_hold_time = std::clamp(release_hold_time, 0.0, 2.0);
     release_timeout = std::clamp(release_timeout, 0.0, 3.0);
+    release_presample_time = std::clamp(release_presample_time, 0.0, 1.0);
+    l4_settle_time = std::clamp(l4_settle_time, 0.0, 0.5);
 }
 
 void AutoParams::LogCurrentParameters() const {
@@ -245,7 +243,6 @@ void AutoParams::LogCurrentParameters() const {
     std::cout << "  Side Offset Adjustment: " << side_offset_adjustment << std::endl;
     std::cout << "  L4 Offset Adjustment: " << l4_offset_adjustment << std::endl;
     std::cout << "  Auto Wrist Adjustment: " << auto_wrist_adjustment << std::endl;
-    std::cout << "  Parallel Retraction: " << (enable_parallel_retraction ? "Enabled" : "Disabled") << std::endl;
     std::cout << "  Adaptive Timing: " << (enable_adaptive_timing ? "Enabled" : "Disabled") << std::endl;
-    std::cout << "  Vision Correction: " << (enable_vision_correction ? "Enabled" : "Disabled") << std::endl;
+    std::cout << "  Max Retry Attempts: " << max_retry_attempts << std::endl;
 }
