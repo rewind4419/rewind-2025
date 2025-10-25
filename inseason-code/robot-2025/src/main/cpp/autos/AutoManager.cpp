@@ -217,19 +217,21 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     // Optional jiggle: only if adaptive timing is on and last release was a timeout
     if (autoParams.enable_adaptive_timing)
     {
-        TaskList* jiggle = new TaskList();
-        jiggle->AddTask(new DelayTask(0.10));
-        jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15, -0.5, 0.0));
-        jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15,  0.6, 0.0));
-        jiggle->AddTask(new CustomTask([](){ AutoDebug::RecordJiggleUsed(); return true; }));
+        // Only allow up to max_retry_attempts jiggles
+        for (int i = 0; i < static_cast<int>(autoParams.max_retry_attempts); i++) {
+            TaskList* jiggle = new TaskList();
+            jiggle->AddTask(new DelayTask(0.10));
+            jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15, -0.5, 0.0));
+            jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15,  0.6, 0.0));
+            jiggle->AddTask(new CustomTask([](){ AutoDebug::RecordJiggleUsed(); return true; }));
 
-        // We don't persist the last-release boolean; use the negative of LastReleaseDetected on dashboard
-        releaseThenRetract->AddTask(
-            new ConditionalTask(
-                [](){ return frc::SmartDashboard::GetBoolean("Auto/LastReleaseDetected", true) == false; },
-                jiggle
-            )
-        );
+            releaseThenRetract->AddTask(
+                new ConditionalTask(
+                    [](){ return frc::SmartDashboard::GetBoolean("Auto/LastReleaseDetected", true) == false; },
+                    jiggle
+                )
+            );
+        }
     }
     
 
