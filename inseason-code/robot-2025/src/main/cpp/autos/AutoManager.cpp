@@ -1,4 +1,5 @@
 #include "Robot.h"
+#include "queue/SensorTasks.h"
 
 #include "Config.h"
 #include "AutoConstants.h"
@@ -188,18 +189,30 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
         new MotorVelocityTask(hardware.intake, CORAL_ARM_OUTTAKE_SPEED)
     );
 
-    TaskList* stopIntaking = new TaskList();
-    stopIntaking->AddTask(new DelayTask(autoParams.score_outtake_delay));
-    stopIntaking->AddTask(new MotorVelocityTask(hardware.intake, 0));
+    TaskList* releaseThenRetract = new TaskList();
+    if (autoParams.enable_adaptive_timing)
+    {
+        releaseThenRetract->AddTask(new WaitForOuttakeReleaseTask(
+            hardware.intake,
+            autoParams.release_current_drop,
+            autoParams.release_hold_time,
+            autoParams.release_timeout
+        ));
+    }
+    else
+    {
+        releaseThenRetract->AddTask(new DelayTask(autoParams.score_outtake_delay));
+    }
+    releaseThenRetract->AddTask(new MotorVelocityTask(hardware.intake, 0));
     
 
     
     if (retractDuringDriveaway)
     {
-        stopIntaking->AddTask(RetractFromDeliver());
+        releaseThenRetract->AddTask(RetractFromDeliver());
     }
     queue.AddTask(new ForkTask(
-        stopIntaking,
+        releaseThenRetract,
         new SwerveWaypointTask(&pather, 
             visionManager.TagToWorld(frc::Pose2d(
                 AutoConstants::RETREAT_DISTANCE * 1_m, 
@@ -252,7 +265,19 @@ void Robot::HumanPlayerPickup(int tagId)
     queue.AddTask(new SwerveLockWheelsTask(&pather));
 
     queue.AddTask(new MotorVelocityTask(hardware.intake, CORAL_ARM_INTAKE_SPEED));
-    queue.AddTask(new DelayTask(autoParams.intake_delay));
+    if (autoParams.enable_adaptive_timing)
+    {
+        queue.AddTask(new WaitForIntakeAcquireTask(
+            hardware.intake,
+            autoParams.acquire_current_threshold,
+            autoParams.acquire_hold_time,
+            autoParams.acquire_timeout
+        ));
+    }
+    else
+    {
+        queue.AddTask(new DelayTask(autoParams.intake_delay));
+    }
 
     TaskList* humanPlayerRetract = new TaskList();
     
