@@ -179,6 +179,8 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     if (yourHighness == HEIGHT_L4)
     {
         queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_DELIVER_AUTO_L4, true, hardware.wristDefaultEpsilon));
+        // settle briefly at L4 before outtake
+        queue.AddTask(new DelayTask(autoParams.l4_settle_time));
     }
     else
     {
@@ -202,7 +204,8 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
             hardware.intake,
             autoParams.release_current_drop,
             autoParams.release_hold_time,
-            autoParams.release_timeout
+            autoParams.release_timeout,
+            autoParams.release_presample_time
         ));
     }
     else

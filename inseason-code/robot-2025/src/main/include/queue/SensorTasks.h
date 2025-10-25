@@ -50,14 +50,15 @@ public:
     double dropA;
     double holdTime;
     double timeout;
+    double presample;
 
     double start = 0.0;
     double sinceDrop = 0.0;
     double baselineA = 0.0;
     double minA = 0.0;
 
-    WaitForOuttakeReleaseTask(MotorController* in, double dropA_, double holdS, double timeoutS)
-        : intake(in), dropA(dropA_), holdTime(holdS), timeout(timeoutS) {}
+    WaitForOuttakeReleaseTask(MotorController* in, double dropA_, double holdS, double timeoutS, double presampleS = 0.0)
+        : intake(in), dropA(dropA_), holdTime(holdS), timeout(timeoutS), presample(presampleS) {}
 
     void Start() override {
         start = frc::Timer::GetFPGATimestamp().value();
@@ -67,6 +68,15 @@ public:
     }
     bool Loop() override {
         double now = frc::Timer::GetFPGATimestamp().value();
+        // presample window: ignore detection during presample to stabilize baseline
+        if ((now - start) < presample) {
+            // refresh baseline during presample window
+            double bi = intake->motor.GetStatorCurrent().GetValue().value();
+            baselineA = 0.7 * baselineA + 0.3 * bi; // simple smoothing to avoid spikes
+            if (bi < minA) minA = bi;
+            sinceDrop = now;
+            return false;
+        }
         double i = intake->motor.GetStatorCurrent().GetValue().value();
         if (i < minA) minA = i;
         bool dropped = (baselineA - i) >= dropA;
