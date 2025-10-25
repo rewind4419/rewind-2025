@@ -492,6 +492,23 @@ void Robot::RunAuto()
             }
         }
 
+        bool twoPieceSafe = false;
+        if (doPiece2)
+        {
+            twoPieceSafe = frc::SmartDashboard::GetBoolean("Auto/TwoPieceSafe", true);
+            AutoDebug::RecordTwoPieceSafe(twoPieceSafe);
+            if (twoPieceSafe)
+            {
+                autoParams.approach_max_velocity *= 0.65;
+                autoParams.approach_max_acceleration *= 0.65;
+                autoParams.scoring_max_velocity *= 0.60;
+                autoParams.scoring_max_acceleration *= 0.60;
+                autoParams.human_player_max_velocity *= 0.70;
+                autoParams.human_player_max_acceleration *= 0.70;
+                autoParams.scoring_position_tolerance = std::max(autoParams.scoring_position_tolerance, 0.07);
+            }
+        }
+
         ScoreOnPole(tag1, piece1Height, piece1Left);
         if(doPiece2)
         {
