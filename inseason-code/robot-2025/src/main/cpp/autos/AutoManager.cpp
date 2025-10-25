@@ -210,6 +210,24 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
         releaseThenRetract->AddTask(new DelayTask(autoParams.score_outtake_delay));
     }
     releaseThenRetract->AddTask(new MotorVelocityTask(hardware.intake, 0));
+
+    // Optional jiggle: only if adaptive timing is on and last release was a timeout
+    if (autoParams.enable_adaptive_timing)
+    {
+        TaskList* jiggle = new TaskList();
+        jiggle->AddTask(new DelayTask(0.10));
+        jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15, -0.5, 0.0));
+        jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15,  0.6, 0.0));
+        jiggle->AddTask(new CustomTask([](){ AutoDebug::RecordJiggleUsed(); return true; }));
+
+        // We don't persist the last-release boolean; use the negative of LastReleaseDetected on dashboard
+        releaseThenRetract->AddTask(
+            new ConditionalTask(
+                [](){ return frc::SmartDashboard::GetBoolean("Auto/LastReleaseDetected", true) == false; },
+                jiggle
+            )
+        );
+    }
     
 
     
