@@ -3,6 +3,7 @@
 #include "Config.h"
 #include <frc/DataLogManager.h>
 #include <wpi/DataLog.h>
+#include "util/AutoDebug.h"
 
 #include "util/maths.h"
 
@@ -380,6 +381,7 @@ void Robot::AutonomousInit() {
     hardware.intake->SetTargetVelocity(0.0);
     visionEnabled = false;
     queue.Clear();
+    AutoDebug::Reset();
     RunAuto();
 }
 
@@ -402,7 +404,7 @@ void Robot::AutonomousPeriodic() {
     hardware.Update();
 }
 
-void Robot::AutonomousExit() {}
+void Robot::AutonomousExit() { AutoDebug::PublishSummary(); }
 
 void Robot::DisabledInit() {}
 
