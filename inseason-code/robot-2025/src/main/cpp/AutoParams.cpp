@@ -55,7 +55,7 @@ void AutoParams::UpdateFromNetworkTables() {
     max_retry_attempts = GetParam("MaxRetryAttempts", 1.0);
 
     // Sensor thresholds
-    acquire_current_threshold = GetParam("AcquireCurrentA", 22.0);
+    acquire_current_threshold = GetParam("AcquireCurrentA", 15.0);
     acquire_hold_time = GetParam("AcquireHoldS", 0.06);
     acquire_timeout = GetParam("AcquireTimeoutS", 1.2);
     release_current_drop = GetParam("ReleaseDropA", 8.0);

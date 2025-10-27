@@ -84,7 +84,7 @@ public:
     double max_retry_attempts = 1.0;            // Number of times to retry failed actions (e.g., jiggle)
     
     // Sensor-based acquire/release thresholds
-    double acquire_current_threshold = 22.0;   // Amps at intake indicating coral captured
+    double acquire_current_threshold = 15.0;   // Amps at intake indicating coral captured
     double acquire_hold_time = 0.06;           // Seconds current must exceed threshold
     double acquire_timeout = 1.2;              // Seconds to give up waiting for acquire
 

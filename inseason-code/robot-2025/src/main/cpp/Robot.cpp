@@ -44,6 +44,10 @@ void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("Arm Pos", hardware.arm->motor.GetPosition().GetValueAsDouble());
     frc::SmartDashboard::PutNumber("Pulley Pos", hardware.pulley->motor.GetPosition().GetValueAsDouble());
 
+    // Intake currents for on-field tuning
+    frc::SmartDashboard::PutNumber("Auto/IntakeStatorA", hardware.intake->motor.GetStatorCurrent().GetValue().value());
+    frc::SmartDashboard::PutNumber("Auto/IntakeSupplyA", hardware.intake->motor.GetSupplyCurrent().GetValue().value());
+
     frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
 
@@ -413,6 +417,13 @@ void Robot::DisabledPeriodic() {
     
     // Update auto parameters from NetworkTables for real-time tuning
     autoParams.UpdateFromNetworkTables();
+
+    // Warn if acquire threshold is likely above practical supply-limited plateau
+    if (autoParams.acquire_current_threshold > 18.0) {
+        frc::SmartDashboard::PutString("Auto/Warning", "AcquireCurrentA may be above supply-limited current; detector may not trigger");
+    } else {
+        frc::SmartDashboard::PutString("Auto/Warning", "");
+    }
     
     // Check if user wants to reset parameters to defaults
     if (frc::SmartDashboard::GetBoolean("Auto/ResetToDefaults", false)) {
