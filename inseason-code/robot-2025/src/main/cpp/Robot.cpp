@@ -1,6 +1,9 @@
 #include "Robot.h"
 
 #include "Config.h"
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
+#include "util/AutoDebug.h"
 
 #include "util/maths.h"
 
@@ -20,9 +23,19 @@ Robot::Robot() {
     InitializeAutos();
 
     visionManager.Init();
+    
+    // Initialize tunable auto parameters
+    autoParams.InitializeParameters();
+    
+    // Add button to reset auto parameters to defaults
+    frc::SmartDashboard::PutBoolean("Auto/ResetToDefaults", false);
 
     frc::SmartDashboard::PutNumber("Test Arm", 0.35);
     frc::SmartDashboard::PutNumber("Test Wrist", 0.3);
+
+    // Start WPILib datalog (creates .wpilog and mirrors to DS log)
+    frc::DataLogManager::Start();
+    frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 }
 
 void Robot::RobotPeriodic() {
@@ -30,6 +43,10 @@ void Robot::RobotPeriodic() {
     frc::SmartDashboard::PutNumber("Elevator Pos", hardware.elevator->motor.GetPosition().GetValueAsDouble());
     frc::SmartDashboard::PutNumber("Arm Pos", hardware.arm->motor.GetPosition().GetValueAsDouble());
     frc::SmartDashboard::PutNumber("Pulley Pos", hardware.pulley->motor.GetPosition().GetValueAsDouble());
+
+    // Intake currents for on-field tuning
+    frc::SmartDashboard::PutNumber("Auto/IntakeStatorA", hardware.intake->motor.GetStatorCurrent().GetValue().value());
+    frc::SmartDashboard::PutNumber("Auto/IntakeSupplyA", hardware.intake->motor.GetSupplyCurrent().GetValue().value());
 
     frc::SmartDashboard::PutNumber("CurrentState", stateManager.currentState);
     frc::SmartDashboard::PutNumber("TargetState", stateManager.targetState);
@@ -368,6 +385,7 @@ void Robot::AutonomousInit() {
     hardware.intake->SetTargetVelocity(0.0);
     visionEnabled = false;
     queue.Clear();
+    AutoDebug::Reset();
     RunAuto();
 }
 
@@ -390,12 +408,28 @@ void Robot::AutonomousPeriodic() {
     hardware.Update();
 }
 
-void Robot::AutonomousExit() {}
+void Robot::AutonomousExit() { AutoDebug::PublishSummary(); }
 
 void Robot::DisabledInit() {}
 
 void Robot::DisabledPeriodic() {
     visionManager.updRoutine();
+    
+    // Update auto parameters from NetworkTables for real-time tuning
+    autoParams.UpdateFromNetworkTables();
+
+    // Warn if acquire threshold is likely above practical supply-limited plateau
+    if (autoParams.acquire_current_threshold > 18.0) {
+        frc::SmartDashboard::PutString("Auto/Warning", "AcquireCurrentA may be above supply-limited current; detector may not trigger");
+    } else {
+        frc::SmartDashboard::PutString("Auto/Warning", "");
+    }
+    
+    // Check if user wants to reset parameters to defaults
+    if (frc::SmartDashboard::GetBoolean("Auto/ResetToDefaults", false)) {
+        autoParams.ResetToDefaults();
+        frc::SmartDashboard::PutBoolean("Auto/ResetToDefaults", false);  // Reset the button
+    }
     
     if (visionManager.optionalVisionEstimate.has_value()){
         auto autoPose = visionManager.optionalVisionEstimate.value().estimatedPose.ToPose2d();
@@ -403,7 +437,7 @@ void Robot::DisabledPeriodic() {
         auto visionPose = frc::Pose2d(autoPose.X(),autoPose.Y(),0.0_rad);
         // printf("Yes, going to %f, %f, %f\n",visionPose.X().value(), visionPose.Y().value(),visionPose.Rotation().Radians().value());
         drivetrain.ResetPose(autoPose);
-        // drivetrain.AddVisionMeasurement(visionPose, visionManager.optional.value().timestamp);
+        // drivetrain.AddVisionMeasurement(visionPose, visionManager.optional.value.timestamp);
     }
 
     drivetrain.Periodic();

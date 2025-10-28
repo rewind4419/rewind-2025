@@ -1,6 +1,11 @@
 #include "Robot.h"
+#include "queue/SensorTasks.h"
+#include "queue/TimedTask.h"
+#include "queue/ConditionalTask.h"
+#include "util/AutoDebug.h"
 
 #include "Config.h"
+#include "AutoConstants.h"
 
 enum Autos
 {
@@ -122,7 +127,7 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     break;
     }
     deploy4->AddTask(new MotorPositionTask(hardware.arm, CORAL_ARM_EXTENDED, true, hardware.armDefaultEpsilon));
-    deploy4->AddTask(new MotorPositionTask(hardware.wrist, 0.436, true));
+    deploy4->AddTask(new MotorPositionTask(hardware.wrist, autoParams.GetAdjustedAutoWristPosition(), true));
     deploy4->AddTask(new CurrentStateTask(STATE_DELIVER, &stateManager));
 
     double leftTreeMul = 1.0;
@@ -132,18 +137,42 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     }
 
     queue.AddTask(new ForkTask{
-        new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(1.558_m, leftTreeMul * 0.156_m,0.0_rad),tagId)
-        ,3.0,0.15,0.03,3.5,2.0),
+        new TimedTask(
+            new SwerveWaypointTask(&pather, 
+                visionManager.TagToWorld(frc::Pose2d(
+                    autoParams.GetAdjustedApproachDistance() * 1_m, 
+                    leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m, 
+                    0.0_rad
+                ), tagId)
+            , autoParams.approach_max_velocity
+            , autoParams.approach_position_tolerance
+            , 0.05
+            , autoParams.approach_max_acceleration
+            , autoParams.approach_max_velocity),
+            autoParams.GetScaledWaypointTimeout(3.0)
+        ),
         deploy4
     });
 
     double L4offset = 0.0;
-    if (yourHighness == HEIGHT_L4) {L4offset = -0.04;}
+    if (yourHighness == HEIGHT_L4) {
+        L4offset = autoParams.GetAdjustedL4Offset();
+    }
 
-    queue.AddTask(new SwerveWaypointTask(&pather, 
-        visionManager.TagToWorld(frc::Pose2d(0.540_m + L4offset * 1_m, leftTreeMul*0.162_m,0.0_rad),tagId) //0.528 and 0.156
-    ,1.5,0.05,0.03,3.5,3.0));
+    queue.AddTask(new TimedTask(
+        new SwerveWaypointTask(&pather, 
+            visionManager.TagToWorld(frc::Pose2d(
+                (autoParams.GetAdjustedScoringDistance() + L4offset) * 1_m, 
+                leftTreeMul * AutoConstants::SCORING_SIDE_OFFSET * 1_m,
+                0.0_rad
+            ), tagId)
+        , autoParams.scoring_max_velocity
+        , autoParams.scoring_position_tolerance
+        , 0.05
+        , autoParams.scoring_max_acceleration
+        , autoParams.scoring_max_velocity),
+        autoParams.GetScaledWaypointTimeout(2.5)
+    ));
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
 
@@ -153,6 +182,8 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
     if (yourHighness == HEIGHT_L4)
     {
         queue.AddTask(new MotorPositionTask(hardware.wrist, CORAL_WRIST_DELIVER_AUTO_L4, true, hardware.wristDefaultEpsilon));
+        // settle briefly at L4 before outtake
+        queue.AddTask(new DelayTask(autoParams.l4_settle_time));
     }
     else
     {
@@ -169,21 +200,65 @@ void Robot::ScoreOnPole(int tagId, DeliverHeight yourHighness, bool scoreOnLeftT
         new MotorVelocityTask(hardware.intake, CORAL_ARM_OUTTAKE_SPEED)
     );
 
-    TaskList* stopIntaking = new TaskList();
-    stopIntaking->AddTask(new DelayTask(0.3));
-    stopIntaking->AddTask(new MotorVelocityTask(hardware.intake, 0));
+    TaskList* releaseThenRetract = new TaskList();
+    if (autoParams.enable_adaptive_timing)
+    {
+        releaseThenRetract->AddTask(new WaitForOuttakeReleaseTask(
+            hardware.intake,
+            autoParams.release_current_drop,
+            autoParams.release_hold_time,
+            autoParams.release_timeout,
+            autoParams.release_presample_time
+        ));
+    }
+    else
+    {
+        releaseThenRetract->AddTask(new DelayTask(autoParams.score_outtake_delay));
+    }
+    releaseThenRetract->AddTask(new MotorVelocityTask(hardware.intake, 0));
+
+    // Optional jiggle: only if adaptive timing is on and last release was a timeout
+    if (autoParams.enable_adaptive_timing)
+    {
+        // Only allow up to max_retry_attempts jiggles
+        for (int i = 0; i < static_cast<int>(autoParams.max_retry_attempts); i++) {
+            TaskList* jiggle = new TaskList();
+            jiggle->AddTask(new DelayTask(0.10));
+            jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15, -0.5, 0.0));
+            jiggle->AddTask(new SwerveDriveForTask(&pather, 0.15,  0.6, 0.0));
+            jiggle->AddTask(new CustomTask([](){ AutoDebug::RecordJiggleUsed(); return true; }));
+
+            releaseThenRetract->AddTask(
+                new ConditionalTask(
+                    [](){ return frc::SmartDashboard::GetBoolean("Auto/LastReleaseDetected", true) == false; },
+                    jiggle
+                )
+            );
+        }
+    }
     
 
     
     if (retractDuringDriveaway)
     {
-        stopIntaking->AddTask(RetractFromDeliver());
+        releaseThenRetract->AddTask(RetractFromDeliver());
     }
     queue.AddTask(new ForkTask(
-        stopIntaking,
-        new SwerveWaypointTask(&pather, 
-            visionManager.TagToWorld(frc::Pose2d(1.0_m, leftTreeMul*0.156_m,0.0_rad), tagId)
-        ,3.0,0.2,0.1,3.5,2.0)
+        releaseThenRetract,
+        new TimedTask(
+            new SwerveWaypointTask(&pather, 
+                visionManager.TagToWorld(frc::Pose2d(
+                    AutoConstants::RETREAT_DISTANCE * 1_m, 
+                    leftTreeMul * autoParams.GetAdjustedSideOffset() * 1_m,
+                    0.0_rad
+                ), tagId)
+            , AutoConstants::RETREAT_VELOCITY
+            , AutoConstants::APPROACH_POSITION_TOLERANCE
+            , 0.1
+            , AutoConstants::RETREAT_ACCELERATION
+            , AutoConstants::RETREAT_VELOCITY),
+            autoParams.GetScaledWaypointTimeout(2.5)
+        )
     ));
     
 }
@@ -200,21 +275,47 @@ void Robot::HumanPlayerPickup(int tagId)
 
     queue.AddTask(
         new ForkTask(
-            new SwerveWaypointTask(&pather, 
-                visionManager.TagToWorld(frc::Pose2d(0.5_m, 0_m, M_PI * 1_rad), tagId)
-            ,4.0,0.08,0.05,4.0,2.0),
+            new TimedTask(
+                new SwerveWaypointTask(&pather, 
+                    visionManager.TagToWorld(frc::Pose2d(
+                        AutoConstants::HUMAN_PLAYER_DISTANCE * 1_m, 
+                        0_m, 
+                        M_PI * 1_rad
+                    ), tagId)
+                , autoParams.human_player_max_velocity
+                , autoParams.human_player_position_tolerance
+                , 0.10
+                , autoParams.human_player_max_acceleration
+                , autoParams.human_player_max_velocity),
+                autoParams.GetScaledWaypointTimeout(3.0)
+            ),
             humanPlayerDeploy
         )
     );
 
     queue.AddTask(
-        new SwerveDriveForTask(&pather, 2, -0.5, 0.0)
+        new SwerveDriveForTask(&pather, 
+            AutoConstants::HUMAN_PLAYER_APPROACH_TIME, 
+            AutoConstants::HUMAN_PLAYER_BACKUP_SPEED, 
+            0.0)
     );
 
     queue.AddTask(new SwerveLockWheelsTask(&pather));
 
     queue.AddTask(new MotorVelocityTask(hardware.intake, CORAL_ARM_INTAKE_SPEED));
-    queue.AddTask(new DelayTask(0.2));
+    if (autoParams.enable_adaptive_timing)
+    {
+        queue.AddTask(new WaitForIntakeAcquireTask(
+            hardware.intake,
+            autoParams.acquire_current_threshold,
+            autoParams.acquire_hold_time,
+            autoParams.acquire_timeout
+        ));
+    }
+    else
+    {
+        queue.AddTask(new DelayTask(autoParams.intake_delay));
+    }
 
     TaskList* humanPlayerRetract = new TaskList();
     
@@ -227,7 +328,10 @@ void Robot::HumanPlayerPickup(int tagId)
 
     queue.AddTask(
         new ForkTask(
-            new SwerveDriveForTask(&pather, 0.5, 1.0, 0.0),
+            new SwerveDriveForTask(&pather, 
+                AutoConstants::HUMAN_PLAYER_RETREAT_TIME, 
+                AutoConstants::HUMAN_PLAYER_RETREAT_SPEED, 
+                0.0),
             humanPlayerRetract
         )
     );
@@ -417,6 +521,23 @@ void Robot::RunAuto()
             }
         }
 
+        bool twoPieceSafe = false;
+        if (doPiece2)
+        {
+            twoPieceSafe = frc::SmartDashboard::GetBoolean("Auto/TwoPieceSafe", true);
+            AutoDebug::RecordTwoPieceSafe(twoPieceSafe);
+            if (twoPieceSafe)
+            {
+                autoParams.approach_max_velocity *= 0.65;
+                autoParams.approach_max_acceleration *= 0.65;
+                autoParams.scoring_max_velocity *= 0.60;
+                autoParams.scoring_max_acceleration *= 0.60;
+                autoParams.human_player_max_velocity *= 0.70;
+                autoParams.human_player_max_acceleration *= 0.70;
+                autoParams.scoring_position_tolerance = std::max(autoParams.scoring_position_tolerance, 0.07);
+            }
+        }
+
         ScoreOnPole(tag1, piece1Height, piece1Left);
         if(doPiece2)
         {
@@ -438,7 +559,10 @@ void Robot::RunAuto()
             break;
         case BACK_UP:
             queue.AddTask(new ForkTask(
-                new SwerveDriveForTask(&pather,1.5,-1.0,0.0),
+                new SwerveDriveForTask(&pather,
+                    AutoConstants::BACKUP_SEQUENCE_TIME,
+                    AutoConstants::BACKUP_SEQUENCE_SPEED,
+                    0.0),
                 RetractFromDeliver()
             ));
             break;
@@ -456,7 +580,10 @@ void Robot::RunAuto()
     //Emergencies only, no vision
     case AUTO_DRIVE_FORWARD_3S:
     {
-        queue.AddTask(new SwerveDriveForTask(&pather, 3.0, 0.5, 0));
+        queue.AddTask(new SwerveDriveForTask(&pather, 
+            AutoConstants::EMERGENCY_DRIVE_TIME, 
+            AutoConstants::EMERGENCY_DRIVE_SPEED, 
+            0));
         queue.AddTask(new SwerveLockWheelsTask(&pather));
     }
         break;
@@ -479,12 +606,18 @@ void Robot::RunAuto()
 
         queue.AddTask(deploy3);
 
-        queue.AddTask(new SwerveDriveForTask(&pather, 6.0, 1.0, 0.0));
+        queue.AddTask(new SwerveDriveForTask(&pather, 
+            AutoConstants::EMERGENCY_TROUGH_DRIVE_TIME, 
+            AutoConstants::EMERGENCY_TROUGH_DRIVE_SPEED, 
+            0.0));
 
         queue.AddTask(new MotorVelocityTask(hardware.intake, CORAL_ARM_OUTTAKE_SPEED));
-        queue.AddTask(new DelayTask(2));
+        queue.AddTask(new DelayTask(AutoConstants::TROUGH_SCORE_DELAY));
 
-        queue.AddTask(new SwerveDriveForTask(&pather, 1.0, -1.0, 0.0));
+        queue.AddTask(new SwerveDriveForTask(&pather, 
+            AutoConstants::EMERGENCY_BACKUP_TIME, 
+            AutoConstants::EMERGENCY_BACKUP_SPEED, 
+            0.0));
 
         queue.AddTask(new MotorVelocityTask(hardware.intake, 0));
 

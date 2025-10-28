@@ -19,6 +19,7 @@
 #include "State.h"
 #include "SwervePather.h"
 #include "Vision.h"
+#include "AutoParams.h"
 
 class Robot : public frc::TimedRobot {
 public:
@@ -35,6 +36,7 @@ public:
     SwervePather pather {&drivetrain};
 
     VisionManager visionManager;
+    AutoParams autoParams;
 
     swerve::requests::FieldCentric drive = swerve::requests::FieldCentric{}.WithDriveRequestType(swerve::DriveRequestType::OpenLoopVoltage); // Use open-loop control for drive motors
 
